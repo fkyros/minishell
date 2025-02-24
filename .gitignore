@@ -4,3 +4,4 @@ a.out
 .vscode/
 minishell
 bin/
+.DS_Store
