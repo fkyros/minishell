@@ -24,6 +24,7 @@ int main(void)
 {
 	char 	*input;
 	char	**command;
+	char	**expanded;
 
 	while (1)
 	{
@@ -31,7 +32,10 @@ int main(void)
 		command = ft_split(input, ' ');	
 		free(input);
 		print_matrix(command);
+		expanded = expand(command);
+		print_matrix(expanded);
 		free_matrix(command);
+		free_matrix(expanded);
 	}
 	return (0);
 }

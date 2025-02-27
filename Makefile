@@ -6,7 +6,7 @@
 #    By: gade-oli <gade-oli@student.42madrid.c      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/29 18:28:42 by gade-oli          #+#    #+#              #
-#    Updated: 2024/10/29 18:39:00 by gade-oli         ###   ########.fr        #
+#    Updated: 2025/02/27 17:16:52 by gade-oli         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,8 @@ CFLAGS = -Wall -Wextra -Werror -lreadline -g
 LIBFT_DIR = megalibft/
 LIBFT = $(LIBFT_DIR)megalibft.a
 
-SRC = src/main.c 
+SRC =   src/main.c \
+		src/expander/env.c
 
 BIN = $(SRC:src/%.c=bin/%.o)
 
