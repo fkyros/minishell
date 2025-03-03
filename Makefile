@@ -1,64 +1,36 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: gade-oli <gade-oli@student.42madrid.c      +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/10/29 18:28:42 by gade-oli          #+#    #+#              #
-#    Updated: 2024/10/29 18:39:00 by gade-oli         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+CC = gcc
+CFLAGS = -Wall -Werror -Wextra
+LDFLAGS = -lreadline
 
-#colors-------------------------------------------------------------------------
+LIBFT_DIR = ./Libft
+SRC_DIR = ./src
 
-RED     = '\033[1;31m'
-GREEN   = '\033[1;32m'
-BLUE    = '\033[1;34m'
-RESET   = '\033[0;0m'
+SRCS = $(SRC_DIR)/cmdpath.c \
+       $(SRC_DIR)/main.c \
+       $(SRC_DIR)/parser_aux.c \
+       $(SRC_DIR)/parser.c \
+       $(SRC_DIR)/utils.c
 
-#variables----------------------------------------------------------------------
+OBJS = $(SRCS:.c=.o)
 
 NAME = minishell
 
-CC = gcc
-
-CFLAGS = -Wall -Wextra -Werror -lreadline -g
-
-LIBFT_DIR = megalibft/
-LIBFT = $(LIBFT_DIR)megalibft.a
-
-SRC = src/main.c 
-
-BIN = $(SRC:src/%.c=bin/%.o)
-
-#recipes------------------------------------------------------------------------
-
 all: $(NAME)
 
-$(LIBFT):
-	@echo $(BLUE)"compiling libft"$(RESET)
-	@make --directory=$(LIBFT_DIR) 
+$(NAME): $(OBJS)
+	@make -C $(LIBFT_DIR)
+	$(CC) $(OBJS) -o $(NAME) -L$(LIBFT_DIR) -lft $(LDFLAGS)
 
-bin/%.o: src/%.c
-	@echo $(BLUE)"compiling binaries..."$(RESET)
-	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $< -o $@ 
-
-$(NAME): $(LIBFT) $(BIN)
-	$(CC) $(BIN) $(CFLAGS) $(LIBFT) -o $@ 
-	@echo $(GREEN)"$(NAME) compiled!"$(RESET)
+%.o: %.c
+	$(CC) $(CFLAGS) -I$(SRC_DIR) -I$(LIBFT_DIR) -c $< -o $@
 
 clean:
-	@make clean --directory=$(LIBFT_DIR) 
-	rm -rf $(BIN)
-	@echo $(RED)"binaries deleted"$(RESET)
+	@rm -f $(OBJS)
+	@make clean -C $(LIBFT_DIR)
 
-fclean:	clean
-	@make fclean --directory=$(LIBFT_DIR) 
-	rm -rf $(NAME)
-	@echo $(RED)"$(NAME) deleted!"$(RESET)
+fclean: clean
+	@rm -f $(NAME)
 
-re:	fclean all
+re: fclean all
 
 .PHONY: all clean fclean re
