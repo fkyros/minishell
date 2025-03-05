@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Werror -Wextra
 LDFLAGS = -lreadline
 
-LIBFT_DIR = ./Libft
+LIBFT_DIR = ./libft
 SRC_DIR = ./src
 
 SRCS = $(SRC_DIR)/cmdpath.c \

@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-pid_t g_child_pid = 0;
+int	g_child_pid = 0;
 
 void	signal_handling(int sig)
 {
@@ -15,6 +15,23 @@ void	signal_handling(int sig)
 		rl_replace_line("", 0);
 		rl_redisplay();
 	}
+}
+
+char	*get_cwd(void)
+{
+	char	*cwd = malloc(2048);
+	if (!cwd)
+	{
+		perror("Error trying to assign memory for the current directory");
+		exit(1);
+	}
+	if (!getcwd(cwd, 2048))
+	{
+		perror("Error trying to obtain current directory");
+		free(cwd);
+		exit(1);
+	}
+	return (cwd);
 }
 
 static void	exec(char **cmd, char **env)
@@ -79,6 +96,8 @@ void	shell_start(char **args, char **env)
 int	main(int argc, char **argv, char **env)
 {
 	//REPL
+	
+	char	*cwd;
 	char	*line;
 	char	**args;
 
@@ -87,9 +106,11 @@ int	main(int argc, char **argv, char **env)
 
 	signal(SIGINT, signal_handling);
 	signal(SIGQUIT, SIG_IGN);
-	while (1)
+	cwd = get_cwd();
+        printf("%s > ", cwd);
+       	free(cwd);
+	while ((line = readline("funny shell > ")))
 	{
-		line = readline("funny shell > ");
 		if (!line)
 		{
 			printf("exit\n");
@@ -106,6 +127,9 @@ int	main(int argc, char **argv, char **env)
 			free_split(args);
 		}
 		free(line);
+		cwd = get_cwd();
+		printf("%s > ", cwd);
+		free(cwd);
 	}
 	return (EXIT_SUCCESS);
 }

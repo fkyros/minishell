@@ -11,7 +11,7 @@
 # include <signal.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-# include "../Libft/libft.h"
+# include "../libft/libft.h"
 
 // UTILS
 
