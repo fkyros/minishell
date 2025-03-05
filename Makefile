@@ -26,7 +26,7 @@ $(NAME): $(OBJS)
 
 clean:
 	@rm -f $(OBJS)
-	@make clean -C $(LIBFT_DIR)
+	@make fclean -C $(LIBFT_DIR)
 
 fclean: clean
 	@rm -f $(NAME)
