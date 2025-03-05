@@ -35,7 +35,6 @@ int main(void)
 		expanded = expand(command);
 		print_matrix(expanded);
 		free_matrix(command);
-		free_matrix(expanded);
 	}
 	return (0);
 }

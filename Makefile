@@ -23,13 +23,13 @@ NAME = minishell
 
 CC = gcc
 
-CFLAGS = -Wall -Wextra -Werror -lreadline -g
+CFLAGS = -Wall -Wextra -Werror -g
 
 LIBFT_DIR = megalibft/
 LIBFT = $(LIBFT_DIR)megalibft.a
 
 SRC =   src/main.c \
-		src/expander/env.c
+	src/expander/env.c
 
 BIN = $(SRC:src/%.c=bin/%.o)
 
@@ -44,10 +44,10 @@ $(LIBFT):
 bin/%.o: src/%.c
 	@echo $(BLUE)"compiling binaries..."$(RESET)
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $< -o $@ 
+	$(CC) -c $< -o $@ $(CFLAGS)
 
 $(NAME): $(LIBFT) $(BIN)
-	$(CC) $(BIN) $(CFLAGS) $(LIBFT) -o $@ 
+	$(CC) $(BIN) $(LIBFT) -o $@ $(CFLAGS) -lreadline
 	@echo $(GREEN)"$(NAME) compiled!"$(RESET)
 
 clean:
