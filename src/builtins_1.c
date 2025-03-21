@@ -47,12 +47,18 @@ void	builtin_cd(char **args)
 	}
 }
 
-void	builtin_pwd()
+void	builtin_pwd(void)
 {
+	char	*cwd;
 
+	cwd = get_cwd();
+	printf("%s\n", cwd);
+	free(cwd);
 }
 
+/*
 void	builtin_export()
 {
 
 }
+*/

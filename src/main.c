@@ -96,18 +96,18 @@ void	shell_start(char **args, char **env)
 	
 	else if (ft_strcmp(args[0], "cd") == 0)
 		builtin_cd(args);
-	/*
 	else if (ft_strcmp(args[0], "pwd") == 0)
 		builtin_pwd();
+	/*
 	else if (ft_strcmp(args[0], "export") == 0)
 		builtin_export();
 	else if (ft_strcmp(args[0], "unset") == 0)
 		builtin_unset();
-	else if (ft_strcmp(args[0], "env") == 0)
-		builtin_env();
-	else if (ft_strcmp(args[0], "exit") == 0)
-		builtin_exit();
 	*/
+	else if (ft_strcmp(args[0], "env") == 0)
+		builtin_env(env);
+	else if (ft_strcmp(args[0], "exit") == 0)
+		builtin_exit(args);
 	else
 		shell_exec(args, env);
 }

@@ -35,9 +35,16 @@ char	*build_full_path(char *path, char *cmd);
 char	*search_in_path(char **paths, char *cmd);
 char	*search_command(char *cmd, char **env);
 
+// SHELL UTILITIES
+
+char    *get_cwd(void);
+
 // BUILTINS
 
 void	builtin_echo(char **args);
 void    builtin_cd(char **args);
+void    builtin_pwd(void);
+void    builtin_env(char **env);
+void	builtin_exit(char **args);
 
 #endif

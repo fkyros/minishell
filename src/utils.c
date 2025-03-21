@@ -57,3 +57,34 @@ char	*ft_getenv(char *name, char **env)
 	}
 	return (NULL);
 }
+
+
+char	*ft_strtok(char *str, const char *delim)
+{
+	static char	*next_token = NULL;
+	char	*start;
+	char	*end;
+	if (str != NULL)
+		next_token = str;
+	if (next_token == NULL)
+		return (NULL);
+	start = next_token;
+	while (*start && ft_strchr(delim, *start))
+		start++;
+	if (*start == '\0')
+	{
+		next_token = NULL;
+		return (NULL);
+	}
+	end = start;
+	while (*end && !ft_strchr(delim, *end))
+		end++;
+	if (*end != '\0')
+	{
+		*end = '\0';
+		next_token = end + 1;
+	}
+	else
+		next_token = NULL;
+	return (start);
+}
