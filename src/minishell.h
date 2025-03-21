@@ -34,4 +34,10 @@ int	is_valid_path(char *cmd);
 char	*build_full_path(char *path, char *cmd);
 char	*search_in_path(char **paths, char *cmd);
 char	*search_command(char *cmd, char **env);
+
+// BUILTINS
+
+void	builtin_echo(char **args);
+void    builtin_cd(char **args);
+
 #endif

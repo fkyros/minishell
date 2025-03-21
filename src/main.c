@@ -43,13 +43,13 @@ static void	exec(char **cmd, char **env)
 
 	if (!cmd || !cmd[0])
 	{
-		ft_putendl_fd("Minishell: invalid command!", 2);
+		ft_putendl_fd("Minishell: invalid command!: ", 2);
 		exit(127);
 	}
 	path = search_command(cmd[0], env);
 	if (!path)
 	{
-		ft_putstr_fd("Minishell: command not found!", 2);
+		ft_putstr_fd("Minishell: command not found!: ", 2);
 		ft_putendl_fd(cmd[0], 2);
 		free_split(cmd);
 		exit(127);
@@ -71,7 +71,7 @@ void	shell_exec(char **args, char **env)
 	pid = fork();
 	if (pid < 0)
 	{
-		perror("Shell: failed");
+		perror("Minishell: failed");
 		return ;
 	}
 	else if (pid == 0)
@@ -91,9 +91,25 @@ void	shell_start(char **args, char **env)
 {
 	if (!args || !args[0])
 		return ;
-	//Builtin handling TO DO
+	if (ft_strcmp(args[0], "echo") == 0)
+		builtin_echo(args);
 	
-	shell_exec(args, env);
+	else if (ft_strcmp(args[0], "cd") == 0)
+		builtin_cd(args);
+	/*
+	else if (ft_strcmp(args[0], "pwd") == 0)
+		builtin_pwd();
+	else if (ft_strcmp(args[0], "export") == 0)
+		builtin_export();
+	else if (ft_strcmp(args[0], "unset") == 0)
+		builtin_unset();
+	else if (ft_strcmp(args[0], "env") == 0)
+		builtin_env();
+	else if (ft_strcmp(args[0], "exit") == 0)
+		builtin_exit();
+	*/
+	else
+		shell_exec(args, env);
 }
 
 int	main(int argc, char **argv, char **env)
@@ -123,10 +139,7 @@ int	main(int argc, char **argv, char **env)
 		{
 			add_history(line);
 			args = parse_command(line);
-			if (args[0] && !ft_strcmp(args[0], "cd"))
-				chdir(args[1]);
-			else
-				shell_start(args, env);
+			shell_start(args, env); //Already contains builtins
 			free_split(args);
 		}
 		free(line);
