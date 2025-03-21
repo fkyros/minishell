@@ -2,21 +2,6 @@
 
 int	g_child_pid = 0;
 
-void	signal_handling(int sig)
-{
-	(void)sig;
-	
-	if (g_child_pid > 0)
-		kill(g_child_pid, SIGINT);
-	else
-	{
-		ft_putstr_fd("\n", 1);
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-	}
-}
-
 char	*get_cwd(void)
 {
 	char	*cwd = malloc(2048);
@@ -32,6 +17,24 @@ char	*get_cwd(void)
 		exit(1);
 	}
 	return (cwd);
+}
+
+void	signal_handling(int sig)
+{
+	(void)sig;
+	char *cwd = get_cwd();
+
+	if (g_child_pid > 0)
+		kill(g_child_pid, SIGINT);
+	else
+	{
+		printf("%s > ", cwd);
+		ft_putstr_fd("\n", 1);
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+	}
+	free(cwd);
 }
 
 static void	exec(char **cmd, char **env)
