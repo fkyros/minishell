@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-int	g_child_pid = 0;
+pid_t	g_child_pid = 0;
 
 char	*get_cwd(void)
 {
@@ -65,7 +65,7 @@ void	shell_exec(char **args, char **env)
 {
 	pid_t	pid;
 	int	status;
-
+	
 	if (!args || !args[0])
 		return ;
 	pid = fork();
@@ -89,6 +89,13 @@ void	shell_exec(char **args, char **env)
 
 void	shell_start(char **args, char **env)
 {
+	/*
+	 * TESTING ARGS
+	*/
+	for (int i = 0; args[i]; i++) {
+		printf("ARG %d: %s\n", i, args[i]);
+	}
+	// -------------------
 	if (!args || !args[0])
 		return ;
 	if (ft_strcmp(args[0], "echo") == 0)
@@ -128,11 +135,13 @@ int	main(int argc, char **argv, char **env)
 	cwd = get_cwd();
         printf("%s > ", cwd);
        	free(cwd);
-	while ((line = readline("funny shell > ")))
+	while (1)
 	{
+		cwd = get_cwd();
+		line = readline("funny shell > ");
 		if (!line)
 		{
-			printf("exit\n");
+			printf("Minishell: exiting!\n");
 			break;
 		}
 		if (*line)
@@ -143,7 +152,6 @@ int	main(int argc, char **argv, char **env)
 			free_split(args);
 		}
 		free(line);
-		cwd = get_cwd();
 		printf("%s > ", cwd);
 		free(cwd);
 	}
