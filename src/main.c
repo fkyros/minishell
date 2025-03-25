@@ -71,7 +71,7 @@ void	shell_exec(char **args, char **env)
 	pid = fork();
 	if (pid < 0)
 	{
-		perror("Minishell: failed");
+		perror("Minishell: forking failed");
 		return ;
 	}
 	else if (pid == 0)
@@ -84,6 +84,8 @@ void	shell_exec(char **args, char **env)
 		g_child_pid = pid;
 		waitpid(pid, &status, 0);
 		g_child_pid = 0;
+		if (status != 0)
+			printf("Minishell: finished process with status %d\n", status);
 	}
 }
 
