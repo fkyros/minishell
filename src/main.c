@@ -94,31 +94,57 @@ void	shell_start(char **args, char **env)
 	/*
 	 * TESTING ARGS
 	*/
-	for (int i = 0; args[i]; i++) {
-		printf("ARG %d: %s\n", i, args[i]);
+	for (int z = 0; args[z]; z++) {
+		printf("ARG %d: %s\n", z, args[z]);
 	}
-	// -------------------
-	if (!args || !args[0])
+	// -------------------	
+	int	i;
+
+	i = 0;
+	if (!args || !args[i] || (parse_redirections(args) == -1))
 		return ;
-	if (ft_strcmp(args[0], "echo") == 0)
-		builtin_echo(args);
-	
-	else if (ft_strcmp(args[0], "cd") == 0)
-		builtin_cd(args);
-	else if (ft_strcmp(args[0], "pwd") == 0)
-		builtin_pwd();
-	/*
-	else if (ft_strcmp(args[0], "export") == 0)
-		builtin_export();
-	else if (ft_strcmp(args[0], "unset") == 0)
-		builtin_unset();
-	*/
-	else if (ft_strcmp(args[0], "env") == 0)
-		builtin_env(env);
-	else if (ft_strcmp(args[0], "exit") == 0)
-		builtin_exit(args);
-	else
-		shell_exec(args, env);
+	while (args[i])
+	{
+		if (ft_strcmp(args[i], "echo") == 0)
+		{
+			builtin_echo(args);
+			return ;
+		}
+		else if (ft_strcmp(args[i], "cd") == 0)
+		{
+			builtin_cd(args);
+			return ;
+		}
+		else if (ft_strcmp(args[i], "pwd") == 0)
+		{
+			builtin_pwd();
+			return ;
+		}
+		/*
+		else if (ft_strcmp(args[i], "export") == 0)
+		{
+			builtin_export();
+			return ;
+		}
+		else if (ft_strcmp(args[i], "unset") == 0)
+		{
+			builtin_unset();
+			return ;
+		}
+		*/
+		else if (ft_strcmp(args[i], "env") == 0)
+		{
+			builtin_env(env);
+			return ;
+		}
+		else if (ft_strcmp(args[i], "exit") == 0)
+		{
+			builtin_exit(args);
+			return ;
+		}
+		i++;
+	}
+	shell_exec(args, env);
 }
 
 int	main(int argc, char **argv, char **env)

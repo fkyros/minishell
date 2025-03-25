@@ -47,4 +47,8 @@ void    builtin_pwd(void);
 void    builtin_env(char **env);
 void	builtin_exit(char **args);
 
+// REDIRECTIONS
+
+int     parse_redirections(char **args);
+int     handle_pipe(char **args, int i);
 #endif

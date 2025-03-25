@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-// ECHO DONE!, CD, PWD, EXPORT
+// ECHO, CD, PWD, EXPORT
 
 void	builtin_echo(char **args)
 {
