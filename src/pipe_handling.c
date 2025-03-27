@@ -13,11 +13,7 @@ static int	create_pipe(int pipe_fds[2])
 static int	execute_pipe(char **args, int i, int pipe_fds[2])
 {
 	pid_t pid;
-	int	stdin_copy;
-	int	stdout_copy;
 
-	stdin_copy = dup(STDIN_FILENO);
-	stdout_copy = dup(STDOUT_FILENO);
 	pid = fork();
 	if (pid < 0)
 	{
@@ -38,10 +34,6 @@ static int	execute_pipe(char **args, int i, int pipe_fds[2])
 		close(pipe_fds[0]);
 		waitpid(pid, NULL, 0);
 	}
-	dup2(stdin_copy, STDIN_FILENO);
-	dup2(stdout_copy, STDOUT_FILENO);
-	close(stdin_copy);
-	close(stdout_copy);
 	return (0);
 }
 

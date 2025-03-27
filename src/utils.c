@@ -58,7 +58,30 @@ char	*ft_getenv(char *name, char **env)
 	return (NULL);
 }
 
+char    *get_cwd(void)
+{
+        char    *cwd = malloc(2048);
+        if (!cwd)
+        {
+                perror("Error trying to assign memory for the current directory");
+                exit(1);
+        }
+        if (!getcwd(cwd, 2048))
+        {
+                perror("Error trying to obtain current directory");
+                free(cwd);
+                exit(1);
+        }
+        return (cwd);
+}
 
+void	print_prompt(char *cwd)
+{
+	write(STDOUT_FILENO, cwd, strlen(cwd));
+	write(STDOUT_FILENO, " > ", 3);
+}
+
+/*
 char	*ft_strtok(char *str, const char *delim)
 {
 	static char	*next_token = NULL;
@@ -88,3 +111,4 @@ char	*ft_strtok(char *str, const char *delim)
 		next_token = NULL;
 	return (start);
 }
+*/

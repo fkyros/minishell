@@ -9,7 +9,7 @@ void	builtin_echo(char **args)
 
 	i = 1;
 	newline = 1;
-	if (args[1] && (ft_strcmp(args[1], "-n") == 0))
+	if (args[i] && (ft_strcmp(args[i], "-n") == 0))
 	{
 		newline = 0;
 		i++;
@@ -21,7 +21,7 @@ void	builtin_echo(char **args)
 			ft_putstr_fd(" ", 1);
 		i++;
 	}
-	if (newline == 1)
+	if (newline)
 		ft_putstr_fd("\n", 1);
 }
 

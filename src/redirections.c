@@ -5,10 +5,8 @@
 static int	handle_input(char **args, int i)
 {
 	int	fd;
-	int	stdin_copy;
 
 	fd = open(args[i + 1], O_RDONLY);
-	stdin_copy = dup(STDIN_FILENO);
 	if (fd < 0)
 	{
 		perror("Minishell: error trying to open file");
@@ -17,19 +15,15 @@ static int	handle_input(char **args, int i)
 	dup2(fd, STDIN_FILENO);
 	close(fd);
 	args[i] = NULL;
-	dup2(stdin_copy, STDIN_FILENO);
-	close(stdin_copy);
 	return (0);
 }
 
 static int	handle_heredoc(char **args, int i)
 {
 	int	pipe_fd[2];
-	int	stdin_copy;
 	char	*line;
 	size_t	len;
 
-	stdin_copy = dup(STDIN_FILENO);
 	if (pipe(pipe_fd) == -1)
 	{
 		perror("Minishell: error trying to create a pipe (heredoc)");
@@ -49,17 +43,13 @@ static int	handle_heredoc(char **args, int i)
 	dup2(pipe_fd[0], STDIN_FILENO);
 	close(pipe_fd[0]);
 	args[i] = NULL;
-	dup2(stdin_copy, STDIN_FILENO);
-	close(stdin_copy);
 	return (0);
 }
 
 static int	handle_output(char **args, int i)
 {
 	int	fd;
-	int	stdout_copy;
 
-	stdout_copy = dup(STDOUT_FILENO);
 	fd = open(args[i + 1], O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (fd < 0)
 	{
@@ -70,18 +60,14 @@ static int	handle_output(char **args, int i)
 	close(fd);
 	args[i] = NULL;
 	args[i + 1] = NULL;
-	dup2(stdout_copy, STDOUT_FILENO);
-	close(stdout_copy);
 	return (0);
 }
 
 static int	handle_append(char **args, int i)
 {
 	int	fd;
-	int	stdout_copy;
 
 	fd = open(args[i + 1], O_CREAT | O_WRONLY | O_APPEND, 0644);
-	stdout_copy = dup(STDOUT_FILENO);
 	if (fd < 0)
 	{
 		perror("Minishell: error trying to open file");
@@ -90,28 +76,34 @@ static int	handle_append(char **args, int i)
 	dup2(fd, STDOUT_FILENO);
 	close(fd);
 	args[i] = NULL;
-	dup2(stdout_copy, STDOUT_FILENO);
-	close(stdout_copy);
 	return (0);
 }
 
 int	parse_redirections(char **args)
 {
-	int	i = 0;
+	int	i;
+	int	status;
 
+	i = 0;
+	status = 0;
 	while (args[i])
 	{
 		if (ft_strcmp(args[i], "<") == 0)
-			return (handle_input(args, i));
+			status = handle_input(args, i);
 		else if (ft_strcmp(args[i], "<<") == 0)
-			return (handle_heredoc(args, i));
+			status = handle_heredoc(args, i);
 		else if (ft_strcmp(args[i], ">") == 0)
-			return (handle_output(args, i));
+			status = handle_output(args, i);
 		else if (ft_strcmp(args[i], ">>") == 0)
-			return (handle_append(args, i));
+			status = handle_append(args, i);
 		else if (ft_strcmp(args[i], "|") == 0)
-			return (handle_pipe(args, i));
-		i++;
+			status = handle_pipe(args, i);
+		if (status == -1)
+			return (-1);
+		if (args[i] == NULL)
+			i = 0;
+		else
+			i++;
 	}
 	return (0);
 }

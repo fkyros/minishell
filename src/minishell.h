@@ -38,6 +38,7 @@ char	*search_command(char *cmd, char **env);
 // SHELL UTILITIES
 
 char    *get_cwd(void);
+void	print_prompt(char *cwd);
 
 // BUILTINS
 

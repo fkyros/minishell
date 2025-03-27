@@ -2,23 +2,6 @@
 
 pid_t	g_child_pid = 0;
 
-char	*get_cwd(void)
-{
-	char	*cwd = malloc(2048);
-	if (!cwd)
-	{
-		perror("Error trying to assign memory for the current directory");
-		exit(1);
-	}
-	if (!getcwd(cwd, 2048))
-	{
-		perror("Error trying to obtain current directory");
-		free(cwd);
-		exit(1);
-	}
-	return (cwd);
-}
-
 void	signal_handling(int sig)
 {
 	(void)sig;
@@ -91,60 +74,70 @@ void	shell_exec(char **args, char **env)
 
 void	shell_start(char **args, char **env)
 {
-	/*
-	 * TESTING ARGS
-	*/
-	for (int z = 0; args[z]; z++) {
-		printf("ARG %d: %s\n", z, args[z]);
-	}
-	// -------------------	
+
+	// TESTING ARGS
+
+        for (int z = 0; args[z]; z++) {
+                printf("ARG %d: %s\n", z, args[z]);
+        }
+        // -------------------
 	int	i;
+	int	original_stdin;
+	int	original_stdout;
+	int	redir_status;
+	int	builtin_executed = 0;
 
 	i = 0;
-	if (!args || !args[i] || (parse_redirections(args) == -1))
+	if (!args || !args[i])
 		return ;
-	while (args[i])
+	original_stdin = dup(STDIN_FILENO);
+	original_stdout = dup(STDOUT_FILENO);
+	if (original_stdin == -1 || original_stdout == -1)
+	{
+		perror("Minishell: Error saving original descriptors");
+		return ;
+	}
+	redir_status = parse_redirections(args);
+	if (redir_status == -1)
+	{
+		dup2(original_stdin, STDIN_FILENO);
+		dup2(original_stdout, STDOUT_FILENO);
+		close(original_stdin);
+		close(original_stdout);
+		return ;
+	}
+	while (args[i] && !builtin_executed)
 	{
 		if (ft_strcmp(args[i], "echo") == 0)
 		{
 			builtin_echo(args);
-			return ;
+			builtin_executed = 1;
 		}
 		else if (ft_strcmp(args[i], "cd") == 0)
 		{
 			builtin_cd(args);
-			return ;
+			builtin_executed = 1;
 		}
 		else if (ft_strcmp(args[i], "pwd") == 0)
 		{
 			builtin_pwd();
-			return ;
+			builtin_executed = 1;
 		}
-		/*
-		else if (ft_strcmp(args[i], "export") == 0)
-		{
-			builtin_export();
-			return ;
-		}
-		else if (ft_strcmp(args[i], "unset") == 0)
-		{
-			builtin_unset();
-			return ;
-		}
-		*/
 		else if (ft_strcmp(args[i], "env") == 0)
 		{
 			builtin_env(env);
-			return ;
+			builtin_executed = 1;
 		}
 		else if (ft_strcmp(args[i], "exit") == 0)
-		{
 			builtin_exit(args);
-			return ;
-		}
 		i++;
 	}
-	shell_exec(args, env);
+	if (!builtin_executed)
+		shell_exec(args, env);
+	dup2(original_stdin, STDIN_FILENO);
+	dup2(original_stdout, STDOUT_FILENO);
+	close(original_stdin);
+	close(original_stdout);
 }
 
 int	main(int argc, char **argv, char **env)
@@ -161,11 +154,10 @@ int	main(int argc, char **argv, char **env)
 	signal(SIGINT, signal_handling);
 	signal(SIGQUIT, SIG_IGN);
 	cwd = get_cwd();
-        printf("%s > ", cwd);
-       	free(cwd);
+	printf("%s > ", cwd);
+	free(cwd);
 	while (1)
 	{
-		cwd = get_cwd();
 		line = readline("funny shell > ");
 		if (!line)
 		{
@@ -179,8 +171,9 @@ int	main(int argc, char **argv, char **env)
 			shell_start(args, env); //Already contains builtins
 			free_split(args);
 		}
-		free(line);
+		cwd = get_cwd();
 		printf("%s > ", cwd);
+		free(line);
 		free(cwd);
 	}
 	return (EXIT_SUCCESS);
