@@ -1,5 +1,6 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
+
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
@@ -12,6 +13,9 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "../libft/libft.h"
+
+# define COMMAND_NOT_FOUND 127
+# define COMMAND_NOT_EXECUTABLE 126
 
 // UTILS
 
@@ -52,4 +56,5 @@ void	builtin_exit(char **args);
 
 int     parse_redirections(char **args);
 int     handle_pipe(char **args, int i);
+
 #endif

@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../inc/minishell.h"
 
 static int	create_pipe(int pipe_fds[2])
 {

@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../inc/minishell.h"
 
 // ECHO, CD, PWD, EXPORT
 

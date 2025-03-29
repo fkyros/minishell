@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../inc/minishell.h"
 
 static char	*extract_token(const char *str, int *index)
 {

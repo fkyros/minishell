@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../inc/minishell.h"
 
 pid_t	g_child_pid = 0;
 
@@ -27,7 +27,7 @@ static void	exec(char **cmd, char **env)
 	if (!cmd || !cmd[0])
 	{
 		ft_putendl_fd("Minishell: invalid command!: ", 2);
-		exit(127);
+		exit(COMMAND_NOT_FOUND);
 	}
 	path = search_command(cmd[0], env);
 	if (!path)
@@ -35,13 +35,13 @@ static void	exec(char **cmd, char **env)
 		ft_putstr_fd("Minishell: command not found!: ", 2);
 		ft_putendl_fd(cmd[0], 2);
 		free_split(cmd);
-		exit(127);
+		exit(COMMAND_NOT_FOUND);
 	}
 	execve(path, cmd, env);
 	perror("Minishell: error");
 	free(path);
 	free_split(cmd);
-	exit(126);
+	exit(COMMAND_NOT_EXECUTABLE);
 }
 
 void	shell_exec(char **args, char **env)
@@ -58,10 +58,7 @@ void	shell_exec(char **args, char **env)
 		return ;
 	}
 	else if (pid == 0)
-	{
 		exec(args, env);
-		exit(127);
-	}
 	else
 	{
 		g_child_pid = pid;
