@@ -2,21 +2,21 @@
 
 // ECHO, CD, PWD, EXPORT
 
-void	builtin_echo(char **args)
+void	builtin_echo(char **args, int *arg_pos)
 {
 	int	i;
 	int	newline;
 
-	i = 1;
+	i = *arg_pos;
 	newline = 1;
-	if (args[i] && (ft_strcmp(args[i], "-n") == 0))
+	if (args[i + 1] && (ft_strcmp(args[i + 1], "-n") == 0))
 	{
 		newline = 0;
 		i++;
 	}
 	while (args[i])
 	{
-		ft_putstr_fd(args[i], 1);
+		ft_putstr_fd(args[i + 1], 1);
 		if (args[i + 1])
 			ft_putstr_fd(" ", 1);
 		i++;
@@ -25,11 +25,11 @@ void	builtin_echo(char **args)
 		ft_putstr_fd("\n", 1);
 }
 
-void	builtin_cd(char **args)
+void	builtin_cd(char **args, int *arg_pos)
 {
 	char	*home;
 
-	if (!args[1])
+	if (!args[*arg_pos + 1])
 	{
 		home = getenv("HOME");
 		if (home)
@@ -42,7 +42,7 @@ void	builtin_cd(char **args)
 	}
 	else
 	{
-		if (chdir(args[1]) != 0)
+		if (chdir(args[*arg_pos + 1]) != 0)
 			perror("An error has ocurred while trying to use 'cd'");
 	}
 }

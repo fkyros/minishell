@@ -20,12 +20,12 @@ void	builtin_env(char **env)
 	}
 }
 
-void	builtin_exit(char **args)
+void	builtin_exit(char **args, int *arg_pos)
 {
 	int exit_code;
 
 	exit_code = 0;
-	if (args[1])
-		exit_code = ft_atoi(args[1]);
+	if (args[*arg_pos])
+		exit_code = ft_atoi(args[*arg_pos]);
 	exit(exit_code);
 }

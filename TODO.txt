@@ -1,0 +1,6 @@
+1 - Have to re-implement builtins
+2 - Work around signals
+3 - Fix readline history
+4 - Implement variable expansion logic and builtins
+5 - Refactor functions so they fit norminette standards
+6 - Add colours to minishell logic and Makefile
