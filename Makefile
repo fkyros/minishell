@@ -19,6 +19,8 @@ RESET   = '\033[0;0m'
 
 #variables-------------------------------------------------------
 
+NAME = minishell
+
 CC = cc
 CFLAGS = -Wall -Werror -Wextra
 LDFLAGS = -lreadline
@@ -35,8 +37,6 @@ SRCS = $(SRC_DIR)/cmdpath.c \
 	   ${SRC_DIR}/memory_handler.c ${SRC_DIR}/command_parser.c
 
 OBJS = $(SRCS:$(SRC_DIR)/%.c=bin/%.o)
-
-NAME = minishell
 
 #recipes----------------------------------------------------------
 

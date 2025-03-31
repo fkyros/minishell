@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../inc/minishell.h"
 
 // COPIES ORIGINAL TOKENS SO WE CAN FREE THEM AFTERWARDS
 static char **copy_original_tokens(char **args, int token_count)
