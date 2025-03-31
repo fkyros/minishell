@@ -10,7 +10,8 @@ SRCS = $(SRC_DIR)/cmdpath.c \
        $(SRC_DIR)/parser_aux.c $(SRC_DIR)/parser.c \
        $(SRC_DIR)/utils.c \
        ${SRC_DIR}/builtins_1.c ${SRC_DIR}/builtins_2.c \
-       ${SRC_DIR}/redirections.c ${SRC_DIR}/pipe_handling.c
+       ${SRC_DIR}/redirections.c ${SRC_DIR}/pipe_handling.c \
+	   ${SRC_DIR}/memory_handler.c ${SRC_DIR}/command_parser.c
 
 OBJS = $(SRCS:.c=.o)
 

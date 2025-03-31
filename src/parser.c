@@ -54,26 +54,23 @@ int	count_tokens(const char *str)
 	return (count);
 }
 
-char	**parse_command(const char *cmd)
+char **parse_command(const char *cmd, int *token_count) 
 {
-	int		index;
-	int		token_count;
-	int		i;
-	char	**tokens;
-
-	if (!cmd)
-		return (NULL);
-	token_count = count_tokens(cmd);
-	tokens = (char **)malloc(sizeof(char *) * (token_count + 1));
-	if (!tokens)
-		return (NULL);
-	index = 0;
-	i = 0;
-	while (i < token_count)
+    int index = 0;
+    int count = count_tokens(cmd);
+    char **tokens = malloc((count + 1) * sizeof(char *));
+	if (!cmd && !tokens)
 	{
-		tokens[i] = get_next_token(cmd, &index);
-		i++;
+		free(tokens);
+		return (NULL);
 	}
-	tokens[i] = NULL;
-	return (tokens);
+    *token_count = count;
+    index = 0;
+    int i = 0;
+    while (i < count) {
+        tokens[i] = get_next_token(cmd, &index);
+        i++;
+    }
+    tokens[i] = NULL;
+    return (tokens);
 }
