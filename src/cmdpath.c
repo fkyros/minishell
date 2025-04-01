@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../inc/minishell.h"
 
 int	is_valid_path(char *cmd)
 {
@@ -49,7 +49,7 @@ char	*search_command(char *cmd, char **env)
 	{
 		if (is_valid_path(cmd))
 			return (cmd);
-		return (NULL);
+		return ("/");
 	}
 	paths = ft_split(ft_getenv("PATH", env), ':');
 	if (!paths)

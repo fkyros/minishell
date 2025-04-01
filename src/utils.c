@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../inc/minishell.h"
 
 
 void	free_split(char **split)
@@ -68,4 +68,19 @@ PINK"  _  | |   "GREEN"____) | | | | |  "PINK"| |\n"
 PINK" (_) | |  "GREEN"|_____/  |_| |_|  "PINK"| |\n"
 PINK"      \\_\\                  /_/ "RST"\n\n"                                                              
 );	
+}
+/***
+ * Prints through STDERR and returns COMMAND_NOT_FOUND code error 
+ */
+int	print_path_error(char *path, t_parse_result *result, int i)
+{
+	if (path && ft_strcmp(path, "/") == 0)
+		ft_putstr_fd(RED BOLD"Minishell: No such file or directory: "
+		RST, STDERR_FILENO);
+	else
+		ft_putstr_fd(RED BOLD"Minishell: Command not found: "
+		RST, STDERR_FILENO);
+	ft_putendl_fd(result->commands[i].argv[0], STDERR_FILENO);
+	free_commands(result);
+	return (COMMAND_NOT_FOUND);
 }

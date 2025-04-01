@@ -1,13 +1,28 @@
-RED=\033[31m
-GREEN=\033[32m
-CYAN=\033[36m
-YELLOW=\033[33m
-BLUE=\e[34m
-MAGENTA=\033[35m
-RESET=\033[0m
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: gade-oli <gade-oli@student.42madrid.c      +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/03/29 18:07:54 by gade-oli          #+#    #+#              #
+#    Updated: 2025/03/29 18:38:11 by gade-oli         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-CC = gcc
-CFLAGS = -Wall -Werror -Wextra
+#colors----------------------------------------------------------
+
+RED 	= '\033[1;31m'
+GREEN   = '\033[1;32m'
+BLUE    = '\033[1;34m'
+RESET   = '\033[0;0m'
+
+#variables-------------------------------------------------------
+
+NAME = minishell
+
+CC = cc
+CFLAGS = -Wall -Werror -Wextra -g
 LDFLAGS = -lreadline
 
 LIBFT_DIR = ./libft
@@ -17,37 +32,36 @@ SRCS = $(SRC_DIR)/cmdpath.c \
        $(SRC_DIR)/main.c \
        $(SRC_DIR)/parser_aux.c $(SRC_DIR)/parser.c \
        $(SRC_DIR)/utils.c \
-       $(SRC_DIR)/builtins_1.c $(SRC_DIR)/builtins_2.c \
-       $(SRC_DIR)/redirections.c $(SRC_DIR)/pipe_handling.c \
-       $(SRC_DIR)/memory_handler.c $(SRC_DIR)/command_parser.c
+       ${SRC_DIR}/builtins_1.c ${SRC_DIR}/builtins_2.c \
+       ${SRC_DIR}/redirections.c ${SRC_DIR}/pipe_handling.c \
+	   ${SRC_DIR}/memory_handler.c ${SRC_DIR}/command_parser.c \
+	   ${SRC_DIR}/env/env.c
 
-OBJS = $(SRCS:.c=.o)
+OBJS = $(SRCS:$(SRC_DIR)/%.c=bin/%.o)
 
-NAME = minishell
+#recipes----------------------------------------------------------
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
-	@echo "$(CYAN)Compiling Libft!$(RESET)"
-	@make -C $(LIBFT_DIR) --no-print-directory > /dev/null
-	@echo "$(CYAN)Compiling Minishell!$(RESET)"
-	@$(CC) $(OBJS) -o $(NAME) -L$(LIBFT_DIR) -lft $(LDFLAGS)
-	@echo "$(GREEN)Success!$(RESET)"
+bin/%.o: src/%.c
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -I$(SRC_DIR) -I$(LIBFT_DIR) -c $< -o $@
 
-%.o: %.c
-	@$(CC) $(CFLAGS) -I$(SRC_DIR) -I$(LIBFT_DIR) -c $< -o $@
+$(NAME): $(OBJS)
+	@echo $(BLUE)"compiling binaries..."$(RESET)
+	@make -C $(LIBFT_DIR)
+	$(CC) $(OBJS) -o $(NAME) -L$(LIBFT_DIR) -lft $(LDFLAGS)
+	@echo $(GREEN)"$(NAME) compiled!"$(RESET)
 
 clean:
-	@echo "$(MAGENTA)Cleaning...$(RESET)"
-	@rm -f $(OBJS)
-	@make clean -C $(LIBFT_DIR) --no-print-directory > /dev/null
-	@echo "$(GREEN)Done!$(RESET)"
+	rm -f $(OBJS)
+	@make clean -C $(LIBFT_DIR)
+	@echo $(RED)"binaries deleted"$(RESET)
 
 fclean: clean
-	@echo "$(RED)Cleaning EVERYTHING!!$(RESET)"
-	@rm -f $(NAME)
-	@make fclean -C $(LIBFT_DIR) --no-print-directory > /dev/null
-	@echo "$(GREEN)Done!$(RESET)"
+	@make clean -C $(LIBFT_DIR)
+	rm -f $(NAME)
+	@echo $(RED)"$(NAME) deleted!"$(RESET)
 
 re: fclean all
 

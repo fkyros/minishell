@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../inc/minishell.h"
 
 /*	CONFIGURING PROCESS INPUT. IF THERE'S AN EXPLICIT REDIRECTION WE'LL OPEN THE FILE
 	IF IT'S NOT THE FIRST COMMAND, WE DUP LAST COMMAND PIPE'S READING END */
@@ -109,13 +109,8 @@ void execute_pipeline(t_parse_result *result, char **env)
             // CHECK FOR BUILTINS
             // NORMAL CMD EXEC
 			path = search_command(result->commands[i].argv[0], env);
-			if (!path)
-			{
-				ft_putstr_fd(BOLD RED"Minishell: command not found -> ", 2);
-				ft_putendl_fd(result->commands[i].argv[0], 2);
-				free_commands(result);
-				exit(127);
-			}
+			if (!path || ft_strcmp(path, "/") == 0)
+				exit(print_path_error(path, result, i));
             execve(path, result->commands[i].argv, env);
             perror("execve");
             exit(EXIT_FAILURE);

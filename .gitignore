@@ -5,3 +5,4 @@ a.out
 minishell
 bin/
 .DS_Store
+*.a
