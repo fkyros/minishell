@@ -4,6 +4,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
+# include <linux/limits.h>
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <sys/types.h>
@@ -36,6 +37,7 @@ typedef struct s_command {
 	int     pipe_out;
 	int     is_first;
 	int     is_last;
+	int     heredoc_fd;
 }   t_command;
 
 
@@ -70,12 +72,18 @@ char    		*get_cwd(void);
 void			print_banner(void);
 
 // BUILTINS
+int				apply_redirections(t_command *cmd);
 
-void			builtin_echo(char **args, int *arg_pos);
-void    		builtin_cd(char **args, int *arg_pos);
+int				is_builtin(char *cmd);
+void			execute_builtin(t_command *cmd);
+void			builtin_echo(char **args);
+void    		builtin_cd(char **args);
 void			builtin_pwd(void);
 void    		builtin_env(char **env);
-void			builtin_exit(char **args, int *arg_pos);
+void			builtin_exit(char **args);
+
+// HEREDOC
+int				process_heredoc(t_command *cmd);
 
 // REDIRECTION PARSING
 // AUX FUNCTIONS

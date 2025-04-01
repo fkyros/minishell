@@ -12,10 +12,13 @@
 
 #colors----------------------------------------------------------
 
-RED 	= '\033[1;31m'
-GREEN   = '\033[1;32m'
-BLUE    = '\033[1;34m'
-RESET   = '\033[0;0m'
+RED 	= \033[1;31m
+GREEN   = \033[1;32m
+BLUE    = \033[1;34m
+RESET   = \033[0;0m
+MAGENTA = \033[35m
+BOLD    = \033[1m
+PINK    = \033[38;5;206m
 
 #variables-------------------------------------------------------
 
@@ -35,7 +38,7 @@ SRCS = $(SRC_DIR)/cmdpath.c \
        ${SRC_DIR}/builtins_1.c ${SRC_DIR}/builtins_2.c \
        ${SRC_DIR}/redirections.c ${SRC_DIR}/pipe_handling.c \
 	   ${SRC_DIR}/memory_handler.c ${SRC_DIR}/command_parser.c \
-	   ${SRC_DIR}/env/env.c
+	   ${SRC_DIR}/env/env.c ${SRC_DIR}/heredoc.c
 
 OBJS = $(SRCS:$(SRC_DIR)/%.c=bin/%.o)
 
@@ -45,23 +48,32 @@ all: $(NAME)
 
 bin/%.o: src/%.c
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -I$(SRC_DIR) -I$(LIBFT_DIR) -c $< -o $@
+	@printf "${MAGENTA}Compiling ${CYAN}$<${RESET}\n"
+	@$(CC) $(CFLAGS) -I$(SRC_DIR) -I$(LIBFT_DIR) -c $< -o $@
 
 $(NAME): $(OBJS)
-	@echo $(BLUE)"compiling binaries..."$(RESET)
-	@make -C $(LIBFT_DIR)
-	$(CC) $(OBJS) -o $(NAME) -L$(LIBFT_DIR) -lft $(LDFLAGS)
-	@echo $(GREEN)"$(NAME) compiled!"$(RESET)
+	@printf "${BLUE}Linking binaries...${RESET}\n"
+	@make -s -C $(LIBFT_DIR) --no-print-directory
+	@$(CC) $(OBJS) -o $(NAME) -L$(LIBFT_DIR) -lft $(LDFLAGS)
+	@printf "${BOLD}${GREEN}${NAME} ${PINK}compiled successfully!${RESET}\n\n"
+	@printf "%b" "\
+	$(BOLD)$(PINK)       __  $(GREEN) _____   _      $(PINK)__  \n\
+	$(PINK)  _   / /$(GREEN)  / ____| | |     $(PINK)\\\\ \\\\ \n\
+	$(PINK) (_) | |  $(GREEN)| (___   | |__    $(PINK)| |\n\
+	$(PINK)     | |   $(GREEN)\\\\___ \\\\  | '_ \\\\   $(PINK)| |\n\
+	$(PINK)  _  | |   $(GREEN)____) | | | | |  $(PINK)| |\n\
+	$(PINK) (_) | |  $(GREEN)|_____/  |_| |_|  $(PINK)| |\n\
+	$(PINK)      \\\\_\\\\                  /_/ $(RST)\n\n"
 
 clean:
-	rm -f $(OBJS)
-	@make clean -C $(LIBFT_DIR)
-	@echo $(RED)"binaries deleted"$(RESET)
+	@rm -rf bin
+	@make -s -C $(LIBFT_DIR) clean --no-print-directory
+	@printf "${RED}Cleaned object files!${RESET}\n"
 
 fclean: clean
-	@make clean -C $(LIBFT_DIR)
-	rm -f $(NAME)
-	@echo $(RED)"$(NAME) deleted!"$(RESET)
+	@rm -f $(NAME)
+	@make -s -C $(LIBFT_DIR) fclean --no-print-directory
+	@printf "${BOLD}${RED}${NAME} deleted!${RESET}\n"
 
 re: fclean all
 

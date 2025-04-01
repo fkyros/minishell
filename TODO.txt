@@ -1,6 +1,8 @@
-1 - Have to re-implement builtins
-2 - Work around signals
-3 - Fix readline history
-4 - Implement variable expansion logic and builtins
-5 - Refactor functions so they fit norminette standards
-6 - Add colours to minishell logic and Makefile
+TODO
+
+1 - FINAL PARSING LOGIC: <, >, |, | <, | >, UNCLOSED '' "" (before child processes) -> yo
+2 - SIGNALS (CTRL+\ HANDLING) -> gabri
+3 - BUILTINS -> gabri y yo
+4 - VARIABLE EXPANSION LOGIC -> gabri
+5 - READLINE: HISTORY, COLOURS -> yo
+6 - NORMINETTE

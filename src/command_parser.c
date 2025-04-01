@@ -52,6 +52,7 @@ static void	init_command(t_command *cmd, char **argv_start, int is_first)
 	cmd->pipe_out = 0;
 	cmd->is_first = is_first;
 	cmd->is_last = 0;
+	cmd->heredoc_fd = -1;
 }
 
 // PROCESSES COMMAND TOKENS AND SEPARATES ARGUMENTS FROM OPERATORS (<, >, <<, >>)

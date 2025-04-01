@@ -2,20 +2,14 @@
 
 void	signal_handling(int sig)
 {
-	pid_t g_child_pid = 0;
 	(void)sig;
 	char *cwd = get_cwd();
 
-	if (g_child_pid > 0)
-		kill(g_child_pid, SIGINT);
-	else
-	{
-		printf("%s > ", cwd);
-		ft_putstr_fd("\n", 1);
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-	}
+	printf(BOLD GREEN"%s > "RST, cwd);
+	ft_putstr_fd("\n", 1);
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
 	free(cwd);
 }
 
