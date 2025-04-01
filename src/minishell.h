@@ -13,6 +13,18 @@
 # include <readline/history.h>
 # include "../libft/libft.h"
 
+// COLOURS!
+# define RST    "\x1b[0m" // RESET COLOUR
+# define RED    "\x1b[31m"
+# define GREEN  "\x1b[32m"
+# define BLUE   "\x1b[34m"
+# define PINK   "\x1b[35m"  
+# define BLINK   "\x1b[5m"
+# define BOLD    "\x1b[1m"
+# define UNDERLINE "\x1b[4m"
+
+
+
 typedef struct s_command {
 	char    **argv;
 	char    *redirect_in;
@@ -51,6 +63,7 @@ char	*search_command(char *cmd, char **env);
 // SHELL UTILITIES
 
 char    *get_cwd(void);
+void	print_banner(void);
 
 // BUILTINS
 
@@ -61,13 +74,13 @@ void    builtin_env(char **env);
 void	builtin_exit(char **args, int *arg_pos);
 
 // REDIRECTION PARSING
-// AUX FUNCTIONS
+// 		-- AUX FUNCTIONS
 int	count_tokens(const char *str);
 int	is_whitespace(char c);
 int	is_quote(char c);
 void	skip_quoted_section(const char *str, int *index, char quote_char);
 void	skip_unquoted_section(const char *str, int *index);
-// MAIN FUNCTIONS
+// 		-- MAIN FUNCTIONS
 int     parse_redirections(char **args);
 int     handle_pipe(char **args, int i);
 char **parse_command(const char *cmd, int *token_count);

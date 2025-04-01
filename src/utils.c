@@ -57,3 +57,15 @@ char    *get_cwd(void)
         return (cwd);
 }
 
+void	print_banner(void)
+{
+printf(                                     
+BLINK BOLD PINK"       __  "GREEN" _____   _      "PINK"__  \n"
+PINK"  _   / /"GREEN"  / ____| | |    "PINK" \\ \\ \n"
+PINK" (_) | |  "GREEN"| (___   | |__    "PINK"| |\n"
+PINK"     | |   "GREEN"\\___ \\  | '_ \\   "PINK"| |\n"
+PINK"  _  | |   "GREEN"____) | | | | |  "PINK"| |\n"
+PINK" (_) | |  "GREEN"|_____/  |_| |_|  "PINK"| |\n"
+PINK"      \\_\\                  /_/ "RST"\n\n"                                                              
+);	
+}

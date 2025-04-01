@@ -111,7 +111,7 @@ void execute_pipeline(t_parse_result *result, char **env)
 			path = search_command(result->commands[i].argv[0], env);
 			if (!path)
 			{
-				ft_putstr_fd("Minishell: command not found!: ", 2);
+				ft_putstr_fd(BOLD RED"Minishell: command not found -> ", 2);
 				ft_putendl_fd(result->commands[i].argv[0], 2);
 				free_commands(result);
 				exit(127);

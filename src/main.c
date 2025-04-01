@@ -29,17 +29,18 @@ int	main(int argc, char **argv, char **env)
 	(void)argc;
 	(void)argv;
 
+	print_banner();
 	signal(SIGINT, signal_handling);
 	signal(SIGQUIT, SIG_IGN);
 	cwd = get_cwd();
-	printf("%s > ", cwd);
+	printf(BOLD GREEN"%s > "RST, cwd);
 	free(cwd);
 	while (1)
 	{
-		line = readline("funny shell > ");
+		line = readline(BOLD PINK"funny shell > "RST);
 		if (!line)
 		{
-			printf("Minishell: exiting!\n");
+			printf(UNDERLINE BOLD PINK"Minishell: exiting!\n"RST);
 			break ;
 		}
 		if (*line)
@@ -52,7 +53,7 @@ int	main(int argc, char **argv, char **env)
 			free(line);
 		}
 		cwd = get_cwd();
-		printf("%s > ", cwd);
+		printf(BOLD GREEN"%s > "RST, cwd);
 		free(cwd);	
 	}
 	return (EXIT_SUCCESS);
