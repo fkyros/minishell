@@ -26,9 +26,18 @@ static char	*extract_token(const char *str, int *index)
 
 static char	*get_next_token(const char *str, int *index)
 {
+	char	*res;
+	char	*expanded;
+
 	while (str[*index] && is_whitespace(str[*index]))
 		(*index)++;
-	return (extract_token(str, index));
+	res = extract_token(str, index);
+	if (res && ft_strncmp(res, "$", 1) == 0)
+	{
+		expanded = expand(res);
+		return (expanded);
+	}
+	return (res);
 }
 
 int	count_tokens(const char *str)

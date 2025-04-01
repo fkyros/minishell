@@ -22,7 +22,7 @@ RESET   = '\033[0;0m'
 NAME = minishell
 
 CC = cc
-CFLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra -g
 LDFLAGS = -lreadline
 
 LIBFT_DIR = ./libft
@@ -34,7 +34,8 @@ SRCS = $(SRC_DIR)/cmdpath.c \
        $(SRC_DIR)/utils.c \
        ${SRC_DIR}/builtins_1.c ${SRC_DIR}/builtins_2.c \
        ${SRC_DIR}/redirections.c ${SRC_DIR}/pipe_handling.c \
-	   ${SRC_DIR}/memory_handler.c ${SRC_DIR}/command_parser.c
+	   ${SRC_DIR}/memory_handler.c ${SRC_DIR}/command_parser.c \
+	   ${SRC_DIR}/env/env.c
 
 OBJS = $(SRCS:$(SRC_DIR)/%.c=bin/%.o)
 

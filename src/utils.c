@@ -57,3 +57,16 @@ char    *get_cwd(void)
         return (cwd);
 }
 
+/***
+ * Prints through STDERR and returns COMMAND_NOT_FOUND code error 
+ */
+int	print_path_error(char *path, t_parse_result *result, int i)
+{
+	if (path && ft_strcmp(path, "/") == 0)
+		ft_putstr_fd("Minishell: No such file or directory: ", STDERR_FILENO);
+	else
+		ft_putstr_fd("Minishell: Command not found: ", STDERR_FILENO);
+	ft_putendl_fd(result->commands[i].argv[0], STDERR_FILENO);
+	free_commands(result);
+	return (COMMAND_NOT_FOUND);
+}
