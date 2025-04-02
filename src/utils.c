@@ -1,6 +1,5 @@
 #include "../inc/minishell.h"
 
-
 void	free_split(char **split)
 {
 	int	i;
@@ -16,6 +15,7 @@ void	free_split(char **split)
 	free(split);
 }
 
+//TODO: still necessary?
 char	*ft_getenv(char *name, char **env)
 {
 	int		i;
@@ -42,17 +42,17 @@ char	*ft_getenv(char *name, char **env)
 
 char    *get_cwd(void)
 {
-        char    *cwd = malloc(2048);
+        char    *cwd = malloc(MAX_CWD);
         if (!cwd)
         {
-                perror("Error trying to assign memory for the current directory");
-                exit(1);
+            perror("Error trying to assign memory for the current directory");
+            exit(1);
         }
-        if (!getcwd(cwd, 2048))
+        if (!getcwd(cwd, MAX_CWD))
         {
-                perror("Error trying to obtain current directory");
-                free(cwd);
-                exit(1);
+            perror("Error trying to obtain current directory");
+            free(cwd);
+            exit(1);
         }
         return (cwd);
 }
@@ -69,6 +69,7 @@ PINK" (_) | |  "GREEN"|_____/  |_| |_|  "PINK"| |\n"
 PINK"      \\_\\                  /_/ "RST"\n\n"                                                              
 );	
 }
+
 /***
  * Prints through STDERR and returns COMMAND_NOT_FOUND code error 
  */

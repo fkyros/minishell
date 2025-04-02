@@ -6,3 +6,11 @@ TODO
 4 - VARIABLE EXPANSION LOGIC -> gabri
 5 - READLINE: HISTORY, COLOURS -> yo
 6 - NORMINETTE
+
+--- gabri issues:
+* $VAR_INEXISTENTE da segfault -> debería imprimir lo que haya almacenado, si no existe, devolvemos el prompt de vuelta
+
+--- issues generales
+* ctrl + L -> borra el cwd del prompt
+* clear -> mantiene el prompt
+* cuando se tabula para obtener resultados automáticos `cd *tab*` se borra el cwd del prompt

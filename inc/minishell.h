@@ -25,6 +25,8 @@
 # define BOLD    "\x1b[1m"
 # define UNDERLINE "\x1b[4m"
 
+# define MAX_CWD 2048
+
 # define COMMAND_NOT_FOUND 127
 # define COMMAND_NOT_EXECUTABLE 126
 

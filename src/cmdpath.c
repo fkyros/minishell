@@ -49,9 +49,9 @@ char	*search_command(char *cmd, char **env)
 	{
 		if (is_valid_path(cmd))
 			return (cmd);
-		return ("/");
+		return (ft_strdup("/"));
 	}
-	paths = ft_split(ft_getenv("PATH", env), ':');
+	paths = ft_split(ft_getenv("PATH", env), ':'); // TODO: change for standard getenv?
 	if (!paths)
 		return (NULL);
 	return (search_in_path(paths, cmd));
