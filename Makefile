@@ -38,7 +38,9 @@ SRCS = $(SRC_DIR)/cmdpath.c \
        ${SRC_DIR}/builtins_1.c ${SRC_DIR}/builtins_2.c \
        ${SRC_DIR}/redirections.c ${SRC_DIR}/pipe_handling.c \
 	   ${SRC_DIR}/memory_handler.c ${SRC_DIR}/command_parser.c \
-	   ${SRC_DIR}/env/env.c ${SRC_DIR}/heredoc.c
+	   ${SRC_DIR}/env/env.c ${SRC_DIR}/heredoc.c \
+	   ${SRC_DIR}/process_handling.c 
+	   
 
 OBJS = $(SRCS:$(SRC_DIR)/%.c=bin/%.o)
 

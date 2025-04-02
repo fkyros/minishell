@@ -83,7 +83,8 @@ void    		builtin_env(char **env);
 void			builtin_exit(char **args);
 
 // HEREDOC
-int				process_heredoc(t_command *cmd);
+void			check_heredoc(t_parse_result *result);
+void    		close_heredocs(t_parse_result *result);
 
 // REDIRECTION PARSING
 // AUX FUNCTIONS
@@ -93,17 +94,22 @@ int				is_quote(char c);
 void			skip_quoted_section(const char *str, int *index, char quote_char);
 void			skip_unquoted_section(const char *str, int *index);
 // MAIN FUNCTIONS
-int				parse_redirections(char **args);
-int     		handle_pipe(char **args, int i);
 char 			**parse_command(const char *cmd, int *token_count);
 t_parse_result	parse_commands(const char *input);
 void 			free_commands(t_parse_result *result);
 
 // PIPING
-
 void 			setup_input(t_command *cmd, int prev_pipe_fd);
 void			setup_output(t_command *cmd, int pipe_fd[2]);
 void 			setup_pipes_and_redirection(t_command *cmd, int prev_pipe_fd, int pipe_fd[2]);
 void 			execute_pipeline(t_parse_result *result, char **env);
+
+// --> PIPING AUX
+void			cmd_exists(t_parse_result *result, char **env);
+void			open_close_pipe(t_parse_result *result, int *i, int (*pipe_fd)[2]);
+void    		child_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, char **env);
+void    		parent_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd);
+void    		process_handling(int *pid, t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, char **env);
+void			wait_processes(t_parse_result *result);
 
 #endif
