@@ -1,52 +1,67 @@
 #include "../inc/minishell.h"
 
-// FUNCTION THAT APPLIES REDIRECTIONS TO BUILTINS
-int apply_redirections(t_command *cmd)
+void    redirect_input_heredoc(t_command *cmd)
 {
-    int fd_in;
-    int fd_out;
+    int fd;
 
-    // REDIRECT INPUT
+    // REDIRECT HEREDOC
     if (cmd->heredoc_fd != -1) 
     {
         dup2(cmd->heredoc_fd, STDIN_FILENO);
         close(cmd->heredoc_fd);
         cmd->heredoc_fd = -1;
     }
+    // REDIRECT INPUT
     else if (cmd->redirect_in)
     {
-        fd_in = open(cmd->redirect_in, O_RDONLY);
-        if (fd_in == -1)
+        fd = open(cmd->redirect_in, O_RDONLY);
+        if (fd == -1)
         {
             perror("open");
-            return (-1);
+            return ;
         }
-        dup2(fd_in, STDIN_FILENO);
-        close(fd_in);
+        dup2(fd, STDIN_FILENO);
+        close(fd);
     }
-    // REDIRECT OUTPUT
+}
+
+void    redirect_output(t_command *cmd)
+{
+    int fd;
+
     if (cmd->redirect_out)
     {
-        fd_out = open(cmd->redirect_out, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-        if (fd_out == -1)
+        fd = open(cmd->redirect_out, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (fd == -1)
         {
             perror("open");
-            return (-1);
+            return ;
         }
-        dup2(fd_out, STDOUT_FILENO);
-        close(fd_out);
+        dup2(fd, STDOUT_FILENO);
+        close(fd);
     }
+}
+
+// FUNCTION THAT APPLIES REDIRECTIONS TO BUILTINS
+int apply_redirections(t_command *cmd)
+{
+    int fd_append;
+
+    // REDIRECT HEREDOC AND INPUT
+    redirect_input_heredoc(cmd);
+    // REDIRECT OUTPUT
+    redirect_output(cmd);
     // REDIRECT APPEND
     if (cmd->redirect_append)
     {
-        fd_out = open(cmd->redirect_append, O_WRONLY | O_CREAT | O_APPEND, 0644);
-        if (fd_out == -1)
+        fd_append = open(cmd->redirect_append, O_WRONLY | O_CREAT | O_APPEND, 0644);
+        if (fd_append == -1)
         {
             perror("open");
             return (-1);
         }
-        dup2(fd_out, STDOUT_FILENO);
-        close(fd_out);
+        dup2(fd_append, STDOUT_FILENO);
+        close(fd_append);
     }
     return (0);
 }

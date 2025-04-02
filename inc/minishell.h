@@ -51,7 +51,6 @@ typedef struct s_parse_result {
 
 // UTILS
 
-int				open_file(char *file, int in_or_out);
 void			free_split(char **split);
 char			*ft_getenv(char *name, char **env);
 int				print_path_error(char *path, t_parse_result *result, int i);
@@ -79,8 +78,6 @@ void			execute_builtin(t_command *cmd);
 void			builtin_echo(char **args);
 void    		builtin_cd(char **args);
 void			builtin_pwd(void);
-void    		builtin_env(char **env);
-void			builtin_exit(char **args);
 
 // HEREDOC
 void			check_heredoc(t_parse_result *result);

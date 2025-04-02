@@ -1,72 +1,37 @@
 #include "../inc/minishell.h"
 
 // ECHO, CD, PWD, EXPORT
-int is_builtin(char *cmd)
+static void    echo_args(char **args, int *newline, int *i)
 {
-    if (!cmd)
-        return (0);
-    return (!ft_strcmp(cmd, "cd") || !ft_strcmp(cmd, "echo") || 
-            !ft_strcmp(cmd, "pwd") || !ft_strcmp(cmd, "export") || 
-            !ft_strcmp(cmd, "unset") || !ft_strcmp(cmd, "env") || 
-            !ft_strcmp(cmd, "exit"));
-}
+    int parsing_flags;
+    int j;
 
-void execute_builtin(t_command *cmd)
-{
-	// SAVE ORIGINAL FD SO WE CAN RESTORE THEM LATER
-    int original_stdin = dup(STDIN_FILENO);
-    int original_stdout = dup(STDOUT_FILENO);
-
-	if (cmd->heredoc_fd != -1) 
-	{
-        close(cmd->heredoc_fd);
-        cmd->heredoc_fd = -1;
-    }
-    // APPLY REDIRECTIONS
-    if (apply_redirections(cmd) != 0)
+    parsing_flags = 1;
+    while (args[*i] && parsing_flags)
     {
-        close(original_stdin);
-        close(original_stdout);
-        return;
-    }
-    // EXECUTE BUILTIN
-    if (!ft_strcmp(cmd->argv[0], "cd"))
-        builtin_cd(cmd->argv);
-    else if (!ft_strcmp(cmd->argv[0], "echo"))
-        builtin_echo(cmd->argv);
-    else if (!ft_strcmp(cmd->argv[0], "pwd"))
-        builtin_pwd();
-
-    // RESTORE ORIGINAL FDS
-    dup2(original_stdin, STDIN_FILENO);
-    dup2(original_stdout, STDOUT_FILENO);
-    close(original_stdin);
-    close(original_stdout);
-}
-
-void builtin_echo(char **args)
-{
-    int i = 1;
-    int newline = 1;
-    int parsing_flags = 1;
-
-    // PROCESS FLAGS (EVEN COMBINED ONES LIKE -nnn)
-    while (args[i] && parsing_flags)
-    {
-        if (args[i][0] == '-' && args[i][1] == 'n')
+        if (args[*i][0] == '-' && args[*i][1] == 'n')
         {
             // CHECK IF IT'S A VALID STRING
-            int j = 2;
-            while (args[i][j] == 'n')
+            j = 2;
+            while (args[*i][j] == 'n')
                 j++;
-            if (args[i++][j] == '\0')  // IF IT'S ONLY THE FLAG
-                newline = 0;
+            // IF IT'S ONLY THE FLAG
+            if (args[(*i)++][j] == '\0')
+                *newline = 0;
             else  // NOT A VALID FLAG, STOP PROCESSING THEM
                 parsing_flags = 0;
         }
         else
             parsing_flags = 0;
     }
+}
+
+void builtin_echo(char **args)
+{
+    int i = 1;
+    int newline = 1;
+    // PROCESS FLAGS (EVEN COMBINED ONES LIKE -nnn)
+    echo_args(args, &newline, &i);
     // PRINT THE REST
     while (args[i])
     {
