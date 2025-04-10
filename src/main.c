@@ -16,8 +16,9 @@ void	signal_handling(int sig)
 int	main(int argc, char **argv, char **env)
 {
 	//REPL
-	char	*cwd;
-	char	*line;
+	char		*cwd;
+	char		*line;
+	char		**our_env;
 	t_parse_result  parse_result;
 
 	(void)argc;
@@ -26,6 +27,8 @@ int	main(int argc, char **argv, char **env)
 	print_banner();
 	signal(SIGINT, signal_handling);
 	signal(SIGQUIT, SIG_IGN);
+	
+	our_env = init_env(env);
 	cwd = get_cwd();
 	printf(BOLD GREEN"%s > "RST, cwd);
 	free(cwd);
@@ -40,9 +43,9 @@ int	main(int argc, char **argv, char **env)
 		if (*line)
 		{
 			add_history(line);
-			parse_result = parse_commands(line);
+			parse_result = parse_commands(line, our_env);
 			if (parse_result.cmd_count > 0)
-                execute_pipeline(&parse_result, env);
+	                execute_pipeline(&parse_result, our_env);
 			free_commands(&parse_result);
 			free(line);
 		}

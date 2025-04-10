@@ -19,9 +19,9 @@ static char **copy_original_tokens(char **args, int token_count)
 }
 
 // INITIALIZES t_parse_result STRUCT, COPYING AND ASSIGNING NECESSARY DATA AND MEMORY
-static int	init_parse_result(const char *input, t_parse_result *result)
+static int	init_parse_result(const char *input, t_parse_result *result, char **our_env)
 {
-	result->args = parse_command(input, &result->token_count);
+	result->args = parse_command(input, &result->token_count, our_env);
 	if (!result->args)
 		return (0);
 	result->original_tokens = copy_original_tokens(result->args, result->token_count);
@@ -102,14 +102,14 @@ static void	fill_command(char **args, int *i, t_command *cmd)
 }
 
 // MAIN FUNCTION THAT PROCESSES THE LINE AND BUILDS THE COMMANDS ARRAY
-t_parse_result	parse_commands(const char *input)
+t_parse_result	parse_commands(const char *input, char **our_env)
 {
 	t_parse_result	result;
 	int				i;
 	int				cmd_start;
 
 	result = (t_parse_result){0};
-	if (!init_parse_result(input, &result))
+	if (!init_parse_result(input, &result, our_env))
 		return (result);
 	i = 0;
 	cmd_start = 0;

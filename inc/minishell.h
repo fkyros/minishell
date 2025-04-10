@@ -59,7 +59,8 @@ char			*ft_getenv(char *name, char **env);
 int				print_path_error(char *path, t_parse_result *result, int i);
 
 // ENV
-char			*expand(char *var);
+char			*expand(char *var, char **our_env);
+char			**init_env(char **env);
 
 // PATHING
 
@@ -97,8 +98,8 @@ void			skip_unquoted_section(const char *str, int *index);
 // MAIN FUNCTIONS
 int				parse_redirections(char **args);
 int     		handle_pipe(char **args, int i);
-char 			**parse_command(const char *cmd, int *token_count);
-t_parse_result	parse_commands(const char *input);
+char 			**parse_command(const char *cmd, int *token_count, char **our_env);
+t_parse_result	parse_commands(const char *input, char **our_env);
 void 			free_commands(t_parse_result *result);
 
 // PIPING

@@ -12,8 +12,7 @@
 
 #include "../../inc/minishell.h"
 
-//TODO: check negative numbers or invalid values for funny corrections
-char	*shlvl(char *lvl, char **new_env)
+char	*shlvl(char *lvl)
 {
 	int	nlvl;
 	char	**split;
@@ -24,7 +23,8 @@ char	*shlvl(char *lvl, char **new_env)
 	if (!split || !split[2])
 		return (free_split(split), ft_strdup("SHLVL=0"));
 	nlvl = ft_atoi(split[2]);
-	lvl_aux = ft_itoa(++nlvl);
+	nlvl++;
+	lvl_aux = ft_itoa(nlvl);
 	res = ft_strjoin("SHLVL=", lvl_aux);
 	free_split(split);
 	free(lvl_aux);
@@ -45,10 +45,10 @@ char	**init_env(char **env)
 	i = 0;
 	while (env[i])
 	{
-		if (ft_strncmp(res[i], "SHLVL=", 6)
-			res = shlvl(env[i], res);
+		if (ft_strncmp(env[i], "SHLVL=", 6) == 0)
+			res[i] = shlvl(env[i]);
 		else
-			res = ft_strdup(env[i]);
+			res[i] = ft_strdup(env[i]);
 		if (!res[i])
 			return (NULL); //TODO: implement and execute safe exit
 		i++;
@@ -56,17 +56,40 @@ char	**init_env(char **env)
 	return (res);
 }
 
+// var name should NOT include its '=' at the end of the name, since the function already handles that
+char	*ft_getenv(char *var, char **env)
+{
+	char	*res;
+	int	i;
+	char	*real_var;
+	int	size;
+	int	found;
+
+	if (!env || !var || !var[0])
+		return (NULL);
+	real_var = ft_strjoin(var, "=");
+	size = ft_strlen(real_var);
+	i = 0;
+	found = 0;
+	res = NULL;
+	while (!found && env[i])
+	{
+		if (ft_strncmp(real_var, env[i], size) == 0)
+			found = 1;
+		i++;
+	}
+	if (found)
+		res = ft_substr(env[i - 1], size, ft_strlen(env[i - 1] + 1));
+	free(real_var);
+	return (res);
+}
+
 // TODO: implement this as a local get_env for new env
 // what if just $ ?
 // NOTE: only expands `env` variables atm, not $? yet
-char	*expand(char *var)
+char	*expand(char *var, char **our_env)
 {
-	char	*res;
-
 	if (var && ft_strncmp(var, "$", 1) == 0 && var++)
-	{
-		res = getenv(var);
-		return (ft_strdup(res));
-	}
+		return (ft_getenv(var, our_env));
 	return (NULL);
 }
