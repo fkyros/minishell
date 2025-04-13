@@ -6,7 +6,7 @@
 /*   By: gade-oli <gade-oli@student.42madrid.c      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 16:00:26 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/04/06 19:29:03 by event            ###   ########.fr       */
+/*   Updated: 2025/04/13 16:28:18 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,9 @@ char	*shlvl(char *lvl)
 	char	*lvl_aux;
 
 	split = ft_split(lvl, '=');
-	if (!split || !split[2])
+	if (!split || !split[1])
 		return (free_split(split), ft_strdup("SHLVL=0"));
-	nlvl = ft_atoi(split[2]);
+	nlvl = ft_atoi(split[1]);
 	nlvl++;
 	lvl_aux = ft_itoa(nlvl);
 	res = ft_strjoin("SHLVL=", lvl_aux);
@@ -31,28 +31,29 @@ char	*shlvl(char *lvl)
 	return (res);
 }
 
-char	**init_env(char **env)
+char	**init_env(char **old_env)
 {
 	int	i;
 	char	**res;
 
 	i = 0;
-	while (env[i])
+	while (old_env[i])
 		i++;
 	res = (char **) ft_calloc(i + 1, sizeof(char *));
 	if (!res)
 		return (NULL); //TODO: implement and execute safe exit
 	i = 0;
-	while (env[i])
+	while (old_env[i])
 	{
 		if (ft_strncmp(env[i], "SHLVL=", 6) == 0)
-			res[i] = shlvl(env[i]);
+			res[i] = shlvl(old_env[i]);
 		else
-			res[i] = ft_strdup(env[i]);
+			res[i] = ft_strdup(old_env[i]);
 		if (!res[i])
 			return (NULL); //TODO: implement and execute safe exit
 		i++;
 	}
+	res[i] = NULL;
 	return (res);
 }
 
@@ -92,4 +93,44 @@ char	*expand(char *var, char **our_env)
 	if (var && ft_strncmp(var, "$", 1) == 0 && var++)
 		return (ft_getenv(var, our_env));
 	return (NULL);
+}
+
+char	*create_var_env(char *name, char *value)
+{
+	char	*aux;
+	char	*res;
+
+	if (!name || !value)
+		return (NULL);
+	aux = ft_strjoin(name, "=");
+	res = ft_strjoin(aux, value);
+	free(aux);
+	return (res);
+}
+
+char	**add_var_to_env(char **our_env, char *name, char *value)
+{
+	int	i;
+	char	**new_env;
+
+	i = 0;
+	while (our_env[i]) //get_size_env
+		i++;
+	res = (char **) ft_calloc(i + 2, sizeof(char *));
+	if (!res)
+		return (NULL); //TODO: implement and execute safe exit
+	i = 0;
+	while (old_env[i])
+	{
+		new_env[i] = ft_strdup(old_env[i]);
+		if (!new_env[i])
+			return (NULL); //TODO: implement and execute safe exit
+		i++;
+	}
+	new_env[i] = create_var_env(name, value);
+	if (!new_env[i])
+		return (NULL); //TODO: implement and execute safe exit
+	i++;
+	new_env[i] = NULL;
+	return (new_env);
 }

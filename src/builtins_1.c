@@ -11,7 +11,7 @@ int is_builtin(char *cmd)
             !ft_strcmp(cmd, "exit"));
 }
 
-void execute_builtin(t_command *cmd)
+void execute_builtin(t_command *cmd, char **our_env)
 {
 	// SAVE ORIGINAL FD SO WE CAN RESTORE THEM LATER
     int original_stdin = dup(STDIN_FILENO);
@@ -36,6 +36,8 @@ void execute_builtin(t_command *cmd)
         builtin_echo(cmd->argv);
     else if (!ft_strcmp(cmd->argv[0], "pwd"))
         builtin_pwd();
+    else if (!ft_strcmp(cmd->argv[0], "env"))
+        builtin_env(our_env);
 
     // RESTORE ORIGINAL FDS
     dup2(original_stdin, STDIN_FILENO);

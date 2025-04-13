@@ -30,6 +30,9 @@
 # define COMMAND_NOT_FOUND 127
 # define COMMAND_NOT_EXECUTABLE 126
 
+// #define malloc(size) NULL
+// TODO: try later to see if everything is properly protected
+
 typedef struct s_command {
 	char    **argv;
 	char    *redirect_in;
@@ -60,7 +63,7 @@ int				print_path_error(char *path, t_parse_result *result, int i);
 
 // ENV
 char			*expand(char *var, char **our_env);
-char			**init_env(char **env);
+char			**init_env(char **old_env);
 
 // PATHING
 
@@ -78,11 +81,11 @@ void			print_banner(void);
 int				apply_redirections(t_command *cmd);
 
 int				is_builtin(char *cmd);
-void			execute_builtin(t_command *cmd);
+void			execute_builtin(t_command *cmd, char **our_env);
 void			builtin_echo(char **args);
 void    		builtin_cd(char **args);
 void			builtin_pwd(void);
-void    		builtin_env(char **env);
+void    		builtin_env(char **our_env);
 void			builtin_exit(char **args);
 
 // HEREDOC
@@ -107,6 +110,6 @@ void 			free_commands(t_parse_result *result);
 void 			setup_input(t_command *cmd, int prev_pipe_fd);
 void			setup_output(t_command *cmd, int pipe_fd[2]);
 void 			setup_pipes_and_redirection(t_command *cmd, int prev_pipe_fd, int pipe_fd[2]);
-void 			execute_pipeline(t_parse_result *result, char **env);
+void 			execute_pipeline(t_parse_result *result, char **our_env);
 
 #endif

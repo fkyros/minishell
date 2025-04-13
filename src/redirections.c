@@ -117,7 +117,7 @@ void setup_pipes_and_redirection(t_command *cmd, int prev_pipe_fd, int pipe_fd[2
     setup_output(cmd, pipe_fd);
 }
 
-void execute_pipeline(t_parse_result *result, char **env)
+void execute_pipeline(t_parse_result *result, char **our_env)
 {
     int i;
     int prev_pipe_fd = -1;
@@ -129,7 +129,7 @@ void execute_pipeline(t_parse_result *result, char **env)
     // CHECK IF CMD DOESN'T EXIST AND ISN'T A BUILTIN (maybe needs to return some kind of error value and print in STDERR..?)
     while (i < result->cmd_count)
     {
-        path = search_command(result->commands[i].argv[0], env);
+        path = search_command(result->commands[i].argv[0], our_env);
 	    if ((!path || ft_strcmp(path, "/") == 0) && !is_builtin(result->commands[i].argv[0]))
         {
             print_path_error(path, result, i);
@@ -159,7 +159,7 @@ void execute_pipeline(t_parse_result *result, char **env)
     {
         if (is_builtin(result->commands[i].argv[0]))
         {
-            execute_builtin(&result->commands[i]);
+            execute_builtin(&result->commands[i], our_env);
             i++;
             continue;
         }
@@ -200,8 +200,8 @@ void execute_pipeline(t_parse_result *result, char **env)
             if (pipe_fd[1] != -1)
                 close(pipe_fd[1]);
             // NORMAL CMD EXEC
-            path = search_command(result->commands[i].argv[0], env);
-            execve(path, result->commands[i].argv, env);
+            path = search_command(result->commands[i].argv[0], our_env);
+            execve(path, result->commands[i].argv, our_env);
             perror("execve");
             free(path);
             exit(EXIT_FAILURE);
