@@ -6,7 +6,7 @@
 /*   By: gade-oli <gade-oli@student.42madrid.c      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 16:00:26 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/04/13 16:28:18 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/04/15 19:28:15 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ char	**init_env(char **old_env)
 	i = 0;
 	while (old_env[i])
 	{
-		if (ft_strncmp(env[i], "SHLVL=", 6) == 0)
+		if (ft_strncmp(old_env[i], "SHLVL=", 6) == 0)
 			res[i] = shlvl(old_env[i]);
 		else
 			res[i] = ft_strdup(old_env[i]);
@@ -116,13 +116,13 @@ char	**add_var_to_env(char **our_env, char *name, char *value)
 	i = 0;
 	while (our_env[i]) //get_size_env
 		i++;
-	res = (char **) ft_calloc(i + 2, sizeof(char *));
-	if (!res)
+	new_env = (char **) ft_calloc(i + 2, sizeof(char *));
+	if (!new_env)
 		return (NULL); //TODO: implement and execute safe exit
 	i = 0;
-	while (old_env[i])
+	while (our_env[i])
 	{
-		new_env[i] = ft_strdup(old_env[i]);
+		new_env[i] = ft_strdup(our_env[i]);
 		if (!new_env[i])
 			return (NULL); //TODO: implement and execute safe exit
 		i++;

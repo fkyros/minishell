@@ -87,6 +87,7 @@ void    		builtin_cd(char **args);
 void			builtin_pwd(void);
 void    		builtin_env(char **our_env);
 void			builtin_exit(char **args);
+void			builtin_export(char **args, char **our_env);
 
 // HEREDOC
 int				process_heredoc(t_command *cmd);

@@ -38,6 +38,8 @@ void execute_builtin(t_command *cmd, char **our_env)
         builtin_pwd();
     else if (!ft_strcmp(cmd->argv[0], "env"))
         builtin_env(our_env);
+    else if (!ft_strcmp(cmd->argv[0], "export"))
+        builtin_export(cmd->argv, our_env);
 
     // RESTORE ORIGINAL FDS
     dup2(original_stdin, STDIN_FILENO);
@@ -80,6 +82,7 @@ void builtin_echo(char **args)
         write(1, "\n", 1);
 }
 
+// TODO: change for ft_getenv, and change internal PWD and OLDPWD env variables
 void builtin_cd(char **args)
 {
     char *home;
