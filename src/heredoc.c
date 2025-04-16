@@ -1,74 +1,79 @@
 #include "../inc/minishell.h"
 
-static void heredoc_readline(t_command *cmd, int (*pipe_fd)[2])
+static void heredoc_readline(const char *heredoc_eof, int pipe_fd[2])
 {
-    char    *line;
-
+    char *line;
+    
     while (1)
     {
         line = readline("> ");
         if (!line) 
         {
-            ft_putstr_fd(RED BOLD"minishell: HEREDOC delimited by EOF\n"RST, STDERR_FILENO);
+            ft_putstr_fd("minishell: warning: here-document delimited by EOF\n", STDERR_FILENO);
             break ;
         }
-        if (ft_strcmp(line, cmd->heredoc) == 0)
+        if (ft_strcmp(line, heredoc_eof) == 0)
         {
             free(line);
             break ;
         }
-        write((*pipe_fd)[1], line, ft_strlen(line));
-        write((*pipe_fd)[1], "\n", 1);
+        write(pipe_fd[1], line, ft_strlen(line));
+        write(pipe_fd[1], "\n", 1);
         free(line);
     }
 }
 
-static int process_heredoc(t_command *cmd) {
+static void process_heredoc(t_command *cmd, const char *heredoc_eof)
+{
     int pipe_fd[2];
-
-    if (!cmd->heredoc) 
-        return (0);
-    if (pipe(pipe_fd)) 
-    {
-        perror(RED BOLD"minishell: pipe"RST);
-        return (-1);
+    
+    if (pipe(pipe_fd) == -1) {
+        perror("minishell: pipe");
+        return ;
     }
-    heredoc_readline(cmd, &pipe_fd);
+    heredoc_readline(heredoc_eof, pipe_fd);
     close(pipe_fd[1]);
     cmd->heredoc_fd = pipe_fd[0];
-    return (0);
 }
 
-void check_heredoc(t_parse_result *result)
+void check_heredocs(t_parse_result *result)
+{
+    t_command *cmd;
+    int i;
+    int j;
+
+    if (!result || !result->commands)
+        return ;
+    i = 0;
+    while (i < result->cmd_count)
+    {
+        cmd = &result->commands[i];
+        cmd->heredoc_fd = -1;
+        j = 0;
+        while (j < cmd->redir_count)
+        {
+            if (cmd->redirs[j].type == heredoc) 
+            {
+                process_heredoc(cmd, cmd->redirs[j].heredoc_eof);
+                break ;
+            }
+            j++;
+        }
+        i++;
+    }
+}
+
+void close_heredocs(t_parse_result *result)
 {
     int i;
 
     i = 0;
     while (i < result->cmd_count)
-        {
-            if (process_heredoc(&result->commands[i]) == -1)
-            {
-                while (i < result->cmd_count)
-                {
-                    if (result->commands[i].heredoc_fd != -1)
-                        close(result->commands[i].heredoc_fd);
-                    i++;
-                }
-                return ;
-            }
-            i++;
-        }
-}
-
-void    close_heredocs(t_parse_result *result)
-{
-    int i;
-    
-    i = 0;
-    while (i < result->cmd_count) 
     {
         if (result->commands[i].heredoc_fd != -1)
+        {
             close(result->commands[i].heredoc_fd);
-        i++;
+            result->commands[i].heredoc_fd = -1;
+        }
     }
 }

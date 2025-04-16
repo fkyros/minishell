@@ -1,135 +1,177 @@
 #include "../inc/minishell.h"
 
-// COPIES ORIGINAL TOKENS SO WE CAN FREE THEM AFTERWARDS
+static void compact_argv(char **argv, int length)
+{
+	int	write_pos;
+	int read_pos;
+    if (!argv) 
+		return ;
+    
+    write_pos = 0;
+	read_pos = 0;
+    while (read_pos < length)
+	{
+        if (argv[read_pos] != NULL) {
+            argv[write_pos++] = argv[read_pos];
+        }
+		read_pos++;
+    }
+    argv[write_pos] = NULL;
+}
+
+static int is_pipe(const char *token)
+{
+    return (ft_strcmp(token, "|") == 0);
+}
+
+static int is_redirection(const char *token)
+{
+    return (ft_strcmp(token, ">") == 0 ||
+            ft_strcmp(token, ">>") == 0 ||
+            ft_strcmp(token, "<") == 0 ||
+            ft_strcmp(token, "<<") == 0);
+}
+
+static enum e_redirect_type get_redirection_type(const char *token)
+{
+    if (ft_strcmp(token, ">") == 0) return out;
+    if (ft_strcmp(token, ">>") == 0) return append;
+    if (ft_strcmp(token, "<") == 0) return in;
+    return (heredoc);
+}
+
 static char **copy_original_tokens(char **args, int token_count)
 {
-	int		i;
-	char	**original_tokens;
+    int i = 0;
+    char **original_tokens = malloc(token_count * sizeof(char *));
+    if (!original_tokens)
+        return NULL;
+    while (i < token_count) {
+        original_tokens[i] = args[i];
+        i++;
+    }
+    return original_tokens;
+}
 
-	original_tokens = malloc(token_count * sizeof(char *));
-	if (!original_tokens)
-		return (NULL);
-	i = 0;
-	while (i < token_count)
+static void init_command(t_command *cmd, char **argv_start, int is_first)
+{
+    cmd->argv = argv_start;
+    cmd->redirs = NULL;
+    cmd->redir_count = 0;
+    cmd->heredoc = NULL;
+    cmd->pipe_out = 0;
+    cmd->is_first = is_first;
+    cmd->is_last = 0;
+    cmd->heredoc_fd = -1;
+    ft_memset(&cmd->redirs, 0, sizeof(t_redirect *));
+}
+
+static int init_parse_result(const char *input, t_parse_result *result)
+{
+	int actual_cmd_count;
+	int i;
+
+    result->args = parse_command(input, &result->token_count);
+    if (!result->args)
+        return 0;
+    result->original_tokens = copy_original_tokens(result->args, result->token_count);
+    if (!result->original_tokens) 
 	{
-		original_tokens[i] = args[i];
+        free(result->args);
+        return (0);
+    }
+    actual_cmd_count = 1;
+	i = 0;
+    while (result->args[i])
+	{
+        if (ft_strcmp(result->args[i], "|") == 0)
+            actual_cmd_count++;
 		i++;
-	}
-	return (original_tokens);
-}
-
-// INITIALIZES t_parse_result STRUCT, COPYING AND ASSIGNING NECESSARY DATA AND MEMORY
-static int	init_parse_result(const char *input, t_parse_result *result)
-{
-	result->args = parse_command(input, &result->token_count);
-	if (!result->args)
-		return (0);
-	result->original_tokens = copy_original_tokens(result->args, result->token_count);
-	if (!result->original_tokens)
+    }
+    result->commands = ft_calloc(actual_cmd_count + 1, sizeof(t_command));
+    if (!result->commands) 
 	{
-		free(result->args);
-		return (0);
-	}
-	result->commands = malloc((result->token_count + 1) * sizeof(t_command));
-	if (!result->commands)
+        free(result->args);
+        return (0);
+    }
+    result->cmd_count = 0;
+    return (1);
+}
+
+static void handle_redirection(t_command *cmd, char **args, int *i)
+{
+    enum e_redirect_type type;
+    
+	type = get_redirection_type(args[*i]);
+    if (!args[*i + 1]) {
+        ft_putstr_fd("minishell: syntax error near unexpected token\n", STDERR_FILENO);
+        return ;
+    }
+    if (type == heredoc)
+        add_redirect(cmd, heredoc, NULL, args[*i + 1]);
+    else 
+        add_redirect(cmd, type, args[*i + 1], NULL);
+    args[*i] = NULL;
+    args[*i + 1] = NULL;
+    *i += 2;
+}
+
+static void fill_command(char **args, int *i, t_command *cmd)
+{
+    int start;
+	int	cmd_length;
+
+	start = *i;
+    // Process all tokens until pipe or end
+    while (args[*i] && !is_pipe(args[*i])) 
 	{
-		free(result->args);
-		free(result->original_tokens);
-		return (0);
-	}
-	result->cmd_count = 0;
-	return (1);
-}
-
-// INITIALIZES A COMMAND ASSIGNING DEFAULT VALUES
-static void	init_command(t_command *cmd, char **argv_start, int is_first)
-{
-	cmd->argv = argv_start;
-	cmd->redirect_in = NULL;
-	cmd->heredoc = NULL;
-	cmd->redirect_out = NULL;
-	cmd->redirect_append = NULL;
-	cmd->pipe_out = 0;
-	cmd->is_first = is_first;
-	cmd->is_last = 0;
-	cmd->heredoc_fd = -1;
-}
-
-// PROCESSES COMMAND TOKENS AND SEPARATES ARGUMENTS FROM OPERATORS (<, >, <<, >>)
-static void	fill_command(char **args, int *i, t_command *cmd)
-{
-	// KEEPS GOING UNTIL IT FINDS AN OPERATOR OR IT'S THE END OF THE LINE
-	while (args[*i] && strcmp(args[*i], "|") != 0 &&
-		strcmp(args[*i], ">") != 0 && strcmp(args[*i], ">>") != 0 &&
-		strcmp(args[*i], "<") != 0 && strcmp(args[*i], "<<") != 0)
-		(*i)++;
-	// PROCESSES OPERATORS AND ARGUMENTS
-	while (args[*i])
+        if (is_redirection(args[*i]))
+            handle_redirection(cmd, args, i);
+        else
+            (*i)++;
+    }
+    if (args[*i] && ft_strcmp(args[*i], "|") == 0) 
 	{
-		if (!strcmp(args[*i], "|"))
-		{
-			cmd->pipe_out = 1;
-			args[(*i)++] = NULL;
-			break ;
-		}
-		else if (!strcmp(args[*i], ">>") && args[*i + 1])
-		{
-			cmd->redirect_append = args[*i + 1];
-			args[(*i)++] = NULL;
-			(*i)++;
-		}
-		else if (!strcmp(args[*i], ">") && args[*i + 1])
-		{
-			cmd->redirect_out = args[*i + 1];
-			args[(*i)++] = NULL;
-			(*i)++;
-		}
-		else if (!strcmp(args[*i], "<") && args[*i + 1])
-		{
-			cmd->redirect_in = args[*i + 1];
-			args[(*i)++] = NULL;
-			(*i)++;
-		}
-		else if (!strcmp(args[*i], "<<") && args[*i + 1])
-		{
-			cmd->heredoc = args[*i + 1];
-			args[(*i)++] = NULL;
-			(*i)++;
-		}
-		else
-			break ;
-	}
+        cmd->pipe_out = 1;
+        args[(*i)++] = NULL;
+    }
+    cmd_length = *i - start;
+    cmd->argv = &args[start];
+    compact_argv(cmd->argv, cmd_length);
 }
 
-// MAIN FUNCTION THAT PROCESSES THE LINE AND BUILDS THE COMMANDS ARRAY
-t_parse_result	parse_commands(const char *input)
+t_parse_result parse_commands(const char *input)
 {
-	t_parse_result	result;
-	int				i;
-	int				cmd_start;
-
+    t_parse_result result;
+    int i;
+	int prev_i;
+    
 	result = (t_parse_result){0};
-	if (!init_parse_result(input, &result))
-		return (result);
 	i = 0;
-	cmd_start = 0;
-	while (result.args[i] && result.cmd_count < result.token_count)
+    if (!init_parse_result(input, &result)) 
+        return (result);
+    while (result.args[i] && result.cmd_count < result.token_count)
 	{
-        // SKIPS TOKENS THAT ARE ISOLATED OPERATORS
-		while (result.args[i] && (ft_strcmp(result.args[i], "|") == 0 ||
-			ft_strcmp(result.args[i], ">") == 0 ||
-			ft_strcmp(result.args[i], ">>") == 0 ||
-			ft_strcmp(result.args[i], "<") == 0 ||
-			ft_strcmp(result.args[i], "<<") == 0))
-			i++;
-		if (!result.args[i])
-			break ;
-		init_command(&result.commands[result.cmd_count],
-			&result.args[cmd_start], result.cmd_count == 0);
+    	while (result.args[i] && ft_strcmp(result.args[i], "|") == 0) 
+		{
+        	ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", STDERR_FILENO);
+        	i++;
+    	}
+		if (!result.args[i]) 
+			break ;		
+		init_command(&result.commands[result.cmd_count], 
+				&result.args[i], result.cmd_count == 0);
+		prev_i = i;
 		fill_command(result.args, &i, &result.commands[result.cmd_count]);
-		result.commands[result.cmd_count].is_last = (result.args[i] == NULL);
-		result.cmd_count++;
-		cmd_start = i;
+		if (!result.commands[result.cmd_count].argv[0] && 
+			result.commands[result.cmd_count].redir_count == 0) 
+		{
+			ft_putstr_fd("minishell: syntax error: empty command\n", STDERR_FILENO);
+			result.cmd_count = 0;
+			break ;
+    	}
+    	if (i > prev_i)
+        	result.cmd_count++;
 	}
-	return (result);
+    return (result);
 }

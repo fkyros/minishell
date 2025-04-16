@@ -1,122 +1,219 @@
 #include "../inc/minishell.h"
 
-void    redirect_input_heredoc(t_command *cmd)
+void add_redirect(t_command *cmd, enum e_redirect_type type, 
+                        char *filename, char *heredoc_eof)
 {
+    t_redirect *new_redirs;
+    int new_count;
+
+    new_count = cmd->redir_count + 1;
+    new_redirs = ft_realloc(cmd->redirs, 
+                          cmd->redir_count * sizeof(t_redirect),
+                          new_count * sizeof(t_redirect));
+    if (!new_redirs)
+        return ;
+    new_redirs[cmd->redir_count] = (t_redirect){
+        .type = type,
+        .filename = filename,
+        .heredoc_eof = heredoc_eof
+    };
+    cmd->redirs = new_redirs;
+    cmd->redir_count = new_count;
+}
+
+void redirect_input_heredoc(t_command *cmd)
+{
+    int i;
+
+    if (!cmd)
+        return ;
+    if (cmd->heredoc_fd != -1)
+    {
+        if (dup2(cmd->heredoc_fd, STDIN_FILENO) == -1)
+            perror("minishell: dup2");
+        close(cmd->heredoc_fd);
+        cmd->heredoc_fd = -1;
+        return ;
+    }
+    if (!cmd->redirs || cmd->redir_count <= 0)
+        return ;
+    while (i >= 0)
+    {
+        if (cmd->redirs[i].type == in && cmd->redirs[i].filename)
+        {
+            int fd = open(cmd->redirs[i].filename, O_RDONLY);
+            if (fd == -1)
+            {
+                perror("minishell: open");
+                continue ;
+            }
+
+            if (dup2(fd, STDIN_FILENO) == -1)
+                perror("minishell: dup2");
+            close(fd);
+            return ;
+        }
+        i--;
+    }
+}
+
+void redirect_output(t_command *cmd)
+{
+    int last_out_fd;
+    int *created_fds;
+    int fd_count;
+    int i;
+    int flags;
     int fd;
 
-    // REDIRECT HEREDOC
+    last_out_fd = -1;
+    created_fds = NULL;
+    fd_count = 0;
+    i = 0;
+    if (!cmd || !cmd->redirs || cmd->redir_count <= 0)
+        return ;
+    created_fds = malloc(cmd->redir_count * sizeof(int));
+    if (!created_fds) 
+    {
+        perror("minishell: malloc");
+        return ;
+    }
+
+    while (i < cmd->redir_count)
+    {
+        if ((cmd->redirs[i].type == out || cmd->redirs[i].type == append) && 
+            cmd->redirs[i].filename)
+        {
+            flags = O_WRONLY | O_CREAT;
+            if (cmd->redirs[i].type == out)
+                flags = flags + O_TRUNC;
+            else 
+                flags = flags + O_APPEND;
+            fd = open(cmd->redirs[i].filename, flags, 0644);
+            if (fd == -1) 
+            {
+                perror("minishell: open");
+                continue ;
+            }
+            created_fds[fd_count++] = fd;
+            if (last_out_fd != -1)
+                close(last_out_fd);
+            last_out_fd = fd;
+        }
+        i++;
+    }
+    if (last_out_fd != -1) 
+    {
+        if (dup2(last_out_fd, STDOUT_FILENO) == -1)
+            perror("minishell: dup2");
+        close(last_out_fd);
+    }
+    i = 0;
+    while (i < fd_count)
+    {
+        if (created_fds[i] != last_out_fd)
+            close(created_fds[i]);
+        i++;
+    }
+    free(created_fds);
+}
+
+int apply_redirections(t_command *cmd)
+{
+    int saved_stdin;
+    int saved_stdout;
+    
+    saved_stdin = dup(STDIN_FILENO);
+    saved_stdout = dup(STDOUT_FILENO);
+    redirect_input_heredoc(cmd);
+    redirect_output(cmd);
+    if (dup2(STDIN_FILENO, STDIN_FILENO) == -1 || 
+        dup2(STDOUT_FILENO, STDOUT_FILENO) == -1)
+    {
+        dup2(saved_stdin, STDIN_FILENO);
+        dup2(saved_stdout, STDOUT_FILENO);
+        close(saved_stdin);
+        close(saved_stdout);
+        return (-1);
+    }
+    close(saved_stdin);
+    close(saved_stdout);
+    return (0);
+}
+
+void setup_input(t_command *cmd, int prev_pipe_fd)
+{
+    int i;
+    int fd;
+
     if (cmd->heredoc_fd != -1) 
     {
         dup2(cmd->heredoc_fd, STDIN_FILENO);
         close(cmd->heredoc_fd);
         cmd->heredoc_fd = -1;
+        return ;
     }
-    // REDIRECT INPUT
-    else if (cmd->redirect_in)
+    i = cmd->redir_count - 1;
+    while (i >= 0)
     {
-        fd = open(cmd->redirect_in, O_RDONLY);
-        if (fd == -1)
+        if (cmd->redirs[i].type == in) 
         {
-            perror("open");
+            fd = open(cmd->redirs[i].filename, O_RDONLY);
+            if (fd == -1) 
+            {
+                perror("minishell: open");
+                exit(1);
+            }
+            dup2(fd, STDIN_FILENO);
+            close(fd);
             return ;
         }
-        dup2(fd, STDIN_FILENO);
-        close(fd);
+        i--;
     }
-}
-
-void    redirect_output(t_command *cmd)
-{
-    int fd;
-
-    if (cmd->redirect_out)
+    if (!cmd->is_first) 
     {
-        fd = open(cmd->redirect_out, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-        if (fd == -1)
-        {
-            perror("open");
-            return ;
-        }
-        dup2(fd, STDOUT_FILENO);
-        close(fd);
-    }
-}
-
-// FUNCTION THAT APPLIES REDIRECTIONS TO BUILTINS
-int apply_redirections(t_command *cmd)
-{
-    int fd_append;
-
-    // REDIRECT HEREDOC AND INPUT
-    redirect_input_heredoc(cmd);
-    // REDIRECT OUTPUT
-    redirect_output(cmd);
-    // REDIRECT APPEND
-    if (cmd->redirect_append)
-    {
-        fd_append = open(cmd->redirect_append, O_WRONLY | O_CREAT | O_APPEND, 0644);
-        if (fd_append == -1)
-        {
-            perror("open");
-            return (-1);
-        }
-        dup2(fd_append, STDOUT_FILENO);
-        close(fd_append);
-    }
-    return (0);
-}
-
-/*	CONFIGURING PROCESS INPUT. IF THERE'S AN EXPLICIT REDIRECTION WE'LL OPEN THE FILE
-	IF IT'S NOT THE FIRST COMMAND, WE DUP LAST COMMAND PIPE'S READING END */
-
-void setup_input(t_command *cmd, int prev_pipe_fd)
-{
-    int fd;
-
-    if (cmd->heredoc_fd != -1) {
-        dup2(cmd->heredoc_fd, STDIN_FILENO);
-        close(cmd->heredoc_fd);
-        cmd->heredoc_fd = -1;
-    }
-    else if (cmd->redirect_in)
-    {
-        fd = open(cmd->redirect_in, O_RDONLY);
-        if (fd < 0)
-        {
-            perror("open redirect_in");
-            exit(EXIT_FAILURE);
-        }
-        dup2(fd, STDIN_FILENO);
-        close(fd);
-    }
-	/*	IF IT'S NOT THE FIRST COMMAND, AND THERE ISN'T AN EXPLICIT REDIRECTION
-		WE USE LAST COMMAND PIPE'S READING END */
-    else if (!cmd->is_first)
         dup2(prev_pipe_fd, STDIN_FILENO);
+    }
 }
-/*	CONFIGURING PROCESS OUTPUT. IF THERE'S AN EXPLICIT REDIRECTION WE'LL OPEN THE FILE
-	IF IT HAS TO BE SENT THROUGH A PIPE, WE DUP THE CURRENT PIPE'S WRITING END */
 
-void setup_output(t_command *cmd, int pipe_fd[2])
+void setup_output(t_command *cmd, int (*pipe_fd)[2])
 {
+    int last_out;
+    int i;
+    int flags;
     int fd;
-	
-	if (cmd->redirect_out || cmd->redirect_append)
-	{
-		if (cmd->redirect_out)
-			fd = open(cmd->redirect_out, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		else
-			fd = open(cmd->redirect_append, O_WRONLY | O_CREAT | O_APPEND, 0644);
-		if (fd < 0)
+
+    last_out = -1;
+    i = 0;
+    while (i < cmd->redir_count)
+    {
+        if (cmd->redirs[i].type == out || cmd->redirs[i].type == append) 
         {
-            perror("open redirect_out");
-            exit(EXIT_FAILURE);
+            flags = O_WRONLY | O_CREAT;
+            if (cmd->redirs[i].type == out)
+                flags = flags + O_TRUNC;
+            else 
+                flags = flags + O_APPEND;
+            
+            fd = open(cmd->redirs[i].filename, flags, 0644);
+            if (fd == -1) 
+            {
+                perror("minishell: open");
+                exit(1);
+            }
+            if (last_out != -1)
+                close(last_out);
+            last_out = fd;
         }
-        dup2(fd, STDOUT_FILENO);
-		close(fd);
-	}
-	/*	IF THE INFO HAS TO BE SENT THROUGH A PIPE,
-		WE DUP THE CURRENT PIPE'S WRITING END TO STDOUT*/
-    else if (cmd->pipe_out)		
-        dup2(pipe_fd[1], STDOUT_FILENO);
+        i++;
+    }
+    if (last_out != -1) 
+    {
+        dup2(last_out, STDOUT_FILENO);
+        close(last_out);
+    }
+    else if (cmd->pipe_out)
+        dup2((*pipe_fd)[1], STDOUT_FILENO);
+    close((*pipe_fd)[0]);
+    close((*pipe_fd)[1]);
 }

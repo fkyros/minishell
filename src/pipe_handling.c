@@ -1,6 +1,5 @@
 #include "../inc/minishell.h"
 
-// CHECK IF CMD DOESN'T EXIST AND ISN'T A BUILTIN (maybe needs to return some kind of error value and print in STDERR..?)
 void cmd_exists(t_parse_result *result, char **env)
 {
     int i;
@@ -33,16 +32,12 @@ void    open_close_pipe(t_parse_result *result, int *i, int (*pipe_fd)[2])
         }
     else
         {
-			// DON'T NEED AN OUTGOING PIPE ON THE LAST COMMAND
             (*pipe_fd)[0] = -1;
             (*pipe_fd)[1] = -1;
         }
 }
 
-/*	FUNCTION THAT GROUPS UP I/O CONFIGURATION FOR A COMMAND
-		- prev_pipe_fd: LAST PIPE'S READING END (if there is one)
-		- pipe_fd: int[2] SO THAT THE PIPE CONNECTS TO THE NEXT COMMAND	*/
-void setup_pipes_and_redirection(t_command *cmd, int prev_pipe_fd, int pipe_fd[2])
+void setup_pipes_and_redirection(t_command *cmd, int prev_pipe_fd, int (*pipe_fd)[2])
 {
     setup_input(cmd, prev_pipe_fd);
     setup_output(cmd, pipe_fd);
@@ -56,23 +51,35 @@ void execute_pipeline(t_parse_result *result, char **env)
     pid_t pid;
 
     cmd_exists(result, env);
-    check_heredoc(result);
+    check_heredocs(result);
+
+    if (result->cmd_count == 1 && is_builtin(result->commands[0].argv[0]))
+    {
+        execute_builtin(&result->commands[0], 1);
+        return ;
+    }
     i = 0;
-	while (i < result->cmd_count)
+    while (i < result->cmd_count)
     {
         if (is_builtin(result->commands[i].argv[0]))
         {
-            execute_builtin(&result->commands[i]);
-            i++;
-            continue ;
+            open_close_pipe(result, &i, &pipe_fd);
+            pid = fork();
+            if (pid == 0)
+                child_process(result, &i, &pipe_fd, &prev_pipe_fd, env);
+            else if (pid > 0)
+                parent_process(result, &i, &pipe_fd, &prev_pipe_fd);
+            else
+                perror("minishell: fork");
         }
-		// IF IT'S NOT THE LAST COMMAND, WE CREATE A PIPE
-        open_close_pipe(result, &i, &pipe_fd);
-        pid = fork();
-        process_handling(&pid, result, &i, &pipe_fd, &prev_pipe_fd, env);
+        else
+        {
+            open_close_pipe(result, &i, &pipe_fd);
+            pid = fork();
+            process_handling(&pid, result, &i, &pipe_fd, &prev_pipe_fd, env);
+        }
         i++;
     }
-    // WAITING FOR ALL CHILD PROCESSES TO FINISH
-	wait_processes(result);
+    wait_processes(result);
     close_heredocs(result);
 }

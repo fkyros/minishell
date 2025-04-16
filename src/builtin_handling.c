@@ -4,40 +4,52 @@ int is_builtin(char *cmd)
 {
     if (!cmd)
         return (0);
-    return (!ft_strcmp(cmd, "cd") || !ft_strcmp(cmd, "echo") || 
-            !ft_strcmp(cmd, "pwd") || !ft_strcmp(cmd, "export") || 
-            !ft_strcmp(cmd, "unset") || !ft_strcmp(cmd, "env") || 
+    return (!ft_strcmp(cmd, "cd") || 
+            !ft_strcmp(cmd, "echo") || 
+            !ft_strcmp(cmd, "pwd") || 
+            !ft_strcmp(cmd, "export") || 
+            !ft_strcmp(cmd, "unset") || 
+            !ft_strcmp(cmd, "env") || 
             !ft_strcmp(cmd, "exit"));
 }
 
-void execute_builtin(t_command *cmd)
+void execute_builtin(t_command *cmd, int apply_redirects)
 {
-	// SAVE ORIGINAL FD SO WE CAN RESTORE THEM LATER
-    int original_stdin = dup(STDIN_FILENO);
-    int original_stdout = dup(STDOUT_FILENO);
+    int saved_stdin;
+    int saved_stdout;
 
-	if (cmd->heredoc_fd != -1) 
-	{
-        close(cmd->heredoc_fd);
-        cmd->heredoc_fd = -1;
-    }
-    // APPLY REDIRECTIONS
-    if (apply_redirections(cmd) != 0)
+    saved_stdin = -1;
+    saved_stdout = -1;
+    if (apply_redirects)
     {
-        close(original_stdin);
-        close(original_stdout);
-        return ;
+        saved_stdin = dup(STDIN_FILENO);
+        saved_stdout = dup(STDOUT_FILENO);
+        if (saved_stdin == -1 || saved_stdout == -1)
+        {
+            perror("minishell: dup");
+            return ;
+        }
+        if (apply_redirections(cmd) != 0)
+        {
+            close(saved_stdin);
+            close(saved_stdout);
+            return ;
+        }
     }
-    // EXECUTE BUILTIN
     if (!ft_strcmp(cmd->argv[0], "cd"))
         builtin_cd(cmd->argv);
     else if (!ft_strcmp(cmd->argv[0], "echo"))
         builtin_echo(cmd->argv);
     else if (!ft_strcmp(cmd->argv[0], "pwd"))
         builtin_pwd();
-    // RESTORE ORIGINAL FDS
-    dup2(original_stdin, STDIN_FILENO);
-    dup2(original_stdout, STDOUT_FILENO);
-    close(original_stdin);
-    close(original_stdout);
+    // Add other builtins as needed
+    if (apply_redirects)
+    {
+        if (dup2(saved_stdin, STDIN_FILENO) == -1)
+            perror("minishell: dup2");
+        if (dup2(saved_stdout, STDOUT_FILENO) == -1)
+            perror("minishell: dup2");
+        close(saved_stdin);
+        close(saved_stdout);
+    }
 }

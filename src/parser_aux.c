@@ -24,3 +24,15 @@ void	skip_unquoted_section(const char *str, int *index)
 	while (str[*index] && !is_whitespace(str[*index]) && !is_quote(str[*index]))
 		(*index)++;
 }
+
+int is_operator(const char *token)
+{
+    if (!token)
+        return (0);
+        
+    return (ft_strcmp(token, "|") == 0 ||
+           ft_strcmp(token, ">") == 0 ||
+           ft_strcmp(token, ">>") == 0 ||
+           ft_strcmp(token, "<") == 0 ||
+           ft_strcmp(token, "<<") == 0);
+}

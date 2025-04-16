@@ -83,6 +83,6 @@ void				ft_hexadecimal(unsigned int x, int *length, char x_or_x);
 void				ft_unsigned_int(unsigned int u, int *length);
 void				ft_pointer(size_t pointer, int *length);
 int					ft_printf(const char *string, ...);
-int				ft_strcmp(char *s1, char *s2);
+int					ft_strcmp(const char *s1, const char *s2);
 
 #endif

@@ -28,18 +28,25 @@
 # define COMMAND_NOT_FOUND 127
 # define COMMAND_NOT_EXECUTABLE 126
 
+enum e_redirect_type 
+{in, out, append, heredoc};
+
+typedef struct s_redirect {
+   enum e_redirect_type type;
+   char *filename;
+   char *heredoc_eof;
+} t_redirect;
+
 typedef struct s_command {
 	char    **argv;
-	char    *redirect_in;
+	t_redirect *redirs; // ALREADY ORDERED LINKED LIST
+	int		redir_count;
 	char    *heredoc;
-	char    *redirect_out;
-	char    *redirect_append;
 	int     pipe_out;
 	int     is_first;
 	int     is_last;
 	int     heredoc_fd;
 }   t_command;
-
 
 typedef struct s_parse_result {
     t_command *commands;
@@ -54,6 +61,7 @@ typedef struct s_parse_result {
 void			free_split(char **split);
 char			*ft_getenv(char *name, char **env);
 int				print_path_error(char *path, t_parse_result *result, int i);
+int				is_operator(const char *token);
 
 // ENV
 char			*expand(char *var);
@@ -65,6 +73,11 @@ char			*build_full_path(char *path, char *cmd);
 char			*search_in_path(char **paths, char *cmd);
 char			*search_command(char *cmd, char **env);
 
+// MEMORY HANDLING
+
+void    		*ft_realloc(void *ptr, size_t old_size, size_t new_size);
+void 			free_commands(t_parse_result *result);
+
 // SHELL UTILITIES
 
 char    		*get_cwd(void);
@@ -74,13 +87,13 @@ void			print_banner(void);
 int				apply_redirections(t_command *cmd);
 
 int				is_builtin(char *cmd);
-void			execute_builtin(t_command *cmd);
+void 			execute_builtin(t_command *cmd, int apply_redirects);
 void			builtin_echo(char **args);
 void    		builtin_cd(char **args);
 void			builtin_pwd(void);
 
 // HEREDOC
-void			check_heredoc(t_parse_result *result);
+void			check_heredocs(t_parse_result *result);
 void    		close_heredocs(t_parse_result *result);
 
 // REDIRECTION PARSING
@@ -91,20 +104,20 @@ int				is_quote(char c);
 void			skip_quoted_section(const char *str, int *index, char quote_char);
 void			skip_unquoted_section(const char *str, int *index);
 // MAIN FUNCTIONS
+void			add_redirect(t_command *cmd, enum e_redirect_type type, char *filename, char *heredoc_eof);
 char 			**parse_command(const char *cmd, int *token_count);
 t_parse_result	parse_commands(const char *input);
-void 			free_commands(t_parse_result *result);
 
 // PIPING
 void 			setup_input(t_command *cmd, int prev_pipe_fd);
-void			setup_output(t_command *cmd, int pipe_fd[2]);
-void 			setup_pipes_and_redirection(t_command *cmd, int prev_pipe_fd, int pipe_fd[2]);
+void 			setup_output(t_command *cmd, int (*pipe_fd)[2]);
+void 			setup_pipes_and_redirection(t_command *cmd, int prev_pipe_fd, int (*pipe_fd)[2]);
 void 			execute_pipeline(t_parse_result *result, char **env);
 
 // --> PIPING AUX
 void			cmd_exists(t_parse_result *result, char **env);
 void			open_close_pipe(t_parse_result *result, int *i, int (*pipe_fd)[2]);
-void    		child_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, char **env);
+void 			child_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, char **env);
 void    		parent_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd);
 void    		process_handling(int *pid, t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, char **env);
 void			wait_processes(t_parse_result *result);
