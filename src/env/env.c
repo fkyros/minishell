@@ -108,9 +108,23 @@ char	*create_var_env(char *name, char *value)
 	return (res);
 }
 
+int	is_var_already_in_env(char *name, char *var_from_env)
+{
+	char	*real_name;
+	int 	res;
+
+	real_name = ft_strjoin(name, "=");
+	res = ft_strncmp(real_name, var_from_env, ft_strlen(real_name));
+	free(real_name);	
+	if (res == 0)
+		return (1);
+	return (0);
+}
+
 char	**add_var_to_env(char **our_env, char *name, char *value)
 {
 	int	i;
+	int	j;
 	char	**new_env;
 
 	i = 0;
@@ -120,17 +134,22 @@ char	**add_var_to_env(char **our_env, char *name, char *value)
 	if (!new_env)
 		return (NULL); //TODO: implement and execute safe exit
 	i = 0;
+	j = 0;
 	while (our_env[i])
 	{
-		new_env[i] = ft_strdup(our_env[i]);
-		if (!new_env[i])
-			return (NULL); //TODO: implement and execute safe exit
+		if (!is_var_already_in_env(name, our_env[i]))
+		{
+			new_env[j] = ft_strdup(our_env[i]);
+			if (!new_env[i])
+				return (NULL); //TODO: implement and execute safe exit
+			j++;
+		}
 		i++;
 	}
-	new_env[i] = create_var_env(name, value);
-	if (!new_env[i])
+	new_env[j] = create_var_env(name, value);
+	if (!new_env[j])
 		return (NULL); //TODO: implement and execute safe exit
-	i++;
-	new_env[i] = NULL;
+	j++;
+	new_env[j] = NULL;
 	return (new_env);
 }

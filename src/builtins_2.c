@@ -20,14 +20,43 @@ void	builtin_unset()
 }
 */
 
-void	builtin_export(char **args, char **our_env)
+void	builtin_export(char **args, t_mini *mini)
 {
-	(void)our_env;
-	if (!args[1])
+	int		i;
+	char	**var;
+	char	**new_env;
+	int		status;
+
+	status = 0;
+	i = 1;
+	if (!args[i])
 	{
-		printf("no behaviour defined\n");
+		ft_putstr_fd("No behaviour defined\n", STDERR_FILENO);
 		return ;
 	}
+	while(args[i])
+	{
+		if (!ft_isalpha(args[i][0]) || !ft_strchr(args[i], '='))
+		{
+			ft_putstr_fd("Export with an invalid identifier\n", STDERR_FILENO);
+			status = 1;
+		}
+		else
+		{
+			var = ft_split(args[i], '=');
+			new_env = add_var_to_env(mini->our_env, var[0], var[1]);
+			if (!new_env)
+				ft_putstr_fd("Error adding var to env\n", STDERR_FILENO);
+			free_split(var);
+		}
+		i++;
+	}
+	if (new_env)
+	{
+		free_split(mini->our_env);
+		mini->our_env = new_env;
+	}
+	mini->last_status = status;
 }
 
 void	builtin_env(char **our_env)
@@ -40,6 +69,7 @@ void	builtin_env(char **our_env)
 		printf("%s\n", our_env[i]);
 		i++;
 	}
+	//return (0); //status for $?
 }
 
 /*

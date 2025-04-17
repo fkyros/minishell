@@ -52,7 +52,14 @@ typedef struct s_parse_result {
     char **args;  
     int token_count;
     int cmd_count;
-} t_parse_result;
+}	t_parse_result;
+
+typedef	struct s_mini
+{
+	char	**our_env;
+	int		last_status;
+}	t_mini;
+
 
 // UTILS
 
@@ -64,6 +71,7 @@ int				print_path_error(char *path, t_parse_result *result, int i);
 // ENV
 char			*expand(char *var, char **our_env);
 char			**init_env(char **old_env);
+char			**add_var_to_env(char **our_env, char *name, char *value);
 
 // PATHING
 
@@ -81,13 +89,13 @@ void			print_banner(void);
 int				apply_redirections(t_command *cmd);
 
 int				is_builtin(char *cmd);
-void			execute_builtin(t_command *cmd, char **our_env);
+void 			execute_builtin(t_command *cmd, t_mini *mini);
 void			builtin_echo(char **args);
 void    		builtin_cd(char **args);
 void			builtin_pwd(void);
 void    		builtin_env(char **our_env);
 void			builtin_exit(char **args);
-void			builtin_export(char **args, char **our_env);
+void			builtin_export(char **args, t_mini *mini);
 
 // HEREDOC
 int				process_heredoc(t_command *cmd);
@@ -111,6 +119,6 @@ void 			free_commands(t_parse_result *result);
 void 			setup_input(t_command *cmd, int prev_pipe_fd);
 void			setup_output(t_command *cmd, int pipe_fd[2]);
 void 			setup_pipes_and_redirection(t_command *cmd, int prev_pipe_fd, int pipe_fd[2]);
-void 			execute_pipeline(t_parse_result *result, char **our_env);
+void 			execute_pipeline(t_parse_result *result, t_mini *mini);
 
 #endif
