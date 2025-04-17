@@ -23,7 +23,7 @@ void setup_pipes_and_redirection(t_command *cmd, int prev_pipe_fd, int (*pipe_fd
     setup_output(cmd, pipe_fd);
 }
 
-void execute_pipeline(t_parse_result *result, char **env)
+void execute_pipeline(t_parse_result *result, t_mini *mini)
 {
     int i;
     int prev_pipe_fd = -1;
@@ -34,7 +34,7 @@ void execute_pipeline(t_parse_result *result, char **env)
 
     if (result->cmd_count == 1 && is_builtin(result->commands[0].argv[0]))
     {
-        execute_builtin(&result->commands[0], 1);
+        execute_builtin(&result->commands[0], 1, mini);
         return ;
     }
     i = 0;
@@ -45,7 +45,7 @@ void execute_pipeline(t_parse_result *result, char **env)
             open_close_pipe(result, &i, &pipe_fd);
             pid = fork();
             if (pid == 0)
-                child_process(result, &i, &pipe_fd, &prev_pipe_fd, env);
+                child_process(result, &i, &pipe_fd, &prev_pipe_fd, mini);
             else if (pid > 0)
                 parent_process(result, &i, &pipe_fd, &prev_pipe_fd);
             else
@@ -55,7 +55,7 @@ void execute_pipeline(t_parse_result *result, char **env)
         {
             open_close_pipe(result, &i, &pipe_fd);
             pid = fork();
-            process_handling(&pid, result, &i, &pipe_fd, &prev_pipe_fd, env);
+            process_handling(&pid, result, &i, &pipe_fd, &prev_pipe_fd, mini);
         }
         i++;
     }

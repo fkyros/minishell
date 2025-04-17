@@ -13,7 +13,7 @@ int is_builtin(char *cmd)
             !ft_strcmp(cmd, "exit"));
 }
 
-void execute_builtin(t_command *cmd, int apply_redirects)
+void execute_builtin(t_command *cmd, int apply_redirects, t_mini *mini)
 {
     int saved_stdin;
     int saved_stdout;
@@ -42,7 +42,10 @@ void execute_builtin(t_command *cmd, int apply_redirects)
         builtin_echo(cmd->argv);
     else if (!ft_strcmp(cmd->argv[0], "pwd"))
         builtin_pwd();
-    // Add other builtins as needed
+    else if (!ft_strcmp(cmd->argv[0], "env"))
+        builtin_env(mini->our_env);
+    else if (!ft_strcmp(cmd->argv[0], "export"))
+        builtin_export(cmd->argv, mini);
     if (apply_redirects)
     {
         if (dup2(saved_stdin, STDIN_FILENO) == -1)

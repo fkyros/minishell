@@ -1,7 +1,7 @@
 #include "../inc/minishell.h"
 
 void child_process(t_parse_result *result, int *i, int (*pipe_fd)[2],
-                  int *prev_pipe_fd, char **env)
+                  int *prev_pipe_fd, t_mini *mini)
 {
     t_command *cmd;
     char    *path;
@@ -34,15 +34,15 @@ void child_process(t_parse_result *result, int *i, int (*pipe_fd)[2],
         close((*pipe_fd)[1]);
     if (is_builtin(cmd->argv[0])) 
     {
-        execute_builtin(cmd, 0);
+        execute_builtin(cmd, 0, mini);
         exit(0);
     } 
     else 
     {
-        path = search_command(cmd->argv[0], env);
+        path = search_command(cmd->argv[0], mini->our_env);
         if (path) 
         {
-            execve(path, cmd->argv, env);
+            execve(path, cmd->argv, mini->our_env);
             free(path);
         }
         ft_putstr_fd("minishell: ", STDERR_FILENO);
@@ -68,7 +68,7 @@ void    parent_process(t_parse_result *result, int *i, int (*pipe_fd)[2],
 }
 
 void    process_handling(int *pid, t_parse_result *result, int *i, 
-    int (*pipe_fd)[2], int *prev_pipe_fd, char **env)
+    int (*pipe_fd)[2], int *prev_pipe_fd, t_mini *mini)
 {
     if (*pid < 0)
         {
@@ -76,7 +76,7 @@ void    process_handling(int *pid, t_parse_result *result, int *i,
             exit(EXIT_FAILURE);
         }
     else if (*pid == 0)
-        child_process(result, i, pipe_fd, prev_pipe_fd, env);
+        child_process(result, i, pipe_fd, prev_pipe_fd, mini);
     else
         parent_process(result, i, pipe_fd, prev_pipe_fd);
 }

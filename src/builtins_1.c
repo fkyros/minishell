@@ -43,6 +43,7 @@ void builtin_echo(char **args)
         write(1, "\n", 1);
 }
 
+// TODO: change for ft_getenv, and change internal PWD and OLDPWD env variables
 void builtin_cd(char **args)
 {
     char *home;

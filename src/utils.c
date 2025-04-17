@@ -1,6 +1,5 @@
 #include "../inc/minishell.h"
 
-
 void	free_split(char **split)
 {
 	int	i;
@@ -16,43 +15,44 @@ void	free_split(char **split)
 	free(split);
 }
 
-char	*ft_getenv(char *name, char **env)
-{
-	int		i;
-	int		j;
-	char	*sub;
+//TODO: still necessary?
+// char	*ft_getenv(char *name, char **env)
+// {
+// 	int		i;
+// 	int		j;
+// 	char	*sub;
 
-	i = 0;
-	while (env[i])
-	{
-		j = 0;
-		while (env[i][j] && env[i][j] != '=')
-			j++;
-		sub = ft_substr(env[i], 0, j);
-		if (ft_strcmp(sub, name) == 0)
-		{
-			free(sub);
-			return (env[i] + j + 1);
-		}
-		free(sub);
-		i++;
-	}
-	return (NULL);
-}
+// 	i = 0;
+// 	while (env[i])
+// 	{
+// 		j = 0;
+// 		while (env[i][j] && env[i][j] != '=')
+// 			j++;
+// 		sub = ft_substr(env[i], 0, j);
+// 		if (ft_strcmp(sub, name) == 0)
+// 		{
+// 			free(sub);
+// 			return (env[i] + j + 1);
+// 		}
+// 		free(sub);
+// 		i++;
+// 	}
+// 	return (NULL);
+// }
 
 char    *get_cwd(void)
 {
-        char    *cwd = malloc(2048);
+        char    *cwd = malloc(MAX_CWD);
         if (!cwd)
         {
-                perror("Error trying to assign memory for the current directory");
-                exit(1);
+            perror("Error trying to assign memory for the current directory");
+            exit(1);
         }
-        if (!getcwd(cwd, 2048))
+        if (!getcwd(cwd, MAX_CWD))
         {
-                perror("Error trying to obtain current directory");
-                free(cwd);
-                exit(1);
+            perror("Error trying to obtain current directory");
+            free(cwd);
+            exit(1);
         }
         return (cwd);
 }
@@ -69,6 +69,7 @@ PINK" (_) | |  "GREEN"|_____/  |_| |_|  "PINK"| |\n"
 PINK"      \\_\\                  /_/ "RST"\n\n"                                                              
 );	
 }
+
 /***
  * Prints through STDERR and returns COMMAND_NOT_FOUND code error 
  */

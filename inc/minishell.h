@@ -25,6 +25,8 @@
 # define BOLD    "\x1b[1m"
 # define UNDERLINE "\x1b[4m"
 
+# define MAX_CWD 2048
+
 # define COMMAND_NOT_FOUND 127
 # define COMMAND_NOT_EXECUTABLE 126
 
@@ -54,7 +56,14 @@ typedef struct s_parse_result {
     char **args;  
     int token_count;
     int cmd_count;
-} t_parse_result;
+}	t_parse_result;
+
+typedef	struct s_mini
+{
+	char	**our_env;
+	int		last_status;
+}	t_mini;
+
 
 // UTILS
 
@@ -64,7 +73,9 @@ int				print_path_error(char *path, t_parse_result *result, int i);
 int				is_operator(const char *token);
 
 // ENV
-char			*expand(char *var);
+char			*expand(char *var, char **our_env);
+char			**init_env(char **old_env);
+char			**add_var_to_env(char **our_env, char *name, char *value);
 
 // PATHING
 
@@ -87,10 +98,13 @@ void			print_banner(void);
 int				apply_redirections(t_command *cmd);
 
 int				is_builtin(char *cmd);
-void 			execute_builtin(t_command *cmd, int apply_redirects);
+void  			execute_builtin(t_command *cmd, int apply_redirects, t_mini *mini);
 void			builtin_echo(char **args);
 void    		builtin_cd(char **args);
 void			builtin_pwd(void);
+void    		builtin_env(char **our_env);
+void			builtin_exit(char **args);
+void			builtin_export(char **args, t_mini *mini);
 
 // HEREDOC
 void			check_heredocs(t_parse_result *result);
@@ -105,20 +119,20 @@ void			skip_quoted_section(const char *str, int *index, char quote_char);
 void			skip_unquoted_section(const char *str, int *index);
 // MAIN FUNCTIONS
 void			add_redirect(t_command *cmd, enum e_redirect_type type, char *filename, char *heredoc_eof);
-char 			**parse_command(const char *cmd, int *token_count);
-t_parse_result	parse_commands(const char *input);
+char 			**parse_command(const char *cmd, int *token_count, char **our_env);
+t_parse_result	parse_commands(const char *input, char **our_env);
 
 // PIPING
 void 			setup_input(t_command *cmd, int prev_pipe_fd);
 void 			setup_output(t_command *cmd, int (*pipe_fd)[2]);
 void 			setup_pipes_and_redirection(t_command *cmd, int prev_pipe_fd, int (*pipe_fd)[2]);
-void 			execute_pipeline(t_parse_result *result, char **env);
+void 			execute_pipeline(t_parse_result *result, t_mini *mini);
 
 // --> PIPING AUX
 void			open_close_pipe(t_parse_result *result, int *i, int (*pipe_fd)[2]);
-void 			child_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, char **env);
+void 			child_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, t_mini *mini);
 void    		parent_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd);
-void    		process_handling(int *pid, t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, char **env);
+void    		process_handling(int *pid, t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, t_mini *mini);
 void			wait_processes(t_parse_result *result);
 
 #endif

@@ -6,3 +6,4 @@ minishell
 bin/
 .DS_Store
 *.a
+*.swp
