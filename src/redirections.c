@@ -24,6 +24,7 @@ void add_redirect(t_command *cmd, enum e_redirect_type type,
 void redirect_input_heredoc(t_command *cmd)
 {
     int i;
+    int fd;
 
     if (!cmd)
         return ;
@@ -42,7 +43,7 @@ void redirect_input_heredoc(t_command *cmd)
     {
         if (cmd->redirs[i].type == in && cmd->redirs[i].filename)
         {
-            int fd = open(cmd->redirs[i].filename, O_RDONLY);
+            fd = open(cmd->redirs[i].filename, O_RDONLY);
             if (fd == -1)
             {
                 perror("minishell: open");
@@ -79,7 +80,6 @@ void redirect_output(t_command *cmd)
         perror("minishell: malloc");
         return ;
     }
-
     while (i < cmd->redir_count)
     {
         if ((cmd->redirs[i].type == out || cmd->redirs[i].type == append) && 

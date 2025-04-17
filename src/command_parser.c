@@ -4,16 +4,15 @@ static void compact_argv(char **argv, int length)
 {
 	int	write_pos;
 	int read_pos;
+
     if (!argv) 
 		return ;
-    
     write_pos = 0;
 	read_pos = 0;
     while (read_pos < length)
 	{
-        if (argv[read_pos] != NULL) {
+        if (argv[read_pos] != NULL)
             argv[write_pos++] = argv[read_pos];
-        }
 		read_pos++;
     }
     argv[write_pos] = NULL;
@@ -34,9 +33,12 @@ static int is_redirection(const char *token)
 
 static enum e_redirect_type get_redirection_type(const char *token)
 {
-    if (ft_strcmp(token, ">") == 0) return out;
-    if (ft_strcmp(token, ">>") == 0) return append;
-    if (ft_strcmp(token, "<") == 0) return in;
+    if (ft_strcmp(token, ">") == 0)
+        return (out);
+    if (ft_strcmp(token, ">>") == 0)
+        return (append);
+    if (ft_strcmp(token, "<") == 0)
+        return (in);
     return (heredoc);
 }
 

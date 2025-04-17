@@ -115,7 +115,6 @@ void 			setup_pipes_and_redirection(t_command *cmd, int prev_pipe_fd, int (*pipe
 void 			execute_pipeline(t_parse_result *result, char **env);
 
 // --> PIPING AUX
-void			cmd_exists(t_parse_result *result, char **env);
 void			open_close_pipe(t_parse_result *result, int *i, int (*pipe_fd)[2]);
 void 			child_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, char **env);
 void    		parent_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd);
