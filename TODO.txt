@@ -1,11 +1,7 @@
 TODO
 
-1 - FINAL PARSING LOGIC: <, >, |, | <, | >, UNCLOSED '' "" (before child processes) -> yo
-
-- Redirection logic -> It doesn't have to JUST overwrite redirections, it also has to create the files even if they're going to be empty at the end
-
-2 - SIGNALS (CTRL+\ HANDLING) -> gabri
-3 - BUILTINS -> gabri y yo
-4 - VARIABLE EXPANSION LOGIC -> gabri
-5 - READLINE: HISTORY, COLOURS -> yo
-6 - NORMINETTE
+1 - FINAL PARSING LOGIC: SHOW ERROR ON UNCLOSED QUOTES
+2 - SIGNALS + READLINE
+3 - BUILTINS (unset) -> gabri
+4 - TRYING TO BREAK IT
+5 - NORMINETTE
