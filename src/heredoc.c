@@ -75,5 +75,6 @@ void close_heredocs(t_parse_result *result)
             close(result->commands[i].heredoc_fd);
             result->commands[i].heredoc_fd = -1;
         }
+        i++;
     }
 }

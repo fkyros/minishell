@@ -35,6 +35,7 @@ void redirect_input_heredoc(t_command *cmd)
         cmd->heredoc_fd = -1;
         return ;
     }
+    i = cmd->redir_count - 1;
     if (!cmd->redirs || cmd->redir_count <= 0)
         return ;
     while (i >= 0)
