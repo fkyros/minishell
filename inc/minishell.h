@@ -95,8 +95,8 @@ char    		*get_cwd(void);
 void			print_banner(void);
 
 // BUILTINS
-int				apply_redirections(t_command *cmd);
 
+int				apply_redirections(t_command *cmd);
 int				is_builtin(char *cmd);
 void  			execute_builtin(t_command *cmd, int apply_redirects, t_mini *mini);
 void			builtin_echo(char **args);
@@ -112,6 +112,7 @@ void    		close_heredocs(t_parse_result *result);
 
 // REDIRECTION PARSING
 // AUX FUNCTIONS
+int				check_unclosed_quotes(const char *str);
 int				count_tokens(const char *str);
 int				is_whitespace(char c);
 int				is_quote(char c);
