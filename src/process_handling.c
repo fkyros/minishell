@@ -99,9 +99,7 @@ void wait_processes(t_parse_result *result, t_mini *mini)
     while (i < result->cmd_count)
     {
         if (wait(&status) == -1)
-        {
-            perror("minishell: wait");
-        }
+            perror(BOLD RED"minishell: wait"RST);
         else
         {
             if (WIFEXITED(status))

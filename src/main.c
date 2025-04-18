@@ -9,13 +9,15 @@
 static int *get_readline_flag(void)
 {
     static int in_readline = 0;
-    return &in_readline;
+
+    return (&in_readline);
 }
 
 void signal_handler(int sig)
 {
-    int *in_readline = get_readline_flag();
-
+    int *in_readline;
+    
+    in_readline = get_readline_flag();
     if (sig == SIGINT)
     {
         write(STDOUT_FILENO, "\n", 1);
@@ -38,12 +40,12 @@ int handle_ctrl_l(int count, int key)
     (void)count;
     (void)key;
 
-    write(STDOUT_FILENO, "\033[H\033[2J", 7); // Limpia pantalla ANSI
+    write(STDOUT_FILENO, "\033[H\033[2J", 7);
 
     rl_replace_line("", 0);
     rl_on_new_line();
     rl_redisplay();
-    return 0;
+    return (0);
 }
 
 void setup_signals(void)
@@ -51,29 +53,29 @@ void setup_signals(void)
     signal(SIGINT, signal_handler);
     signal(SIGQUIT, SIG_IGN);
     signal(SIGWINCH, signal_handler);
-    rl_bind_key('\f', handle_ctrl_l);  // Ctrl+L limpia pantalla
+    rl_bind_key('\f', handle_ctrl_l);
 }
 
 char *build_prompt(void)
 {
-    char *cwd = get_cwd();
+    char *cwd;
     char *base;
     char *prompt;
+    char *tmp;
 
+    cwd = get_cwd();
     if (cwd)
     {
-        char *tmp = ft_strjoin(BOLD GREEN, cwd);
+        tmp = ft_strjoin(BOLD GREEN, cwd);
         free(cwd);
         base = ft_strjoin(tmp, " > " RST);
         free(tmp);
     }
     else
-    {
         base = ft_strdup(BOLD GREEN "minishell > " RST);
-    }
     prompt = ft_strjoin(base, BOLD PINK "funny shell > " RST);
     free(base);
-    return prompt;
+    return (prompt);
 }
 
 t_mini *init_shell(char **env)
@@ -101,13 +103,11 @@ int run_prompt_loop(t_mini *mini)
         line = readline(prompt);
         *in_readline = 0;
         free(prompt);
-
         if (!line)
         {
-            printf("\nMinishell: exiting!\n");
-            return 0;
+            printf(PINK BOLD"\nMinishell: exiting!\n"RST);
+            return (0);
         }
-
         if (*line)
         {
             add_history(line);
@@ -126,17 +126,14 @@ int main(int argc, char **argv, char **env)
 
     (void)argc;
     (void)argv;
-
     setup_signals();
     print_banner();
 
     mini = init_shell(env);
     if (!mini)
-        return 1;
-
+        return (1);
     run_prompt_loop(mini);
-
     free_array(mini->our_env);
     free(mini);
-    return EXIT_SUCCESS;
+    return (EXIT_SUCCESS);
 }

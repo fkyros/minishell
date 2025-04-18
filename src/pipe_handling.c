@@ -6,7 +6,7 @@ void    open_close_pipe(t_parse_result *result, int *i, int (*pipe_fd)[2])
         {
             if (pipe(*pipe_fd) < 0)
             {
-                perror(RED BOLD"pipe"RST);
+                perror(RED BOLD"minishell: pipe"RST);
                 exit(EXIT_FAILURE);
             }
         }
@@ -53,7 +53,7 @@ void execute_pipeline(t_parse_result *result, t_mini *mini)
             else if (pid > 0)
                 parent_process(result, &i, &pipe_fd, &prev_pipe_fd);
             else
-                perror("minishell: fork");
+                perror(BOLD RED"minishell: fork"RST);
         }
         else
         {

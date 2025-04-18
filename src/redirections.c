@@ -31,7 +31,7 @@ void redirect_input_heredoc(t_command *cmd)
     if (cmd->heredoc_fd != -1)
     {
         if (dup2(cmd->heredoc_fd, STDIN_FILENO) == -1)
-            perror("minishell: dup2");
+            perror(BOLD RED"minishell: dup2"RST);
         close(cmd->heredoc_fd);
         cmd->heredoc_fd = -1;
         return ;
@@ -46,12 +46,12 @@ void redirect_input_heredoc(t_command *cmd)
             fd = open(cmd->redirs[i].filename, O_RDONLY);
             if (fd == -1)
             {
-                perror("minishell: open");
+                perror(BOLD RED"minishell: open"RST);
                 continue ;
             }
 
             if (dup2(fd, STDIN_FILENO) == -1)
-                perror("minishell: dup2");
+                perror(BOLD RED"minishell: dup2"RST);
             close(fd);
             return ;
         }
@@ -77,7 +77,7 @@ void redirect_output(t_command *cmd)
     created_fds = malloc(cmd->redir_count * sizeof(int));
     if (!created_fds) 
     {
-        perror("minishell: malloc");
+        perror(BOLD RED"minishell: malloc"RST);
         return ;
     }
     while (i < cmd->redir_count)
@@ -93,7 +93,7 @@ void redirect_output(t_command *cmd)
             fd = open(cmd->redirs[i].filename, flags, 0644);
             if (fd == -1) 
             {
-                perror("minishell: open");
+                perror(BOLD RED"minishell: open"RST);
                 continue ;
             }
             created_fds[fd_count++] = fd;
@@ -106,7 +106,7 @@ void redirect_output(t_command *cmd)
     if (last_out_fd != -1) 
     {
         if (dup2(last_out_fd, STDOUT_FILENO) == -1)
-            perror("minishell: dup2");
+            perror(BOLD RED"minishell: dup2"RST);
         close(last_out_fd);
     }
     i = 0;
@@ -162,7 +162,7 @@ void setup_input(t_command *cmd, int prev_pipe_fd)
             fd = open(cmd->redirs[i].filename, O_RDONLY);
             if (fd == -1) 
             {
-                perror("minishell: open");
+                perror(BOLD RED"minishell: open"RST);
                 exit(1);
             }
             dup2(fd, STDIN_FILENO);
@@ -199,7 +199,7 @@ void setup_output(t_command *cmd, int (*pipe_fd)[2])
             fd = open(cmd->redirs[i].filename, flags, 0644);
             if (fd == -1) 
             {
-                perror("minishell: open");
+                perror(BOLD RED"minishell: open"RST);
                 exit(1);
             }
             if (last_out != -1)

@@ -28,7 +28,7 @@ static void process_heredoc(t_command *cmd, const char *heredoc_eof)
     int pipe_fd[2];
     
     if (pipe(pipe_fd) == -1) {
-        perror("minishell: pipe");
+        perror(BOLD RED"minishell: pipe"RST);
         return ;
     }
     heredoc_readline(heredoc_eof, pipe_fd);

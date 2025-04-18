@@ -54,12 +54,12 @@ void builtin_cd(char **args)
         if (!home)
             ft_putstr_fd(BOLD RED"Minishell: cd: HOME not set\n"RST, 2);
         if (chdir(home) != 0)
-            perror("cd");
+            perror(BOLD RED"minishell error: cd"RST);
     }
     else
     {
         if (chdir(args[1]) != 0)
-            perror("cd");
+            perror(BOLD RED"minishell error: cd"RST);
     }
 }
 
@@ -68,6 +68,6 @@ void builtin_pwd(void)
     char cwd[PATH_MAX];
 
     if (getcwd(cwd, sizeof(cwd)) == NULL)
-        perror("pwd");
+        perror(BOLD RED"minishell error: pwd"RST);
     printf("%s\n", cwd);
 }
