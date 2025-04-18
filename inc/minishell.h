@@ -11,6 +11,7 @@
 # include <sys/stat.h>
 # include <fcntl.h>
 # include <signal.h>
+# include <termcap.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "../libft/libft.h"
@@ -87,6 +88,7 @@ char			*search_command(char *cmd, char **env);
 // MEMORY HANDLING
 
 void    		*ft_realloc(void *ptr, size_t old_size, size_t new_size);
+void			free_array(char **arr);
 void 			free_commands(t_parse_result *result);
 
 // SHELL UTILITIES
@@ -95,8 +97,8 @@ char    		*get_cwd(void);
 void			print_banner(void);
 
 // BUILTINS
-int				apply_redirections(t_command *cmd);
 
+int				apply_redirections(t_command *cmd);
 int				is_builtin(char *cmd);
 void  			execute_builtin(t_command *cmd, int apply_redirects, t_mini *mini);
 void			builtin_echo(char **args);
@@ -112,6 +114,7 @@ void    		close_heredocs(t_parse_result *result);
 
 // REDIRECTION PARSING
 // AUX FUNCTIONS
+int				check_unclosed_quotes(const char *str);
 int				count_tokens(const char *str);
 int				is_whitespace(char c);
 int				is_quote(char c);
@@ -133,6 +136,6 @@ void			open_close_pipe(t_parse_result *result, int *i, int (*pipe_fd)[2]);
 void 			child_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, t_mini *mini);
 void    		parent_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd);
 void    		process_handling(int *pid, t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, t_mini *mini);
-void			wait_processes(t_parse_result *result);
+void 			wait_processes(t_parse_result *result, t_mini *mini);
 
 #endif

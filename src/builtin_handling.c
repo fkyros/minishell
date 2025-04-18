@@ -26,7 +26,7 @@ void execute_builtin(t_command *cmd, int apply_redirects, t_mini *mini)
         saved_stdout = dup(STDOUT_FILENO);
         if (saved_stdin == -1 || saved_stdout == -1)
         {
-            perror("minishell: dup");
+            perror(BOLD RED"minishell: dup"RST);
             return ;
         }
         if (apply_redirections(cmd) != 0)
@@ -49,9 +49,9 @@ void execute_builtin(t_command *cmd, int apply_redirects, t_mini *mini)
     if (apply_redirects)
     {
         if (dup2(saved_stdin, STDIN_FILENO) == -1)
-            perror("minishell: dup2");
+            perror(BOLD RED"minishell: dup2"RST);
         if (dup2(saved_stdout, STDOUT_FILENO) == -1)
-            perror("minishell: dup2");
+            perror(BOLD RED"minishell: dup2"RST);
         close(saved_stdin);
         close(saved_stdout);
     }

@@ -45,12 +45,12 @@ char    *get_cwd(void)
         char    *cwd = malloc(MAX_CWD);
         if (!cwd)
         {
-            perror("Error trying to assign memory for the current directory");
+            perror(BOLD RED"minishell: Error trying to assign memory for the current directory"RST);
             exit(1);
         }
         if (!getcwd(cwd, MAX_CWD))
         {
-            perror("Error trying to obtain current directory");
+            perror(BOLD RED"minishell: Error trying to obtain current directory"RST);
             free(cwd);
             exit(1);
         }

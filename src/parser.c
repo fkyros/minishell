@@ -61,9 +61,20 @@ int	count_tokens(const char *str)
 
 char **parse_command(const char *cmd, int *token_count, char **our_env) 
 {
-    int index = 0;
-    int count = count_tokens(cmd);
-    char **tokens = malloc((count + 1) * sizeof(char *));
+    int index;
+    int count;
+    char **tokens;
+	int	i;
+
+	if (!check_unclosed_quotes(cmd))
+    {
+        ft_putstr_fd("minishell: syntax error: unclosed quotes\n", STDERR_FILENO);
+        *token_count = 0;
+        return (NULL);
+    }
+	index = 0;
+	count = count_tokens(cmd);
+	tokens = malloc((count + 1) * sizeof(char *));
 	if (!cmd && !tokens)
 	{
 		free(tokens);
@@ -71,7 +82,7 @@ char **parse_command(const char *cmd, int *token_count, char **our_env)
 	}
     *token_count = count;
     index = 0;
-    int i = 0;
+    i = 0;
     while (i < count) {
         tokens[i] = get_next_token(cmd, &index, our_env);
         i++;

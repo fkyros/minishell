@@ -29,6 +29,20 @@ void    *ft_realloc(void *ptr, size_t old_size, size_t new_size)
     return (new_ptr);
 }
 
+void	free_array(char **arr)
+{
+	int i = 0;
+
+	if (!arr)
+		return;
+	while (arr[i])
+	{
+		free(arr[i]);
+		i++;
+	}
+	free(arr);
+}
+
 void free_commands(t_parse_result *result) 
 {
     int i;
@@ -43,6 +57,13 @@ void free_commands(t_parse_result *result)
         while (i < result->token_count)
             free(result->original_tokens[i++]);
         free(result->original_tokens);
+    }
+    i = 0;
+    while (i < result->cmd_count)
+    {
+        if (result->commands[i].redirs)
+            free(result->commands[i].redirs);
+        i++;
     }
     free(result->commands);
     result->commands = NULL;

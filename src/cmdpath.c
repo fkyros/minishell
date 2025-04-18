@@ -42,6 +42,7 @@ char	*search_in_path(char **paths, char *cmd)
 char	*search_command(char *cmd, char **env)
 {
 	char	**paths;
+	char	*path_env;
 
 	if (!env || !cmd)
 		return (NULL);
@@ -49,9 +50,13 @@ char	*search_command(char *cmd, char **env)
 	{
 		if (is_valid_path(cmd))
 			return (cmd);
-		return (ft_strdup("/")); //TODO: change this solution
+		return (ft_strdup("/"));
 	}
-	paths = ft_split(ft_getenv("PATH", env), ':'); // TODO: change for standard getenv?
+	path_env = ft_getenv("PATH", env);
+	if (!path_env)
+		return (NULL);
+	paths = ft_split(path_env, ':');
+	free(path_env);
 	if (!paths)
 		return (NULL);
 	return (search_in_path(paths, cmd));

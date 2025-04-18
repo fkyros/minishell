@@ -10,6 +10,35 @@ int	is_quote(char c)
 	return (c == '\'' || c == '\"');
 }
 
+int	check_unclosed_quotes(const char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == '\'')
+		{
+			i++;
+			while (str[i] && str[i] != '\'')
+				i++;
+			if (!str[i])
+				return (0);
+		}
+		else if (str[i] == '\"')
+		{
+			i++;
+			while (str[i] && str[i] != '\"')
+				i++;
+			if (!str[i])
+				return (0);
+		}
+		if (str[i])
+			i++;
+	}
+	return (1);
+}
+
 void	skip_quoted_section(const char *str, int *index, char quote_char)
 {
 	(*index)++;

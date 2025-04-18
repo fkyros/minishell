@@ -6,7 +6,7 @@ void    open_close_pipe(t_parse_result *result, int *i, int (*pipe_fd)[2])
         {
             if (pipe(*pipe_fd) < 0)
             {
-                perror(RED BOLD"pipe"RST);
+                perror(RED BOLD"minishell: pipe"RST);
                 exit(EXIT_FAILURE);
             }
         }
@@ -44,12 +44,16 @@ void execute_pipeline(t_parse_result *result, t_mini *mini)
         {
             open_close_pipe(result, &i, &pipe_fd);
             pid = fork();
-            if (pid == 0)
+            if (pid == 0) 
+            {
+                signal(SIGINT, SIG_DFL);
+                signal(SIGQUIT, SIG_DFL);
                 child_process(result, &i, &pipe_fd, &prev_pipe_fd, mini);
+            }
             else if (pid > 0)
                 parent_process(result, &i, &pipe_fd, &prev_pipe_fd);
             else
-                perror("minishell: fork");
+                perror(BOLD RED"minishell: fork"RST);
         }
         else
         {
@@ -59,6 +63,6 @@ void execute_pipeline(t_parse_result *result, t_mini *mini)
         }
         i++;
     }
-    wait_processes(result);
+    wait_processes(result, mini);
     close_heredocs(result);
 }
