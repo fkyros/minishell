@@ -43,7 +43,7 @@ void execute_builtin(t_command *cmd, int apply_redirects, t_mini *mini)
     else if (!ft_strcmp(cmd->argv[0], "pwd"))
         builtin_pwd();
     else if (!ft_strcmp(cmd->argv[0], "env"))
-        builtin_env(mini->our_env);
+        builtin_env(mini);
     else if (!ft_strcmp(cmd->argv[0], "export"))
         builtin_export(cmd->argv, mini);
     if (apply_redirects)

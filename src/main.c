@@ -111,7 +111,7 @@ int run_prompt_loop(t_mini *mini)
         if (*line)
         {
             add_history(line);
-            parse_result = parse_commands(line, mini->our_env);
+            parse_result = parse_commands(line, mini);
             if (parse_result.cmd_count > 0)
                 execute_pipeline(&parse_result, mini);
             free_commands(&parse_result);

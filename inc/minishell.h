@@ -74,7 +74,7 @@ int				print_path_error(char *path, t_parse_result *result, int i);
 int				is_operator(const char *token);
 
 // ENV
-char			*expand(char *var, char **our_env);
+char			*expand(char *var, t_mini *mini);
 char			**init_env(char **old_env);
 char			**add_var_to_env(char **our_env, char *name, char *value);
 
@@ -104,7 +104,7 @@ void  			execute_builtin(t_command *cmd, int apply_redirects, t_mini *mini);
 void			builtin_echo(char **args);
 void    		builtin_cd(char **args);
 void			builtin_pwd(void);
-void    		builtin_env(char **our_env);
+void    		builtin_env(t_mini *mini);
 void			builtin_exit(char **args);
 void			builtin_export(char **args, t_mini *mini);
 
@@ -122,8 +122,8 @@ void			skip_quoted_section(const char *str, int *index, char quote_char);
 void			skip_unquoted_section(const char *str, int *index);
 // MAIN FUNCTIONS
 void			add_redirect(t_command *cmd, enum e_redirect_type type, char *filename, char *heredoc_eof);
-char 			**parse_command(const char *cmd, int *token_count, char **our_env);
-t_parse_result	parse_commands(const char *input, char **our_env);
+char 			**parse_command(const char *cmd, int *token_count, t_mini *mini);
+t_parse_result	parse_commands(const char *input, t_mini *mini);
 
 // PIPING
 void 			setup_input(t_command *cmd, int prev_pipe_fd);

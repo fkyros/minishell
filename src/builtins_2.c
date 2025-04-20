@@ -6,7 +6,7 @@
 /*   By: gade-oli <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 19:39:00 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/04/15 19:39:02 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/04/20 16:48:35 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,17 +59,17 @@ void	builtin_export(char **args, t_mini *mini)
 	mini->last_status = status;
 }
 
-void	builtin_env(char **our_env)
+void	builtin_env(t_mini *mini)
 {
 	int i;
 
 	i = 0;
-	while (our_env[i])
+	while (mini->our_env[i])
 	{
-		printf("%s\n", our_env[i]);
+		printf("%s\n", mini->our_env[i]);
 		i++;
 	}
-	//return (0); //status for $?
+	mini->last_status = 0;
 }
 
 /*

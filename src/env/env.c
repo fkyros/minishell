@@ -88,10 +88,12 @@ char	*ft_getenv(char *var, char **env)
 // TODO: implement this as a local get_env for new env
 // what if just $ ?
 // NOTE: only expands `env` variables atm, not $? yet
-char	*expand(char *var, char **our_env)
+char	*expand(char *var, t_mini *mini)
 {
+	if (var && ft_strncmp(var, "$?", 2) == 0)
+		return (ft_itoa(mini->last_status));
 	if (var && ft_strncmp(var, "$", 1) == 0 && var++)
-		return (ft_getenv(var, our_env));
+		return (ft_getenv(var, mini->our_env));
 	return (NULL);
 }
 

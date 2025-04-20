@@ -92,10 +92,12 @@ void process_handling(int *pid, t_parse_result *result, int *i,
 
 void wait_processes(t_parse_result *result, t_mini *mini)
 {
-    int i = 0;
+    int i;
     int status;
-    int last_status = 0;
+    int last_status;
 
+	i = 0;
+	last_status = 0;
     while (i < result->cmd_count)
     {
         if (wait(&status) == -1)

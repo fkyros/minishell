@@ -68,12 +68,12 @@ static void init_command(t_command *cmd, char **argv_start, int is_first)
     ft_memset(&cmd->redirs, 0, sizeof(t_redirect *));
 }
 
-static int init_parse_result(const char *input, t_parse_result *result, char **our_env)
+static int init_parse_result(const char *input, t_parse_result *result, t_mini *mini)
 {
 	int actual_cmd_count;
 	int i;
 
-    result->args = parse_command(input, &result->token_count, our_env);
+    result->args = parse_command(input, &result->token_count, mini);
     if (!result->args)
         return 0;
     result->original_tokens = copy_original_tokens(result->args, result->token_count);
@@ -142,14 +142,14 @@ static void fill_command(char **args, int *i, t_command *cmd)
     compact_argv(cmd->argv, cmd_length);
 }
 
-t_parse_result parse_commands(const char *input, char **our_env)
+t_parse_result parse_commands(const char *input, t_mini *mini)
 {
     t_parse_result result;
     int i;
 	int prev_i;
     
 	result = (t_parse_result){0};
-	if (!init_parse_result(input, &result, our_env))
+	if (!init_parse_result(input, &result, mini))
 		return (result);
 	i = 0;
     while (result.args[i] && result.cmd_count < result.token_count)
