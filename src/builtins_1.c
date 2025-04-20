@@ -49,13 +49,18 @@ void	update_cd_vars(t_mini *mini)
 {
 	char	cwd[PATH_MAX];
 	char	*oldpwd;
+	char	**new_env;
 
 	oldpwd = ft_getenv("PWD", mini->our_env);
-	mini->our_env = add_var_to_env(mini->our_env, "OLDPWD", oldpwd);
+	new_env = add_var_to_env(mini->our_env, "OLDPWD", oldpwd);
 	free(oldpwd);
+	free_split(mini->our_env);
+	mini->our_env = new_env;
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
 		perror(BOLD RED"minishell error: pwd"RST);
-	mini->our_env = add_var_to_env(mini->our_env, "PWD", cwd);
+	new_env = add_var_to_env(mini->our_env, "PWD", cwd);
+	free_split(mini->our_env);
+	mini->our_env = new_env;
 	mini->last_status = 0;
 }
 

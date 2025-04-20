@@ -6,7 +6,7 @@
 /*   By: gade-oli <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 19:39:00 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/04/20 16:48:35 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/04/20 20:56:38 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ void	builtin_export(char **args, t_mini *mini)
 	i = 1;
 	if (!args[i])
 	{
-		ft_putstr_fd("No behaviour defined\n", STDERR_FILENO);
+		ft_putstr_fd("no behaviour defined\n", STDERR_FILENO);
+		ft_putstr_fd("see more at https://www.man7.org/linux/man-pages/man1/export.1p.html\n", STDERR_FILENO);
 		return ;
 	}
 	while(args[i])

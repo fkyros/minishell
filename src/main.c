@@ -131,7 +131,7 @@ int main(int argc, char **argv, char **env)
 
     mini = init_shell(env);
     if (!mini)
-        return (1);
+        return (GENERIC_ERROR);
     run_prompt_loop(mini);
     free_array(mini->our_env);
     free(mini);
