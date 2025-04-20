@@ -28,6 +28,7 @@
 
 # define MAX_CWD 2048
 
+# define GENERIC_ERROR 1
 # define COMMAND_NOT_FOUND 127
 # define COMMAND_NOT_EXECUTABLE 126
 
@@ -101,9 +102,9 @@ void			print_banner(void);
 int				apply_redirections(t_command *cmd);
 int				is_builtin(char *cmd);
 void  			execute_builtin(t_command *cmd, int apply_redirects, t_mini *mini);
-void			builtin_echo(char **args);
-void    		builtin_cd(char **args);
-void			builtin_pwd(void);
+void			builtin_echo(char **args, t_mini *mini);
+void    		builtin_cd(char **args, t_mini *mini);
+void			builtin_pwd(t_mini *mini);
 void    		builtin_env(t_mini *mini);
 void			builtin_exit(char **args);
 void			builtin_export(char **args, t_mini *mini);

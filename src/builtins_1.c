@@ -26,48 +26,80 @@ static void    echo_args(char **args, int *newline, int *i)
     }
 }
 
-void builtin_echo(char **args)
+void builtin_echo(char **args, t_mini *mini)
 {
-    int i = 1;
-    int newline = 1;
-    // PROCESS FLAGS (EVEN COMBINED ONES LIKE -nnn)
-    echo_args(args, &newline, &i);
-    // PRINT THE REST
-    while (args[i])
-    {
-        write(1, args[i], ft_strlen(args[i]));
-        if (args[(i++) + 1])
-            write(1, " ", 1);
-    }
-    if (newline)
-        write(1, "\n", 1);
+	int	i;
+	int	newline;
+
+	i = 1;
+	newline = 1;
+	echo_args(args, &newline, &i);
+	while (args[i])
+	{
+		write(1, args[i], ft_strlen(args[i]));
+		if (args[(i++) + 1])
+			write(1, " ", 1);
+	}
+	if (newline)
+		write(1, "\n", 1);
+	mini->last_status = 0;
 }
 
-// TODO: change for ft_getenv, and change internal PWD and OLDPWD env variables
-void builtin_cd(char **args)
+void	update_cd_vars(t_mini *mini)
 {
-    char *home;
+	char	cwd[PATH_MAX];
+	char	*oldpwd;
 
-    if (!args[1])
-    {
-        home = getenv("HOME");
-        if (!home)
-            ft_putstr_fd(BOLD RED"Minishell: cd: HOME not set\n"RST, 2);
-        if (chdir(home) != 0)
-            perror(BOLD RED"minishell error: cd"RST);
-    }
-    else
-    {
-        if (chdir(args[1]) != 0)
-            perror(BOLD RED"minishell error: cd"RST);
-    }
+	oldpwd = ft_getenv("PWD", mini->our_env);
+	mini->our_env = add_var_to_env(mini->our_env, "OLDPWD", oldpwd);
+	free(oldpwd);
+	if (getcwd(cwd, sizeof(cwd)) == NULL)
+		perror(BOLD RED"minishell error: pwd"RST);
+	mini->our_env = add_var_to_env(mini->our_env, "PWD", cwd);
+	mini->last_status = 0;
 }
 
-void builtin_pwd(void)
-{
-    char cwd[PATH_MAX];
 
-    if (getcwd(cwd, sizeof(cwd)) == NULL)
-        perror(BOLD RED"minishell error: pwd"RST);
-    printf("%s\n", cwd);
+void	builtin_cd(char **args, t_mini *mini)
+{
+	char	*home;
+	int	error;
+
+	error = 0;
+	if (!args[1])
+	{
+		home = ft_getenv("HOME", mini->our_env);
+		if (!home)
+			ft_putstr_fd(BOLD RED"Minishell: cd: HOME not set\n"RST, 2);
+		error = 1;
+		if (chdir(home) != 0)
+		{
+			perror(BOLD RED"minishell error: cd"RST);
+			error = 1;
+		}
+	}
+	else
+	{
+		if (chdir(args[1]) != 0)
+		{
+			perror(BOLD RED"minishell error: cd"RST);
+			error = 1;
+		}
+	}
+	if (error)
+	{
+		mini->last_status = GENERIC_ERROR;
+		return ;
+	}
+	update_cd_vars(mini);
+}
+
+void builtin_pwd(t_mini *mini)
+{
+	char	cwd[PATH_MAX];
+
+	if (getcwd(cwd, sizeof(cwd)) == NULL)
+		perror(BOLD RED"minishell error: pwd"RST);
+	printf("%s\n", cwd);
+	mini->last_status = 0;
 }

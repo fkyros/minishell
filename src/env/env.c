@@ -6,7 +6,7 @@
 /*   By: gade-oli <gade-oli@student.42madrid.c      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 16:00:26 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/04/15 19:28:15 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/04/20 18:39:20 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ char	**init_env(char **old_env)
 		i++;
 	res = (char **) ft_calloc(i + 1, sizeof(char *));
 	if (!res)
-		return (NULL); //TODO: implement and execute safe exit
+		return (NULL);
 	i = 0;
 	while (old_env[i])
 	{
@@ -50,7 +50,7 @@ char	**init_env(char **old_env)
 		else
 			res[i] = ft_strdup(old_env[i]);
 		if (!res[i])
-			return (NULL); //TODO: implement and execute safe exit
+			return (NULL);
 		i++;
 	}
 	res[i] = NULL;
@@ -85,11 +85,10 @@ char	*ft_getenv(char *var, char **env)
 	return (res);
 }
 
-// TODO: implement this as a local get_env for new env
-// what if just $ ?
-// NOTE: only expands `env` variables atm, not $? yet
 char	*expand(char *var, t_mini *mini)
 {
+	if (var && ft_strncmp(var, "$", 1) == 0 && !var[1])
+		return (var);
 	if (var && ft_strncmp(var, "$?", 2) == 0)
 		return (ft_itoa(mini->last_status));
 	if (var && ft_strncmp(var, "$", 1) == 0 && var++)
@@ -130,11 +129,11 @@ char	**add_var_to_env(char **our_env, char *name, char *value)
 	char	**new_env;
 
 	i = 0;
-	while (our_env[i]) //get_size_env
+	while (our_env[i])
 		i++;
 	new_env = (char **) ft_calloc(i + 2, sizeof(char *));
 	if (!new_env)
-		return (NULL); //TODO: implement and execute safe exit
+		return (NULL);
 	i = 0;
 	j = 0;
 	while (our_env[i])
@@ -142,15 +141,15 @@ char	**add_var_to_env(char **our_env, char *name, char *value)
 		if (!is_var_already_in_env(name, our_env[i]))
 		{
 			new_env[j] = ft_strdup(our_env[i]);
-			if (!new_env[i])
-				return (NULL); //TODO: implement and execute safe exit
+			if (!new_env[j])
+				return (NULL);
 			j++;
 		}
 		i++;
 	}
 	new_env[j] = create_var_env(name, value);
 	if (!new_env[j])
-		return (NULL); //TODO: implement and execute safe exit
+		return (NULL);
 	j++;
 	new_env[j] = NULL;
 	return (new_env);
