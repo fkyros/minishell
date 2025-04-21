@@ -107,6 +107,7 @@ static void handle_redirection(t_command *cmd, char **args, int *i)
 	type = get_redirection_type(args[*i]);
     if (!args[*i + 1]) {
         ft_putstr_fd("minishell: syntax error near unexpected token\n", STDERR_FILENO);
+        args[(*i)++] = NULL;
         return ;
     }
     if (type == heredoc)
