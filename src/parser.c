@@ -27,12 +27,17 @@ static char	*extract_token(const char *str, int *index)
 static char	*get_next_token(const char *str, int *index, t_mini *mini)
 {
 	char	*res;
+	char	*expanded_token;
 
 	while (str[*index] && is_whitespace(str[*index]))
 		(*index)++;
 	res = extract_token(str, index);
 	if (res && ft_strncmp(res, "$", 1) == 0)
-		return (expand(res, mini));
+	{
+		expanded_token = expand(res, mini);
+		free(res);
+		return (expanded_token);
+	}
 	return (res);
 }
 
