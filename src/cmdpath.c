@@ -2,7 +2,13 @@
 
 int	is_valid_path(char *cmd)
 {
-	return (access(cmd, X_OK) == 0);
+	struct stat path_stat;
+
+	if (access(cmd, X_OK) != 0)
+		return (0);
+	if (stat(cmd, &path_stat) != 0)
+		return (0);
+	return S_ISREG(path_stat.st_mode);
 }
 
 char	*build_full_path(char *path, char *cmd)
@@ -50,7 +56,7 @@ char	*search_command(char *cmd, char **env)
 	{
 		if (is_valid_path(cmd))
 			return (cmd);
-		return (ft_strdup("/"));
+		return (NULL);
 	}
 	path_env = ft_getenv("PATH", env);
 	if (!path_env)
