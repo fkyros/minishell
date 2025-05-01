@@ -20,12 +20,34 @@ void	builtin_unset()
 }
 */
 
+char	**export_args_split(char **args, int *i)
+{
+	char	*value;
+	char	*value_str_join;
+	char	**res;
+	int	value_is_empty;
+
+	value = ft_strchr(args[*i], '=');
+	value++;
+	value_is_empty = !value || !ft_strcmp(value, "");
+	if (value_is_empty && args[*i+1] && !ft_strchr(args[*i+1], '='))
+	{
+		value_str_join = ft_strjoin(args[*i], args[*i+1]);
+		res = ft_split(value_str_join, '=');
+		free(value_str_join);
+		(*i)++;
+	}
+	else
+		res = ft_split(args[*i], '=');
+	return (res);
+}
+
 void	builtin_export(char **args, t_mini *mini)
 {
-	int		i;
+	int	i;
 	char	**var;
 	char	**new_env;
-	int		status;
+	int	status;
 
 	status = 0;
 	i = 1;
@@ -39,23 +61,20 @@ void	builtin_export(char **args, t_mini *mini)
 	{
 		if (!ft_isalpha(args[i][0]) || !ft_strchr(args[i], '='))
 		{
-			ft_putstr_fd("Export with an invalid identifier\n", STDERR_FILENO);
+			ft_putstr_fd("error: export with an invalid identifier\n", STDERR_FILENO);
 			status = 1;
 		}
 		else
 		{
-			var = ft_split(args[i], '=');
+			var = export_args_split(args, &i);;
 			new_env = add_var_to_env(mini->our_env, var[0], var[1]);
 			if (!new_env)
 				ft_putstr_fd("Error adding var to env\n", STDERR_FILENO);
 			free_split(var);
+			free_split(mini->our_env);
+			mini->our_env = new_env;
 		}
 		i++;
-	}
-	if (new_env)
-	{
-		free_split(mini->our_env);
-		mini->our_env = new_env;
 	}
 	mini->last_status = status;
 }

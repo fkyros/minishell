@@ -47,6 +47,8 @@ char	**init_env(char **old_env)
 	{
 		if (ft_strncmp(old_env[i], "SHLVL=", 6) == 0)
 			res[i] = shlvl(old_env[i]);
+		else if (ft_strncmp(old_env[i], "SHELL=", 6) == 0)
+			res[i] = ft_strdup("SHELL=minishell");
 		else
 			res[i] = ft_strdup(old_env[i]);
 		if (!res[i])
@@ -101,12 +103,16 @@ char	*create_var_env(char *name, char *value)
 	char	*aux;
 	char	*res;
 
-	if (!name || !value)
+	if (!name)
 		return (NULL);
 	aux = ft_strjoin(name, "=");
-	res = ft_strjoin(aux, value);
-	free(aux);
-	return (res);
+	if (value)
+	{
+		res = ft_strjoin(aux, value);
+		free(aux);
+		return (res);
+	}
+	return (aux);
 }
 
 int	is_var_already_in_env(char *name, char *var_from_env)
