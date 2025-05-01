@@ -3,22 +3,51 @@
 /*                                                        :::      ::::::::   */
 /*   builtins_2.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gade-oli <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: gade-oli <gade-oli@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/15 19:39:00 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/04/20 20:56:38 by gade-oli         ###   ########.fr       */
+/*   Created: 2025/05/01 18:22:55 by gade-oli          #+#    #+#             */
+/*   Updated: 2025/05/01 19:14:12 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
 
-// UNSET, EXPORT, ENV, EXIT
-/*
-void	builtin_unset()
+void	builtin_unset(char **args, t_mini *mini)
 {
+	int	i;
+	int	j;
+	int	flag;
+	char	**new_env;
 
+	i = 1;
+	j = 0;
+	flag = 0;
+	new_env = NULL;
+	while (args[i])
+	{
+		if (!ft_isalpha(args[i][0]))
+		{
+			i++;
+			continue;
+		}
+		while (!flag && mini->our_env[j])
+		{
+			if (is_var_already_in_env(args[i], mini->our_env[j]))
+				flag = 1;
+			j++;
+		}
+		if (flag)
+			new_env = delete_var_from_env(args[i], mini->our_env);
+		flag = 0;
+		if (new_env)
+		{
+			free(mini->our_env);
+			mini->our_env = new_env;
+		}
+		i++;
+	}
+	mini->last_status = 0;
 }
-*/
 
 char	**export_args_split(char **args, int *i)
 {

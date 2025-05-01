@@ -46,6 +46,8 @@ void execute_builtin(t_command *cmd, int apply_redirects, t_mini *mini)
         builtin_env(mini);
     else if (!ft_strcmp(cmd->argv[0], "export"))
         builtin_export(cmd->argv, mini);
+    else if (!ft_strcmp(cmd->argv[0], "unset"))
+	builtin_unset(cmd->argv, mini);
     if (apply_redirects)
     {
         if (dup2(saved_stdin, STDIN_FILENO) == -1)

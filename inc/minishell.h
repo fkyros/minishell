@@ -77,7 +77,9 @@ int				is_operator(const char *token);
 // ENV
 char			*expand(char *var, t_mini *mini);
 char			**init_env(char **old_env);
+int			is_var_already_in_env(char *name, char *var_from_env);
 char			**add_var_to_env(char **our_env, char *name, char *value);
+char			**delete_var_from_env(char *name, char **our_env);
 
 // PATHING
 
@@ -108,6 +110,7 @@ void			builtin_pwd(t_mini *mini);
 void    		builtin_env(t_mini *mini);
 void			builtin_exit(char **args);
 void			builtin_export(char **args, t_mini *mini);
+void			builtin_unset(char **args, t_mini *mini);
 
 // HEREDOC
 void			check_heredocs(t_parse_result *result);
