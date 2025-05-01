@@ -31,6 +31,7 @@
 # define GENERIC_ERROR 1
 # define COMMAND_NOT_FOUND 127
 # define COMMAND_NOT_EXECUTABLE 126
+# define MAX_ERROR 255
 
 enum e_redirect_type 
 {in, out, append, heredoc};
@@ -108,9 +109,9 @@ void			builtin_echo(char **args, t_mini *mini);
 void    		builtin_cd(char **args, t_mini *mini);
 void			builtin_pwd(t_mini *mini);
 void    		builtin_env(t_mini *mini);
-void			builtin_exit(char **args);
 void			builtin_export(char **args, t_mini *mini);
 void			builtin_unset(char **args, t_mini *mini);
+void			builtin_exit(char **args, t_mini *mini);
 
 // HEREDOC
 void			check_heredocs(t_parse_result *result);
