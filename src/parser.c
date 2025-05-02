@@ -24,15 +24,20 @@ static char	*extract_token(const char *str, int *index)
 	return (ft_substr(str, start, len));
 }
 
-static char	*get_next_token(const char *str, int *index, char **our_env)
+static char	*get_next_token(const char *str, int *index, t_mini *mini)
 {
 	char	*res;
+	char	*expanded_token;
 
 	while (str[*index] && is_whitespace(str[*index]))
 		(*index)++;
 	res = extract_token(str, index);
 	if (res && ft_strncmp(res, "$", 1) == 0)
-		return (expand(res, our_env));
+	{
+		expanded_token = expand(res, mini);
+		free(res);
+		return (expanded_token);
+	}
 	return (res);
 }
 
@@ -59,7 +64,7 @@ int	count_tokens(const char *str)
 	return (count);
 }
 
-char **parse_command(const char *cmd, int *token_count, char **our_env) 
+char **parse_command(const char *cmd, int *token_count, t_mini *mini) 
 {
     int index;
     int count;
@@ -84,7 +89,7 @@ char **parse_command(const char *cmd, int *token_count, char **our_env)
     index = 0;
     i = 0;
     while (i < count) {
-        tokens[i] = get_next_token(cmd, &index, our_env);
+        tokens[i] = get_next_token(cmd, &index, mini);
         i++;
     }
     tokens[i] = NULL;

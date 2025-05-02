@@ -1,4 +1,10 @@
 #include "../inc/minishell.h"
+#include <signal.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 /*
  * Encapsulated access to a static readline flag.
