@@ -70,9 +70,6 @@ PINK"      \\_\\                  /_/ "RST"\n\n"
 );	
 }
 
-/***
- * Prints through STDERR and returns COMMAND_NOT_FOUND code error 
- */
 int	print_path_error(char *path, t_parse_result *result, int i)
 {
 	if (path && ft_strcmp(path, "/") == 0)

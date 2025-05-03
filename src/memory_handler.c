@@ -29,40 +29,56 @@ void    *ft_realloc(void *ptr, size_t old_size, size_t new_size)
     return (new_ptr);
 }
 
-void	free_array(char **arr)
+void    free_array(char **arr)
 {
-	int i = 0;
+    int i = 0;
 
-	if (!arr)
-		return;
-	while (arr[i])
-	{
-		free(arr[i]);
-		i++;
-	}
-	free(arr);
+    if (!arr)
+        return ;
+    while (arr[i])
+    {
+        free(arr[i]);
+        i++;
+    }
+    free(arr);
 }
 
-void free_commands(t_parse_result *result) 
+void    free_redirs(t_redirect *redirs, int redir_count)
+{
+    int j;
+
+    if (!redirs)
+        return;
+    j = 0;
+    while (j < redir_count)
+    {
+        if (redirs[j].type == heredoc && redirs[j].heredoc_eof)
+            free(redirs[j].heredoc_eof);
+        if (redirs[j].filename)
+            free(redirs[j].filename);
+        j++;
+    }
+    free(redirs);
+}
+
+void    free_commands(t_parse_result *result)
 {
     int i;
 
-    i = 0;
-    if (!result) 
+    if (!result)
         return ;
-    if (result->args) 
-        free(result->args);
-    if (result->original_tokens) 
-    {
-        while (i < result->token_count)
-            free(result->original_tokens[i++]);
+    if (result->args)
+        free_array(result->args);
+    if (result->original_tokens)
         free(result->original_tokens);
-    }
     i = 0;
     while (i < result->cmd_count)
     {
-        if (result->commands[i].redirs)
-            free(result->commands[i].redirs);
+        t_command *cmd = &result->commands[i];
+        if (cmd->redirs)
+            free_redirs(cmd->redirs, cmd->redir_count);
+        if (cmd->heredoc)
+            free(cmd->heredoc);
         i++;
     }
     free(result->commands);
