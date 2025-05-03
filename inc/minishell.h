@@ -107,7 +107,7 @@ int				is_builtin(char *cmd);
 void  			execute_builtin(t_command *cmd, int apply_redirects, t_mini *mini);
 void			builtin_echo(char **args, t_mini *mini);
 void    		builtin_cd(char **args, t_mini *mini);
-void			builtin_pwd(t_mini *mini);
+void			builtin_pwd(char **args, t_mini *mini);
 void    		builtin_env(t_mini *mini);
 void			builtin_export(char **args, t_mini *mini);
 void			builtin_unset(char **args, t_mini *mini);
