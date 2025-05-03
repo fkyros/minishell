@@ -63,8 +63,9 @@ typedef struct s_parse_result {
 
 typedef	struct s_mini
 {
-	char	**our_env;
+	char		**our_env;
 	int		last_status;
+	t_parse_result	*parse_result;
 }	t_mini;
 
 
