@@ -6,7 +6,7 @@
 /*   By: gade-oli <gade-oli@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 18:22:55 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/05/03 18:14:18 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/05/03 18:32:09 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	builtin_unset(char **args, t_mini *mini)
 		flag = 0;
 		if (new_env)
 		{
-			free(mini->our_env);
+			free_split(mini->our_env);
 			mini->our_env = new_env;
 		}
 		i++;
@@ -95,7 +95,7 @@ void	builtin_export(char **args, t_mini *mini)
 		}
 		else
 		{
-			var = export_args_split(args, &i);;
+			var = export_args_split(args, &i);
 			new_env = add_var_to_env(mini->our_env, var[0], var[1]);
 			if (!new_env)
 				ft_putstr_fd("Error adding var to env\n", STDERR_FILENO);
