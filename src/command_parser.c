@@ -100,18 +100,43 @@ static int init_parse_result(const char *input, t_parse_result *result, t_mini *
     return (1);
 }
 
-static void handle_redirection(t_command *cmd, char **args, int *i)
+static char *extract_raw_heredoc_delim(const char *input) 
+{
+    const char *heredoc_pos;
+    const char *delim_start;
+    const char *delim_end;
+    
+    heredoc_pos = strstr(input, "<<");
+    if (!heredoc_pos) 
+        return NULL;
+    delim_start = heredoc_pos + 2;
+    while (*delim_start && is_whitespace(*delim_start)) 
+        delim_start++;
+    delim_end = delim_start;
+    while (*delim_end && !is_whitespace(*delim_end) && 
+           *delim_end != '|' && *delim_end != '<' && *delim_end != '>') {
+        delim_end++;
+    }
+    return ft_substr(delim_start, 0, delim_end - delim_start);
+}
+
+static void handle_redirection(t_command *cmd, char **args, int *i, const char *input) 
 {
     enum e_redirect_type type;
-    
-	type = get_redirection_type(args[*i]);
-    if (!args[*i + 1]) {
+    char *heredoc_eof;
+
+    type = get_redirection_type(args[*i]);
+    if (!args[*i + 1]) 
+    {
         ft_putstr_fd("minishell: syntax error near unexpected token\n", STDERR_FILENO);
         args[(*i)++] = NULL;
         return ;
     }
-    if (type == heredoc)
-        add_redirect(cmd, heredoc, NULL, args[*i + 1]);
+    if (type == heredoc) 
+    {
+        heredoc_eof = extract_raw_heredoc_delim(input);
+        add_redirect(cmd, heredoc, NULL, heredoc_eof);
+    } 
     else 
         add_redirect(cmd, type, args[*i + 1], NULL);
     args[*i] = NULL;
@@ -119,17 +144,16 @@ static void handle_redirection(t_command *cmd, char **args, int *i)
     *i += 2;
 }
 
-static void fill_command(char **args, int *i, t_command *cmd)
+static void fill_command(char **args, int *i, t_command *cmd, const char *input)
 {
     int start;
 	int	cmd_length;
 
 	start = *i;
-    // Process all tokens until pipe or end
     while (args[*i] && !is_pipe(args[*i])) 
 	{
         if (is_redirection(args[*i]))
-            handle_redirection(cmd, args, i);
+            handle_redirection(cmd, args, i, input);
         else
             (*i)++;
     }
@@ -165,7 +189,7 @@ t_parse_result parse_commands(const char *input, t_mini *mini)
 		init_command(&result.commands[result.cmd_count], 
 				&result.args[i], result.cmd_count == 0);
 		prev_i = i;
-		fill_command(result.args, &i, &result.commands[result.cmd_count]);
+		fill_command(result.args, &i, &result.commands[result.cmd_count], input);
 		if (!result.commands[result.cmd_count].argv[0] && 
 			result.commands[result.cmd_count].redir_count == 0) 
 		{

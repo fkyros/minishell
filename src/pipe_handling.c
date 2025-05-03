@@ -30,7 +30,7 @@ void execute_pipeline(t_parse_result *result, t_mini *mini)
     int pipe_fd[2];
     pid_t pid;
 
-    check_heredocs(result);
+    check_heredocs(result, mini);
 
     if (result->cmd_count == 1 && is_builtin(result->commands[0].argv[0]))
     {

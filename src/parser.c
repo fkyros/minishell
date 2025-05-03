@@ -1,44 +1,49 @@
 #include "../inc/minishell.h"
 
-static char	*extract_token(const char *str, int *index)
+static char *extract_token(const char *str, int *index)
 {
-	int		start;
-	int		len;
-	char	quote_char;
+    int     start;
+    int     len;
+    char    quote_char;
 
-	if (is_quote(str[*index]))
-	{
-		quote_char = str[*index];
-		start = ++(*index);
-		while (str[*index] && str[*index] != quote_char)
-			(*index)++;
-		len = *index - start;
-		(*index)++;
-	}
-	else
-	{
-		start = *index;
-		skip_unquoted_section(str, index);
-		len = *index - start;
-	}
-	return (ft_substr(str, start, len));
+    if (is_quote(str[*index]))
+    {
+        quote_char = str[*index];
+        start = ++(*index);
+        while (str[*index] && str[*index] != quote_char)
+            (*index)++;
+        len = *index - start;
+        (*index)++;
+    }
+    else
+    {
+        start = *index;
+        skip_unquoted_section(str, index);
+        len = *index - start;
+    }
+    return (ft_substr(str, start, len));
 }
 
-static char	*get_next_token(const char *str, int *index, t_mini *mini)
+static char *get_next_token(const char *str, int *index, t_mini *mini)
 {
-	char	*res;
-	char	*expanded_token;
+    char    *res;
+    char    *expanded_token;
+    int     in_single_quote = 0;
 
-	while (str[*index] && is_whitespace(str[*index]))
-		(*index)++;
-	res = extract_token(str, index);
-	if (res && ft_strncmp(res, "$", 1) == 0)
-	{
-		expanded_token = expand(res, mini);
-		free(res);
-		return (expanded_token);
-	}
-	return (res);
+    while (str[*index] && is_whitespace(str[*index]))
+        (*index)++;
+
+    res = extract_token(str, index);
+
+    if (str[*index - 1] == '\'')
+        in_single_quote = 1;
+    if (res && ft_strncmp(res, "$", 1) == 0 && !in_single_quote)
+    {
+        expanded_token = expand(res, mini);  // Expansión de variable
+        free(res);
+        return (expanded_token);
+    }
+    return (res);
 }
 
 int	count_tokens(const char *str)

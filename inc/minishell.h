@@ -114,8 +114,9 @@ void			builtin_unset(char **args, t_mini *mini);
 void			builtin_exit(char **args, t_mini *mini);
 
 // HEREDOC
-void			check_heredocs(t_parse_result *result);
+void			check_heredocs(t_parse_result *result, t_mini *mini);
 void    		close_heredocs(t_parse_result *result);
+char 			*expand_line(const char *line, t_mini *mini);
 
 // REDIRECTION PARSING
 // AUX FUNCTIONS
@@ -125,6 +126,7 @@ int				is_whitespace(char c);
 int				is_quote(char c);
 void			skip_quoted_section(const char *str, int *index, char quote_char);
 void			skip_unquoted_section(const char *str, int *index);
+char    		*ft_strjoin_char(const char *s1, char c);
 // MAIN FUNCTIONS
 void			add_redirect(t_command *cmd, enum e_redirect_type type, char *filename, char *heredoc_eof);
 char 			**parse_command(const char *cmd, int *token_count, t_mini *mini);
