@@ -67,8 +67,10 @@ void    free_commands(t_parse_result *result)
 
     if (!result)
         return ;
+    if (result->original_tokens)
+        free_array(result->original_tokens);
     if (result->args)
-        free_array(result->args);
+        free(result->args);
     if (result->original_tokens)
         free(result->original_tokens);
     i = 0;

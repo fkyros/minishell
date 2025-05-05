@@ -40,8 +40,6 @@ static char	*get_next_token(const char *s, int *i, t_mini *mini)
 	return (res);
 }
 
-
-
 int	count_tokens(const char *str)
 {
 	int	index;
