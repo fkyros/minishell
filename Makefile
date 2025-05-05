@@ -40,7 +40,7 @@ SRCS = $(SRC_DIR)/cmdpath.c \
 	   ${SRC_DIR}/memory_handler.c ${SRC_DIR}/command_parser.c \
 	   ${SRC_DIR}/env/env.c ${SRC_DIR}/heredoc.c \
 	   ${SRC_DIR}/process_handling.c ${SRC_DIR}/builtin_handling.c \
-	   ${SRC_DIR}/heredoc_expand.c
+	   ${SRC_DIR}/heredoc_expand.c ${SRC_DIR}/parser_quote_handler.c \
 	   
 
 OBJS = $(SRCS:$(SRC_DIR)/%.c=bin/%.o)

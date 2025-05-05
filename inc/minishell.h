@@ -26,6 +26,12 @@
 # define BOLD    "\x1b[1m"
 # define UNDERLINE "\x1b[4m"
 
+// QUOTE PARSER!
+# define STATE_NONE 0
+# define STATE_SINGLE 1
+# define STATE_DOUBLE 2
+
+
 # define MAX_CWD 2048
 
 # define GENERIC_ERROR 1
@@ -74,11 +80,17 @@ void			free_split(char **split);
 char			*ft_getenv(char *name, char **env);
 int				print_path_error(char *path, t_parse_result *result, int i);
 int				is_operator(const char *token);
+char			*expand_variable(const char *line, int *i, t_mini *mini);
+
+// QUOTE PARSING
+int				quote_state_after(int state, char quote);
+void			append_to_buf(char *buf, size_t *pos, const char *src, size_t len);
+void			handle_dollar(const char *s, int *i, t_mini *mini, char *buf, size_t *pos);
 
 // ENV
 char			*expand(char *var, t_mini *mini);
 char			**init_env(char **old_env);
-int			is_var_already_in_env(char *name, char *var_from_env);
+int				is_var_already_in_env(char *name, char *var_from_env);
 char			**add_var_to_env(char **our_env, char *name, char *value);
 char			**delete_var_from_env(char *name, char **our_env);
 

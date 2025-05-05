@@ -34,24 +34,30 @@ static char	*expand_status(int *i, t_mini *mini)
 	return (ft_itoa(mini->last_status));
 }
 
-static char	*expand_variable(const char *line, int *i, t_mini *mini)
+char *expand_variable(const char *line, int *i, t_mini *mini)
 {
-	char	*var;
+	char	*name;
 	char	*dollar_var;
 	char	*value;
 
-	(*i)++;
-	var = extract_var_name(line, i);
-	if (!var)
-		return (NULL);
-	dollar_var = ft_strjoin("$", var);
-	free(var);
-	value = expand(dollar_var, mini);
-	free(dollar_var);
-	if (!value)
-		return (ft_strdup(""));
-	return (ft_strdup(value));
+    if (line[*i] == '$' && line[*i + 1] == '?')
+    {
+        *i += 2;
+        return ft_itoa(mini->last_status);
+    }
+    (*i)++;
+    name = extract_var_name(line, i);
+    if (!name)
+        return ft_strdup("");
+    dollar_var = ft_strjoin("$", name);
+    free(name);
+    value = expand(dollar_var, mini);
+    free(dollar_var);
+    if (!value)
+        return (ft_strdup(""));
+    return (ft_strdup(value));
 }
+
 
 static char	*get_expanded_value(const char *line, int *i, t_mini *mini)
 {

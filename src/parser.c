@@ -1,50 +1,46 @@
 #include "../inc/minishell.h"
 
-static char *extract_token(const char *str, int *index)
+static char	*get_next_token(const char *s, int *i, t_mini *mini)
 {
-    int     start;
-    int     len;
-    char    quote_char;
+	char	buf[4096];
+	size_t	pos;
+	int		state;
+	char	c;
+	char	*res;
 
-    if (is_quote(str[*index]))
-    {
-        quote_char = str[*index];
-        start = ++(*index);
-        while (str[*index] && str[*index] != quote_char)
-            (*index)++;
-        len = *index - start;
-        (*index)++;
-    }
-    else
-    {
-        start = *index;
-        skip_unquoted_section(str, index);
-        len = *index - start;
-    }
-    return (ft_substr(str, start, len));
+	pos = 0;
+	state = STATE_NONE;
+	ft_bzero(buf, sizeof(buf));
+	while (s[*i] && is_whitespace(s[*i]))
+		(*i)++;
+	while (s[*i] && (state != STATE_NONE || !is_whitespace(s[*i])))
+	{
+		c = s[*i];
+		if ((c == '\'' && state != STATE_DOUBLE)
+			|| (c == '"' && state != STATE_SINGLE))
+		{
+			state = quote_state_after(state, c);
+			(*i)++;
+		}
+		else if (c == '$' && state != STATE_SINGLE)
+			handle_dollar(s, i, mini, buf, &pos);
+		else
+		{
+			buf[pos++] = c;
+			(*i)++;
+		}
+	}
+	buf[pos] = '\0';
+	if (state != STATE_NONE)
+	{
+		ft_putstr_fd("minishell: syntax error: unclosed quotes\n", 2);
+		return (NULL);
+	}
+	res = ft_strdup(buf);
+	return (res);
 }
 
-static char *get_next_token(const char *str, int *index, t_mini *mini)
-{
-    char    *res;
-    char    *expanded_token;
-    int     in_single_quote = 0;
 
-    while (str[*index] && is_whitespace(str[*index]))
-        (*index)++;
-
-    res = extract_token(str, index);
-
-    if (str[*index - 1] == '\'')
-        in_single_quote = 1;
-    if (res && ft_strncmp(res, "$", 1) == 0 && !in_single_quote)
-    {
-        expanded_token = expand(res, mini);  // Expansión de variable
-        free(res);
-        return (expanded_token);
-    }
-    return (res);
-}
 
 int	count_tokens(const char *str)
 {
