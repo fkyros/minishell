@@ -6,7 +6,7 @@
 /*   By: gade-oli <gade-oli@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 18:22:55 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/05/01 19:55:17 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/05/03 18:32:09 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	builtin_unset(char **args, t_mini *mini)
 		flag = 0;
 		if (new_env)
 		{
-			free(mini->our_env);
+			free_split(mini->our_env);
 			mini->our_env = new_env;
 		}
 		i++;
@@ -95,7 +95,7 @@ void	builtin_export(char **args, t_mini *mini)
 		}
 		else
 		{
-			var = export_args_split(args, &i);;
+			var = export_args_split(args, &i);
 			new_env = add_var_to_env(mini->our_env, var[0], var[1]);
 			if (!new_env)
 				ft_putstr_fd("Error adding var to env\n", STDERR_FILENO);
@@ -137,28 +137,40 @@ static int	ft_isnum(char *str)
 	return (0);
 }
 
+int	get_num_args(char **args)
+{
+	int	res;
+
+	res = 0;
+	while (args[res])
+		res++;
+	return (res);
+}
+
 void	builtin_exit(char **args, t_mini *mini)
 {
 	int	status;
 
+	status = 0;
 	ft_putstr_fd("exit\n", STDERR_FILENO);
-	if (args[2])
+	if (get_num_args(args) > 2)
 	{
 		ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
 		mini->last_status = GENERIC_ERROR;
 		return ;
 	}
-	if (!ft_isnum(args[1]))
+	if (args[1] && !ft_isnum(args[1]))
 	{
 		ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
 		ft_putstr_fd(args[1], STDERR_FILENO);
 		ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
 		status = MAX_ERROR;
 	}
-	else
+	else if (args[1])
 		status = ft_atoi(args[1]) % 256;
 	rl_clear_history();
 	free_array(mini->our_env);
+	free_commands(mini->parse_result);
 	free(mini);
 	exit(status);
 }
