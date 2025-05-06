@@ -1,4 +1,4 @@
-#include "../inc/minishell.h"
+#include "../../../inc/minishell.h"
 
 static int check_expand(const char *str) 
 {

@@ -41,7 +41,7 @@ void	builtin_unset(char **args, t_mini *mini)
 		flag = 0;
 		if (new_env)
 		{
-			free_split(mini->our_env);
+			free_array(mini->our_env);
 			mini->our_env = new_env;
 		}
 		i++;
@@ -99,8 +99,8 @@ void	builtin_export(char **args, t_mini *mini)
 			new_env = add_var_to_env(mini->our_env, var[0], var[1]);
 			if (!new_env)
 				ft_putstr_fd("Error adding var to env\n", STDERR_FILENO);
-			free_split(var);
-			free_split(mini->our_env);
+			free_array(var);
+			free_array(mini->our_env);
 			mini->our_env = new_env;
 		}
 		i++;

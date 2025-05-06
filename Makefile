@@ -31,16 +31,13 @@ LDFLAGS = -lreadline
 LIBFT_DIR = ./libft
 SRC_DIR = ./src
 
-SRCS = $(SRC_DIR)/cmdpath.c \
-       $(SRC_DIR)/main.c \
-       $(SRC_DIR)/parser_aux.c $(SRC_DIR)/parser.c \
-       $(SRC_DIR)/utils.c \
-       ${SRC_DIR}/builtins_1.c ${SRC_DIR}/builtins_2.c \
-       ${SRC_DIR}/redirections.c ${SRC_DIR}/pipe_handling.c \
-	   ${SRC_DIR}/memory_handler.c ${SRC_DIR}/command_parser.c \
-	   ${SRC_DIR}/env/env.c ${SRC_DIR}/heredoc.c \
-	   ${SRC_DIR}/process_handling.c ${SRC_DIR}/builtin_handling.c \
-	   ${SRC_DIR}/heredoc_expand.c ${SRC_DIR}/parser_quote_handler.c \
+SRCS = 	$(SRC_DIR)/main/main.c $(SRC_DIR)/main/utils.c ${SRC_DIR}/main/memory_handler.c \
+		$(SRC_DIR)/parsing/cmdpath.c $(SRC_DIR)/parsing/parser_aux.c $(SRC_DIR)/parsing/parser.c \
+		${SRC_DIR}/parsing/parser_quote_handler.c ${SRC_DIR}/parsing/command_parser.c \
+		${SRC_DIR}/builtins/builtins_1.c ${SRC_DIR}/builtins/builtins_2.c ${SRC_DIR}/builtins/builtin_handling.c \
+		${SRC_DIR}/env/env.c \
+		${SRC_DIR}/redirs_pipes/process_handling.c ${SRC_DIR}/redirs_pipes/redirections.c ${SRC_DIR}/redirs_pipes/pipe_handling.c \
+		${SRC_DIR}/redirs_pipes/heredoc/heredoc.c ${SRC_DIR}/redirs_pipes/heredoc/heredoc_expand.c \
 	   
 
 OBJS = $(SRCS:$(SRC_DIR)/%.c=bin/%.o)

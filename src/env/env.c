@@ -21,12 +21,12 @@ char	*shlvl(char *lvl)
 
 	split = ft_split(lvl, '=');
 	if (!split || !split[1])
-		return (free_split(split), ft_strdup("SHLVL=0"));
+		return (free_array(split), ft_strdup("SHLVL=0"));
 	nlvl = ft_atoi(split[1]);
 	nlvl++;
 	lvl_aux = ft_itoa(nlvl);
 	res = ft_strjoin("SHLVL=", lvl_aux);
-	free_split(split);
+	free_array(split);
 	free(lvl_aux);
 	return (res);
 }

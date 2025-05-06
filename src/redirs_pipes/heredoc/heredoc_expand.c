@@ -1,4 +1,4 @@
-#include "../inc/minishell.h"
+#include "../../../inc/minishell.h"
 
 char	*str_append(char *s1, const char *s2)
 {

@@ -35,13 +35,13 @@ char	*search_in_path(char **paths, char *cmd)
 		full_path = build_full_path(paths[i], cmd);
 		if (full_path && access(full_path, X_OK) == 0)
 		{
-			free_split(paths);
+			free_array(paths);
 			return (full_path);
 		}
 		free(full_path);
 		i++;
 	}
-	free_split(paths);
+	free_array(paths);
 	return (NULL);
 }
 

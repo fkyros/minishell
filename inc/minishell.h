@@ -77,7 +77,6 @@ typedef	struct s_mini
 
 // UTILS
 
-void			free_split(char **split);
 char			*ft_getenv(char *name, char **env);
 int				print_path_error(char *path, t_parse_result *result, int i);
 int				is_operator(const char *token);
