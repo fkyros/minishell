@@ -44,14 +44,19 @@ static enum e_redirect_type get_redirection_type(const char *token)
 
 static char **copy_original_tokens(char **args, int token_count)
 {
-    int i = 0;
-    char **original_tokens = malloc(token_count * sizeof(char *));
+    char **original_tokens;
+    int     i;
+
+    original_tokens = malloc((token_count + 1) * sizeof(char *));
     if (!original_tokens)
         return NULL;
-    while (i < token_count) {
+    i = 0;
+    while(i < token_count)
+    {
         original_tokens[i] = args[i];
         i++;
     }
+    original_tokens[token_count] = NULL;
     return original_tokens;
 }
 
@@ -138,7 +143,7 @@ static void handle_redirection(t_command *cmd, char **args, int *i, const char *
         add_redirect(cmd, heredoc, NULL, heredoc_eof);
     } 
     else 
-        add_redirect(cmd, type, args[*i + 1], NULL);
+        add_redirect(cmd, type, ft_strdup(args[*i + 1]), NULL);
     args[*i] = NULL;
     args[*i + 1] = NULL;
     *i += 2;

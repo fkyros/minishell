@@ -1,4 +1,4 @@
-#!/bin/bash
+ #!/bin/bash
 
 # COLOURS
 PURPLE='\033[0;35m'
@@ -8,6 +8,21 @@ GREEN='\033[0;32m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 BOLD='\033[1m'
+
+clean_valgrind_log() {
+    local log_file="$LOG_DIR/full_valgrind_output.txt"
+    local cleaned_log="$LOG_DIR/full_valgrind_output_clean.txt"
+
+    # Get all PIDs of external commands (like /usr/bin/ls)
+    grep -oP '^==\K\d+(?=== Command: (?!\./minishell))' "$log_file" > "$LOG_DIR/external_pids.txt"
+
+    # Remove lines belonging to external PIDs
+    grep -vFf "$LOG_DIR/external_pids.txt" "$log_file" > "$cleaned_log"
+
+    # Replace original log with cleaned version
+    mv "$cleaned_log" "$log_file"
+    rm -f "$LOG_DIR/external_pids.txt"
+}
 
 # Logs directory
 LOG_DIR="valgrind_logs"
@@ -34,9 +49,11 @@ valgrind --suppressions=readline.supp \
          --log-file="$LOG_DIR/full_valgrind_output.txt" \
          ./minishell "$@"
 
-# Get ./minishell's PID from the first Memcheck header line
-MAIN_PID=$(grep -a -m1 '^==[0-9]\+== Memcheck' "$LOG_DIR/full_valgrind_output.txt" \
-           | sed -E 's/^==([0-9]+)==.*/\1/')
+# Clean the log by removing external command entries
+clean_valgrind_log
+
+# Get ./minishell's PID
+MAIN_PID=$(grep -m1 "HEAP SUMMARY" "$LOG_DIR/full_valgrind_output.txt" | grep -oP "==\K\d+(?==)")
 
 if [[ -z "$MAIN_PID" ]]; then
     echo -e "${RED}Error:${NC} couldn't identify minishell's PID"
@@ -44,18 +61,16 @@ if [[ -z "$MAIN_PID" ]]; then
 fi
 
 # Get ./minishell (parent process) logs
-grep -a "^==${MAIN_PID}==" "$LOG_DIR/full_valgrind_output.txt" > "$LOG_DIR/valgrind_output.txt"
+grep "^==${MAIN_PID}==" "$LOG_DIR/full_valgrind_output.txt" > "$LOG_DIR/valgrind_output.txt"
 
 # Main valgrind summary (./minishell)
 echo -e "\n${PURPLE}${BOLD}=========== MAIN LOG (PID $MAIN_PID ${RED}[./minishell]${PURPLE}${BOLD}) ===========${NC}"
-grep -a -E "LEAK SUMMARY|definitely lost|indirectly lost|possibly lost|still reachable|All heap blocks were freed" \
-    "$LOG_DIR/valgrind_output.txt" | while read -r line; do
+grep -E "LEAK SUMMARY|definitely lost|indirectly lost|possibly lost|still reachable" "$LOG_DIR/valgrind_output.txt" | while read -r line; do
     case "$line" in
-        *"LEAK SUMMARY"*)     echo -e "${GREEN}$line${NC}" ;;
-        *"definitely lost:"*) echo -e "${RED}$line${NC}"   ;;
+        *"LEAK SUMMARY"*)  echo -e "${GREEN}$line${NC}" ;;
+        *"definitely lost:"*) echo -e "${RED}$line${NC}" ;;
         *"indirectly lost:"*|*"possibly lost:"*) echo -e "${YELLOW}$line${NC}" ;;
-        *"still reachable:"*) echo -e "${CYAN}$line${NC}"  ;;
-        *"All heap blocks were freed"*) echo -e "${GREEN}$line${NC}" ;;
+        *"still reachable:"*) echo -e "${CYAN}$line${NC}" ;;
     esac
 done
 
@@ -64,26 +79,30 @@ echo -e "\n${PURPLE}${BOLD}==================== CHILDREN LOG ===================
 > "$LOG_DIR/valgrind_children_log.txt"
 
 # Get children's logs
-grep -a -oP '^==\K[0-9]+(?=== Command: )' "$LOG_DIR/full_valgrind_output.txt" | while read -r child_pid; do
+grep -oP '^==\K\d+(?=== Command: )' "$LOG_DIR/full_valgrind_output.txt" | while read -r child_pid; do
     if [[ "$child_pid" != "$MAIN_PID" ]]; then
-        # Write in children's log
-        grep -a "^==${child_pid}==" "$LOG_DIR/full_valgrind_output.txt" >> "$LOG_DIR/valgrind_children_log.txt"
+        # Get the command this child executed (e.g., ./minishell or /usr/bin/ls)
+        CHILD_CMD=$(grep -m1 "^==${child_pid}== Command: " "$LOG_DIR/full_valgrind_output.txt" | sed 's/.*Command: //')
         
-        # Show children summary
-        echo -e "\n${YELLOW}CHILD PID $child_pid:${NC}"
-        grep -a -E "LEAK SUMMARY|definitely lost|indirectly lost|possibly lost|still reachable|blocks are still reachable|All heap blocks were freed" \
-             <(grep -a "^==${child_pid}==" "$LOG_DIR/full_valgrind_output.txt") | while read -r line; do
-            case "$line" in
-                *"LEAK SUMMARY"*)     echo -e "${GREEN}$line${NC}" ;;
-                *"definitely lost:"*) echo -e "${RED}$line${NC}"   ;;
-                *"indirectly lost:"*|*"possibly lost:"*) echo -e "${YELLOW}$line${NC}" ;;
-                *"still reachable:"*|*"blocks are still reachable"*) echo -e "${CYAN}$line${NC}" ;;
-                *"All heap blocks were freed"*) echo -e "${GREEN}$line${NC}" ;;
-            esac
-        done
+        # Only show leaks if the child is running minishell (i.e., a builtin)
+        if [[ "$CHILD_CMD" == "./minishell" ]]; then
+            # Write in children's log
+            grep "^==${child_pid}==" "$LOG_DIR/full_valgrind_output.txt" >> "$LOG_DIR/valgrind_children_log.txt"
+            
+            # Show children summary
+            echo -e "\n${YELLOW}CHILD PID $child_pid:${NC}"
+            grep -E "LEAK SUMMARY|definitely lost|indirectly lost|possibly lost|still reachable|blocks are still reachable" <(grep "^==${child_pid}==" "$LOG_DIR/full_valgrind_output.txt") | while read -r line; do
+                case "$line" in
+                    *"LEAK SUMMARY"*) echo -e "${GREEN}$line${NC}" ;;
+                    *"definitely lost:"*) echo -e "${RED}$line${NC}" ;;
+                    *"indirectly lost:"*|*"possibly lost:"*) echo -e "${YELLOW}$line${NC}" ;;
+                    *"still reachable:"*|*"blocks are still reachable"*) echo -e "${CYAN}$line${NC}" ;;
+                esac
+            done
+        else
+            echo -e "\n${YELLOW}Skipping external command: $CHILD_CMD${NC}"
+        fi
     fi
 done
-
 # Done!! :D
 echo -e "\n${PURPLE}✔ All logs were saved to a directory named: ${BOLD}$LOG_DIR/${RED} :) ${NC}\n"
-

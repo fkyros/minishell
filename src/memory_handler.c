@@ -61,32 +61,32 @@ void    free_redirs(t_redirect *redirs, int redir_count)
     free(redirs);
 }
 
-void    free_commands(t_parse_result *result)
+void free_commands(t_parse_result *result)
 {
     int i;
+    t_command *cmd;
 
     if (!result)
-        return ;
+        return;
     if (result->original_tokens)
         free_array(result->original_tokens);
     if (result->args)
         free(result->args);
-    if (result->original_tokens)
-        free(result->original_tokens);
     i = 0;
     while (i < result->cmd_count)
     {
-        t_command *cmd = &result->commands[i];
+        cmd = &result->commands[i];
         if (cmd->redirs)
             free_redirs(cmd->redirs, cmd->redir_count);
         if (cmd->heredoc)
             free(cmd->heredoc);
         i++;
     }
-    free(result->commands);
-    result->commands = NULL;
-    result->args = NULL;
+    if (result->commands)
+        free(result->commands);
+    result->commands       = NULL;
+    result->args           = NULL;
     result->original_tokens = NULL;
-    result->cmd_count = 0;
-    result->token_count = 0;
+    result->cmd_count      = 0;
+    result->token_count    = 0;
 }
