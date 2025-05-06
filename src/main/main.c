@@ -124,7 +124,6 @@ int main(int argc, char **argv, char **env)
 	(void)argv;
 	setup_signals();
 	print_banner();
-
 	mini = init_shell(env);
 	if (!mini)
 		return (1);

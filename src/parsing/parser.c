@@ -93,32 +93,33 @@ int count_tokens(const char *str)
 
 char **parse_command(const char *cmd, int *token_count, t_mini *mini) 
 {
-    int index;
-    int count;
-    char **tokens;
-	int	i;
+    int index = 0;
+    int cap = 4;
+    int used = 0;
+    char **tokens = malloc(cap * sizeof(char *));
+    char *tok;
 
-	if (!check_unclosed_quotes(cmd))
+    if (!check_unclosed_quotes(cmd))
     {
         ft_putstr_fd("minishell: syntax error: unclosed quotes\n", STDERR_FILENO);
         *token_count = 0;
         return (NULL);
     }
-	index = 0;
-	count = count_tokens(cmd);
-	tokens = malloc((count + 1) * sizeof(char *));
-	if (!cmd && !tokens)
-	{
-		free(tokens);
-		return (NULL);
-	}
-    *token_count = count;
-    index = 0;
-    i = 0;
-    while (i < count) {
-        tokens[i] = get_next_token(cmd, &index, mini);
-        i++;
+    while (index < (int)ft_strlen(cmd) && 
+        (tok = get_next_token(cmd, &index, mini)) != NULL)
+    {
+        if (tok[0] == '\0') {
+            free(tok);
+            continue ;
+        }
+        if (used + 1 >= cap) {
+            cap *= 2;
+            tokens = realloc(tokens, cap * sizeof(char *));
+        }
+        tokens[used++] = tok;
     }
-    tokens[i] = NULL;
+    tokens[used] = NULL;
+    *token_count = used;
     return (tokens);
 }
+
