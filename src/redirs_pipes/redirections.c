@@ -121,25 +121,46 @@ void redirect_output(t_command *cmd)
 
 int apply_redirections(t_command *cmd)
 {
-    int saved_stdin;
-    int saved_stdout;
-    
-    saved_stdin = dup(STDIN_FILENO);
-    saved_stdout = dup(STDOUT_FILENO);
-    redirect_input_heredoc(cmd);
-    redirect_output(cmd);
-    if (dup2(STDIN_FILENO, STDIN_FILENO) == -1 || 
-        dup2(STDOUT_FILENO, STDOUT_FILENO) == -1)
+    int status = 0;
+    int fd;
+    int i;
+    int flags;
+    t_redirect * r;
+
+    i = 0;
+    while (i < cmd->redir_count)
     {
-        dup2(saved_stdin, STDIN_FILENO);
-        dup2(saved_stdout, STDOUT_FILENO);
-        close(saved_stdin);
-        close(saved_stdout);
-        return (-1);
+        r = &cmd->redirs[i];
+        if (r->type == in && r->filename)
+        {
+            fd = open(r->filename, O_RDONLY);
+            if (fd < 0)
+            {
+                perror(r->filename);
+                return (1);
+            }
+            dup2(fd, STDIN_FILENO);
+            close(fd);
+        }
+        else if ((r->type == out || r->type == append) && r->filename)
+        {
+            flags = O_WRONLY | O_CREAT;
+            if (r->type == append)
+                flags |= O_APPEND;
+            else
+                flags |= O_TRUNC;
+            fd = open(r->filename, flags, 0644);
+            if (fd < 0)
+            {
+                perror(r->filename);
+                return (1);
+            }
+            dup2(fd, STDOUT_FILENO);
+            close(fd);
+        }
+        i++;
     }
-    close(saved_stdin);
-    close(saved_stdout);
-    return (0);
+    return (status);
 }
 
 void setup_input(t_command *cmd, int prev_pipe_fd)
@@ -172,9 +193,7 @@ void setup_input(t_command *cmd, int prev_pipe_fd)
         i--;
     }
     if (!cmd->is_first) 
-    {
         dup2(prev_pipe_fd, STDIN_FILENO);
-    }
 }
 
 void setup_output(t_command *cmd, int (*pipe_fd)[2])
