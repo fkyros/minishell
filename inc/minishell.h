@@ -116,7 +116,7 @@ void			print_banner(void);
 
 int				apply_redirections(t_command *cmd);
 int				is_builtin(char *cmd);
-void  			execute_builtin(t_command *cmd, int apply_redirects, t_mini *mini);
+void  			execute_builtin(t_command *cmd, t_mini *mini);
 void			builtin_echo(char **args, t_mini *mini);
 void    		builtin_cd(char **args, t_mini *mini);
 void			builtin_pwd(char **args, t_mini *mini);
@@ -155,6 +155,6 @@ void			open_close_pipe(t_parse_result *result, int *i, int (*pipe_fd)[2]);
 void 			child_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, t_mini *mini);
 void    		parent_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd);
 void    		process_handling(int *pid, t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, t_mini *mini);
-void 			wait_processes(t_parse_result *result, t_mini *mini);
+void 			wait_processes(pid_t *pids, int n_commands, t_mini *mini);
 
 #endif

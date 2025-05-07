@@ -125,7 +125,7 @@ static char *extract_raw_heredoc_delim(const char *input)
     return ft_substr(delim_start, 0, delim_end - delim_start);
 }
 
-static void handle_redirection(t_command *cmd, char **args, int *i, const char *input) 
+static int handle_redirection(t_command *cmd, char **args, int *i, const char *input) 
 {
     enum e_redirect_type type;
     char *heredoc_eof;
@@ -134,8 +134,7 @@ static void handle_redirection(t_command *cmd, char **args, int *i, const char *
     if (!args[*i + 1]) 
     {
         ft_putstr_fd("minishell: syntax error near unexpected token\n", STDERR_FILENO);
-        args[(*i)++] = NULL;
-        return ;
+        return (0);
     }
     if (type == heredoc) 
     {
@@ -147,9 +146,10 @@ static void handle_redirection(t_command *cmd, char **args, int *i, const char *
     args[*i] = NULL;
     args[*i + 1] = NULL;
     *i += 2;
+    return (1);
 }
 
-static void fill_command(char **args, int *i, t_command *cmd, const char *input)
+static int fill_command(char **args, int *i, t_command *cmd, const char *input)
 {
     int start;
 	int	cmd_length;
@@ -158,7 +158,10 @@ static void fill_command(char **args, int *i, t_command *cmd, const char *input)
     while (args[*i] && !is_pipe(args[*i])) 
 	{
         if (is_redirection(args[*i]))
-            handle_redirection(cmd, args, i, input);
+        {
+            if(!handle_redirection(cmd, args, i, input))
+                return (0);
+        }
         else
             (*i)++;
     }
@@ -170,6 +173,7 @@ static void fill_command(char **args, int *i, t_command *cmd, const char *input)
     cmd_length = *i - start;
     cmd->argv = &args[start];
     compact_argv(cmd->argv, cmd_length);
+    return (1);
 }
 
 t_parse_result parse_commands(const char *input, t_mini *mini)
@@ -194,7 +198,8 @@ t_parse_result parse_commands(const char *input, t_mini *mini)
 		init_command(&result.commands[result.cmd_count], 
 				&result.args[i], result.cmd_count == 0);
 		prev_i = i;
-		fill_command(result.args, &i, &result.commands[result.cmd_count], input);
+		if (!fill_command(result.args, &i, &result.commands[result.cmd_count], input))
+            return (result);
 		if (!result.commands[result.cmd_count].argv[0] && 
 			result.commands[result.cmd_count].redir_count == 0) 
 		{

@@ -29,40 +29,36 @@ void execute_pipeline(t_parse_result *result, t_mini *mini)
     int prev_pipe_fd = -1;
     int pipe_fd[2];
     pid_t pid;
-
-    check_heredocs(result, mini);
-
-    if (result->cmd_count == 1 && is_builtin(result->commands[0].argv[0]))
+    pid_t *pids;
+    
+    pids = malloc(sizeof(pid_t) * result->cmd_count);
+    if (!pids)
     {
-        execute_builtin(&result->commands[0], 1, mini);
+        perror("minishell: malloc");
         return ;
     }
+    check_heredocs(result, mini);
     i = 0;
     while (i < result->cmd_count)
     {
-        if (is_builtin(result->commands[i].argv[0]))
+        open_close_pipe(result, &i, &pipe_fd);
+        pid = fork();
+        if (pid == 0) 
         {
-            open_close_pipe(result, &i, &pipe_fd);
-            pid = fork();
-            if (pid == 0) 
-            {
-                signal(SIGINT, SIG_DFL);
-                signal(SIGQUIT, SIG_DFL);
-                child_process(result, &i, &pipe_fd, &prev_pipe_fd, mini);
-            }
-            else if (pid > 0)
-                parent_process(result, &i, &pipe_fd, &prev_pipe_fd);
-            else
-                perror(BOLD RED"minishell: fork"RST);
+            signal(SIGINT, SIG_DFL);
+            signal(SIGQUIT, SIG_DFL);
+            child_process(result, &i, &pipe_fd, &prev_pipe_fd, mini);
+        }
+        else if (pid > 0)
+        {
+            pids[i] = pid;
+           parent_process(result, &i, &pipe_fd, &prev_pipe_fd);
         }
         else
-        {
-            open_close_pipe(result, &i, &pipe_fd);
-            pid = fork();
-            process_handling(&pid, result, &i, &pipe_fd, &prev_pipe_fd, mini);
-        }
+            perror(BOLD RED"minishell: fork"RST);
         i++;
     }
-    wait_processes(result, mini);
+    wait_processes(pids, result->cmd_count, mini);
+    free(pids);
     close_heredocs(result);
 }

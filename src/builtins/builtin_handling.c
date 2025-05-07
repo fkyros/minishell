@@ -25,29 +25,21 @@ int	is_builtin(char *cmd)
 		|| !ft_strcmp(cmd, "exit"));
 }
 
-void	execute_builtin(t_command *cmd, int apply_redirects, t_mini *mini)
+void	execute_builtin(t_command *cmd, t_mini *mini)
 {
 	int	saved_stdin;
 	int	saved_stdout;
 
 	saved_stdin = -1;
 	saved_stdout = -1;
-	if (apply_redirects)
+	saved_stdin = dup(STDIN_FILENO);
+	saved_stdout = dup(STDOUT_FILENO);
+	if (saved_stdin == -1 || saved_stdout == -1)
 	{
-		saved_stdin = dup(STDIN_FILENO);
-		saved_stdout = dup(STDOUT_FILENO);
-		if (saved_stdin == -1 || saved_stdout == -1)
-		{
-			perror(BOLD RED"minishell: dup"RST);
-			return ;
-		}
-		if (apply_redirections(cmd) != 0)
-		{
-			close(saved_stdin);
-			close(saved_stdout);
-			return ;
-		}
+		perror(BOLD RED"minishell: dup"RST);
+		return ;
 	}
+	apply_redirections(cmd);
 	if (!ft_strcmp(cmd->argv[0], "cd"))
 		builtin_cd(cmd->argv, mini);
 	else if (!ft_strcmp(cmd->argv[0], "echo"))
@@ -62,13 +54,10 @@ void	execute_builtin(t_command *cmd, int apply_redirects, t_mini *mini)
 		builtin_unset(cmd->argv, mini);
 	else if (!ft_strcmp(cmd->argv[0], "exit"))
 		builtin_exit(cmd->argv, mini);
-	if (apply_redirects)
-	{
-		if (dup2(saved_stdin, STDIN_FILENO) == -1)
-			perror(BOLD RED"minishell: dup2"RST);
-		if (dup2(saved_stdout, STDOUT_FILENO) == -1)
-			perror(BOLD RED"minishell: dup2"RST);
-		close(saved_stdin);
-		close(saved_stdout);
-	}
+	if (dup2(saved_stdin, STDIN_FILENO) == -1)
+		perror(BOLD RED"minishell: dup2"RST);
+	if (dup2(saved_stdout, STDOUT_FILENO) == -1)
+		perror(BOLD RED"minishell: dup2"RST);
+	close(saved_stdin);
+	close(saved_stdout);
 }

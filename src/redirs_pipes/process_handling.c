@@ -34,7 +34,7 @@ void child_process(t_parse_result *result, int *i, int (*pipe_fd)[2],
 		close((*pipe_fd)[1]);
 	if (is_builtin(cmd->argv[0]))
 	{
-		execute_builtin(cmd, 0, mini);
+		execute_builtin(cmd, mini);
 		free_array(mini->our_env);
 		free(mini);
 		exit(0);
@@ -90,7 +90,7 @@ void process_handling(int *pid, t_parse_result *result, int *i,
 		parent_process(result, i, pipe_fd, prev_pipe_fd);
 }
 
-void wait_processes(t_parse_result *result, t_mini *mini)
+void wait_processes(pid_t *pids, int n_commands, t_mini *mini)
 {
     int i;
     int status;
@@ -98,17 +98,14 @@ void wait_processes(t_parse_result *result, t_mini *mini)
 
 	i = 0;
 	last_status = 0;
-    while (i < result->cmd_count)
+    while (i < n_commands)
     {
-        if (wait(&status) == -1)
-            perror(BOLD RED"minishell: wait"RST);
-        else
-        {
-            if (WIFEXITED(status))
-                last_status = WEXITSTATUS(status);
-            else if (WIFSIGNALED(status))
-                last_status = 128 + WTERMSIG(status);
-        }
+        if (waitpid(pids[i], &status, 0) == -1)
+            perror("minishell: waitpid");
+        else if (WIFEXITED(status))
+            last_status = WEXITSTATUS(status);
+        else if (WIFSIGNALED(status))
+            last_status = 128 + WTERMSIG(status);
         i++;
     }
     mini->last_status = last_status;
