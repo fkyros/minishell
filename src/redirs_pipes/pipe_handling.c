@@ -23,54 +23,115 @@ void setup_pipes_and_redirection(t_command *cmd, int prev_pipe_fd, int (*pipe_fd
     setup_output(cmd, pipe_fd);
 }
 
-void execute_pipeline(t_parse_result *result, t_mini *mini)
+static void	handle_single_builtin(t_parse_result *result, t_mini *mini)
 {
-    int            i;
-    int            pipes[2][2];
-    pid_t          *pids;
-
-    check_heredocs(result, mini);
-    pids = malloc(sizeof(pid_t) * result->cmd_count);
-    if (!pids)
-    {
-        perror("malloc");
-        exit(EXIT_FAILURE);
-    }
-    i = 0;
-    while (i < result->cmd_count)
-    {
-        if (i < result->cmd_count - 1 && pipe(pipes[i % 2]) < 0)
-            perror("minishell: pipe"), exit(1);
-        pids[i] = fork();
-        if (pids[i] < 0)
-            perror("minishell: fork"), exit(1);
-        if (pids[i] == 0)
-        {
-            if (i > 0)
-            {
-                dup2(pipes[(i-1) % 2][0], STDIN_FILENO);
-                close(pipes[(i-1) % 2][1]);
-            }
-            if (i < result->cmd_count - 1)
-            {
-                dup2(pipes[i % 2][1], STDOUT_FILENO);
-                close(pipes[i % 2][0]);
-            }
-            if (apply_redirections(&result->commands[i]))
-                exit(1);
-            if (is_builtin(result->commands[i].argv[0]))
-                execute_builtin(&result->commands[i], mini), exit(mini->last_status);
-            else
-                exec_command(result->commands[i].argv, mini->our_env);
-        }
-        if (i > 0)
-        {
-            close(pipes[(i-1) % 2][0]);
-            close(pipes[(i-1) % 2][1]);
-        }
-        i++;
-    }
-    i = 0;
-    wait_processes(pids, result->cmd_count, mini);
-    free(pids);
+	if (result->cmd_count == 1
+		&& is_builtin(result->commands[0].argv[0]))
+	{
+		execute_builtin(&result->commands[0], mini);
+		close_heredocs(result);
+	}
 }
+
+static pid_t	*alloc_pids(int count)
+{
+	pid_t	*pids;
+
+	pids = malloc(sizeof(pid_t) * count);
+	if (!pids)
+	{
+		perror("malloc");
+		exit(EXIT_FAILURE);
+	}
+	return (pids);
+}
+
+static void	create_pipe(int i, int cmd_count, int pipes[2][2])
+{
+	if (i < cmd_count - 1 && pipe(pipes[i % 2]) < 0)
+	{
+		perror("minishell: pipe");
+		exit(EXIT_FAILURE);
+	}
+}
+
+static void	setup_child_io(int i, int cmd_count, int pipes[2][2], t_command *cmd)
+{
+	if (i > 0)
+	{
+		dup2(pipes[(i - 1) % 2][0], STDIN_FILENO);
+		close(pipes[(i - 1) % 2][1]);
+	}
+	if (cmd->heredoc_fd != -1)
+	{
+		dup2(cmd->heredoc_fd, STDIN_FILENO);
+		close(cmd->heredoc_fd);
+	}
+	if (i < cmd_count - 1)
+	{
+		dup2(pipes[i % 2][1], STDOUT_FILENO);
+		close(pipes[i % 2][0]);
+	}
+}
+
+static void	child_branch(int i, t_parse_result *res, t_mini *mini,
+	int pipes[2][2])
+{
+	t_command *cmd = &res->commands[i];
+
+	setup_child_io(i, res->cmd_count, pipes, cmd);
+	if (apply_redirections(cmd))
+		exit(EXIT_FAILURE);
+	if (is_builtin(cmd->argv[0]))
+	{
+		execute_builtin(cmd, mini);
+		exit(mini->last_status);
+	}
+	exec_command(cmd->argv, mini->our_env);
+	perror(cmd->argv[0]);
+	exit(127);
+}
+
+static void	spawn_commands(t_parse_result *res, t_mini *mini)
+{
+	int		i;
+	int		pipes[2][2];
+	pid_t	*pids;
+
+	pids = alloc_pids(res->cmd_count);
+	i = 0;
+	while (i < res->cmd_count)
+	{
+		create_pipe(i, res->cmd_count, pipes);
+		pids[i] = fork();
+		if (pids[i] < 0)
+		{
+			perror("minishell: fork");
+			exit(EXIT_FAILURE);
+		}
+		if (pids[i] == 0)
+			child_branch(i, res, mini, pipes);
+		if (i > 0)
+		{
+			close(pipes[(i - 1) % 2][0]);
+			close(pipes[(i - 1) % 2][1]);
+		}
+		i++;
+	}
+	wait_processes(pids, res->cmd_count, mini);
+	free(pids);
+}
+
+void	execute_pipeline(t_parse_result *result, t_mini *mini)
+{
+	check_heredocs(result, mini);
+	handle_single_builtin(result, mini);
+	if (result->cmd_count == 1
+		&& is_builtin(result->commands[0].argv[0]))
+		return ;
+	spawn_commands(result, mini);
+	close_heredocs(result);
+}
+
+
+

@@ -45,25 +45,31 @@ char	*search_in_path(char **paths, char *cmd)
 	return (NULL);
 }
 
-char	*search_command(char *cmd, char **env)
+char *search_command(char *cmd, char **env)
 {
-	char	**paths;
-	char	*path_env;
+    char    **paths;
+    char    *path_env;
+    int      v;
 
-	if (!env || !cmd)
-		return (NULL);
-	if (cmd[0] == '/' || cmd[0] == '.')
-	{
-		if (is_valid_path(cmd))
-			return (cmd);
-		return (NULL);
-	}
-	path_env = ft_getenv("PATH", env);
-	if (!path_env)
-		return (NULL);
-	paths = ft_split(path_env, ':');
-	free(path_env);
-	if (!paths)
-		return (NULL);
-	return (search_in_path(paths, cmd));
+    if (!env || !cmd)
+        return (NULL);
+    if (ft_strchr(cmd, '/') != NULL)
+    {
+        v = is_valid_path(cmd);
+        if (v == -1)
+            return (strdup("__DIR__"));
+        if (v)
+            return (cmd);
+        return (NULL);
+    }
+    path_env = ft_getenv("PATH", env);
+    if (!path_env)
+        return (NULL);
+    paths = ft_split(path_env, ':');
+    free(path_env);
+    if (!paths)
+        return (NULL);
+    return (search_in_path(paths, cmd));
 }
+
+

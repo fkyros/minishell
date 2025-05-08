@@ -56,7 +56,6 @@ static char *get_next_token(const char *s, int *i, t_mini *mini)
     return (ft_strdup(buf));
 }
 
-
 int count_tokens(const char *str)
 {
     int index = 0;
@@ -90,7 +89,6 @@ int count_tokens(const char *str)
     return (count);
 }
 
-
 char **parse_command(const char *cmd, int *token_count, t_mini *mini) 
 {
     int index = 0;
@@ -101,25 +99,33 @@ char **parse_command(const char *cmd, int *token_count, t_mini *mini)
 
     if (!check_unclosed_quotes(cmd))
     {
-        ft_putstr_fd("minishell: syntax error: unclosed quotes\n", STDERR_FILENO);
+        ft_putstr_fd("minishell: syntax error: unclosed quotes\n",
+                     STDERR_FILENO);
         *token_count = 0;
         return (NULL);
     }
-    while (index < (int)ft_strlen(cmd) && 
-        (tok = get_next_token(cmd, &index, mini)) != NULL)
+    while (index < (int)ft_strlen(cmd) &&
+           (tok = get_next_token(cmd, &index, mini)) != NULL)
     {
-        if (tok[0] == '\0') {
+        if (used == 0 && tok[0] == '\0')
+        {
             free(tok);
-            continue ;
+            tokens[0] = strdup("");
+            used = 1;
+            break;
         }
-        if (used + 1 >= cap) {
-            cap *= 2;
-            tokens = realloc(tokens, cap * sizeof(char *));
+        if (tok[0] == '\0')
+        {
+            free(tok);
+            continue;
         }
+        if (used + 1 >= cap)
+            tokens = realloc(tokens, (cap *= 2) * sizeof(char *));
         tokens[used++] = tok;
     }
     tokens[used] = NULL;
     *token_count = used;
     return (tokens);
 }
+
 

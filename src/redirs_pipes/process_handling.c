@@ -4,7 +4,6 @@ void child_process(t_parse_result *result, int *i, int (*pipe_fd)[2],
                   int *prev_pipe_fd, t_mini *mini)
 {
 	t_command	*cmd;
-	char		*path;
 
 	cmd = &result->commands[*i];
 	if (!cmd->argv[0])
@@ -40,21 +39,7 @@ void child_process(t_parse_result *result, int *i, int (*pipe_fd)[2],
 		exit(0);
 	}
 	else
-	{
-		path = search_command(cmd->argv[0], mini->our_env);
-		if (path)
-		{
-			execve(path, cmd->argv, mini->our_env);
-			free(path);
-		}
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
-		ft_putstr_fd(cmd->argv[0], STDERR_FILENO);
-		ft_putstr_fd(": command not found\n", STDERR_FILENO);
-		free_commands(result);
-		free_array(mini->our_env);
-		free(mini);
-		exit(127);
-	}
+		exec_command(cmd->argv, mini->our_env);
 }
 
 void	parent_process(t_parse_result *result, int *i, int (*pipe_fd)[2],
