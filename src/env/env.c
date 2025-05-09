@@ -6,7 +6,7 @@
 /*   By: gade-oli <gade-oli@student.42madrid.c      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 16:00:26 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/05/01 18:44:56 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/05/09 19:24:20 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ char	*ft_getenv(char *var, char **env)
 char	*expand(char *var, t_mini *mini)
 {
 	if (var && ft_strncmp(var, "$", 1) == 0 && !var[1])
-		return (var);
+		return (ft_strdup(var));
 	if (var && ft_strncmp(var, "$?", 2) == 0)
 		return (ft_itoa(mini->last_status));
 	if (var && ft_strncmp(var, "$", 1) == 0 && var++)
