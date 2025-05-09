@@ -6,7 +6,7 @@
 /*   By: gade-oli <gade-oli@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 18:22:55 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/05/09 20:13:02 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/05/09 20:30:08 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,20 +145,20 @@ void	builtin_env(t_mini *mini)
 	mini->last_status = 0;
 }
 
-static int	ft_isnum(char *str)
+static int	ft_isnotnum(char *str)
 {
 	int	i;
 
 	i = 0;
 	if (str[0] == '-')
 		i++;
-	while (i)
+	while (str[i])
 	{
 		if (!ft_isdigit(str[i]))
-			return (0);
+			return (1);
 		i++;
 	}
-	return (1);
+	return (0);
 }
 
 void	builtin_exit(char **args, t_mini *mini)
@@ -166,19 +166,19 @@ void	builtin_exit(char **args, t_mini *mini)
 	int	status;
 
 	status = 0;
-	ft_putstr_fd("exit\n", STDERR_FILENO);
-	if (get_num_args(args) > 2)
-	{
-		ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
-		mini->last_status = GENERIC_ERROR;
-		return ;
-	}
-	if (args[1] && !ft_isnum(args[1]))
+	ft_putstr_fd("exit\n", STDOUT_FILENO);
+	if (args[1] && ft_isnotnum(args[1]))
 	{
 		ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
 		ft_putstr_fd(args[1], STDERR_FILENO);
 		ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
-		status = MAX_ERROR;
+		status = BUILTIN_MISUSE;
+	}
+	else if (get_num_args(args) > 2)
+	{
+		ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
+		mini->last_status = GENERIC_ERROR;
+		return ;
 	}
 	else if (args[1])
 		status = ft_atoi(args[1]) % 256;
