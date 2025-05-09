@@ -6,7 +6,7 @@
 /*   By: gade-oli <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/03 17:27:15 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/05/03 17:33:37 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/05/09 19:29:37 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,4 +60,14 @@ void	execute_builtin(t_command *cmd, t_mini *mini)
 		perror(BOLD RED"minishell: dup2"RST);
 	close(saved_stdin);
 	close(saved_stdout);
+}
+
+int	get_num_args(char **args)
+{
+	int	res;
+
+	res = 0;
+	while (args[res])
+		res++;
+	return (res);
 }

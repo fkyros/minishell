@@ -6,7 +6,7 @@
 /*   By: gade-oli <gade-oli@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 18:22:55 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/05/03 18:32:09 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/05/09 19:29:46 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,16 +135,6 @@ static int	ft_isnum(char *str)
 		i++;
 	}
 	return (0);
-}
-
-int	get_num_args(char **args)
-{
-	int	res;
-
-	res = 0;
-	while (args[res])
-		res++;
-	return (res);
 }
 
 void	builtin_exit(char **args, t_mini *mini)

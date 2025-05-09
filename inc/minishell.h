@@ -115,6 +115,7 @@ void			print_banner(void);
 
 // BUILTINS
 
+int			get_num_args(char **args);
 int				apply_redirections(t_command *cmd);
 int				is_builtin(char *cmd);
 void  			execute_builtin(t_command *cmd, t_mini *mini);
@@ -157,5 +158,8 @@ void 			child_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *pr
 void    		parent_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd);
 void    		process_handling(int *pid, t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, t_mini *mini);
 void 			wait_processes(pid_t *pids, int n_commands, t_mini *mini);
+
+// SAFE FUNCTIONS
+int			safe_chdir(char *dir);
 
 #endif
