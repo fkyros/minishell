@@ -82,7 +82,7 @@ void	builtin_cd(char **args, t_mini *mini)
 	}
 	else
 	{
-		if (get_num_args(args) > 1)
+		if (get_num_args(args) > 2)
 		{
 			ft_putstr_fd(BOLD RED"Minishell: cd: too many arguments\n"RST, STDOUT_FILENO);
 			error = 1;
