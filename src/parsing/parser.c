@@ -32,6 +32,9 @@ static char *get_next_token(const char *s, int *i, t_mini *mini)
     ft_bzero(buf, sizeof(buf));
     while (s[*i] && (state != STATE_NONE || !is_whitespace(s[*i])))
     {
+        if (state == STATE_NONE
+         && (s[*i] == '<' || s[*i] == '>' || s[*i] == '|'))
+            break;
         c = s[*i];
         if ((c == '\'' && state != STATE_DOUBLE)
          || (c == '"' && state != STATE_SINGLE))
