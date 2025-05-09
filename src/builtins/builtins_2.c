@@ -6,7 +6,7 @@
 /*   By: gade-oli <gade-oli@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 18:22:55 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/05/09 19:29:46 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/05/09 19:46:15 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,10 +131,10 @@ static int	ft_isnum(char *str)
 	while (i)
 	{
 		if (!ft_isdigit(str[i]))
-			return (1);
+			return (0);
 		i++;
 	}
-	return (0);
+	return (1);
 }
 
 void	builtin_exit(char **args, t_mini *mini)
