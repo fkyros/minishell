@@ -6,11 +6,29 @@
 /*   By: gade-oli <gade-oli@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 18:22:55 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/05/09 19:46:15 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/05/09 20:13:02 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
+
+static int	invalid_var_name(char *var)
+{
+	int	i;
+
+	i = 0;
+	if (!var)
+		return (1);
+	if (!ft_isalpha(var[0]))
+		return (1);
+	while (var[i])
+	{
+		if (!ft_isalnum(var[i]) || var[i] != '_')
+			return (1);
+		i++;
+	}
+	return (0);
+}
 
 void	builtin_unset(char **args, t_mini *mini)
 {
@@ -25,7 +43,7 @@ void	builtin_unset(char **args, t_mini *mini)
 	new_env = NULL;
 	while (args[i])
 	{
-		if (!ft_isalpha(args[i][0]))
+		if (invalid_var_name(args[i]) || !ft_strcmp(args[i], "_"))
 		{
 			i++;
 			continue;
@@ -71,6 +89,7 @@ char	**export_args_split(char **args, int *i)
 	return (res);
 }
 
+
 void	builtin_export(char **args, t_mini *mini)
 {
 	int	i;
@@ -88,7 +107,12 @@ void	builtin_export(char **args, t_mini *mini)
 	}
 	while(args[i])
 	{
-		if (!ft_isalpha(args[i][0]) || !ft_strchr(args[i], '='))
+		if (!ft_strncmp(args[i], "_=", 2))
+		{
+			i++;
+			continue;
+		}
+		else if (invalid_var_name(args[i]) || !ft_strchr(args[i], '='))
 		{
 			ft_putstr_fd("error: export with an invalid identifier\n", STDERR_FILENO);
 			status = 1;
