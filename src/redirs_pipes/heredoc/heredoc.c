@@ -65,30 +65,32 @@ static void process_heredoc(t_command *cmd, const char *heredoc_eof, t_mini *min
 
 void check_heredocs(t_parse_result *result, t_mini *mini)
 {
-	t_command	*cmd;
-	int			i;
-	int			j;
+    t_command   *cmd;
+    int         i;
+    int         j;
 
-	if (!result || !result->commands)
-		return ;
-	i = 0;
-	while (i < result->cmd_count)
-	{
-		cmd = &result->commands[i];
-		cmd->heredoc_fd = -1;
-		j = 0;
-		while (j < cmd->redir_count)
-		{
-			if (cmd->redirs[j].type == heredoc)
-			{
-				process_heredoc(cmd, cmd->redirs[j].heredoc_eof, mini);
-				break ;
-			}
-			j++;
-		}
-		i++;
-	}
+    if (!result || !result->commands)
+        return ;
+    i = 0;
+    while (i < result->cmd_count)
+    {
+        cmd = &result->commands[i];
+        cmd->heredoc_fd = -1;
+        j = 0;
+        while (j < cmd->redir_count)
+        {
+            if (cmd->redirs[j].type == heredoc)
+            {
+                process_heredoc(cmd,
+                                cmd->redirs[j].heredoc_eof,
+                                mini);
+            }
+            j++;
+        }
+        i++;
+    }
 }
+
 
 void close_heredocs(t_parse_result *result)
 {

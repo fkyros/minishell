@@ -2,11 +2,11 @@
 
 static char *get_next_token(const char *s, int *i, t_mini *mini)
 {
-	char	buf[4096];
-	size_t	pos;
-	int		state;
-	char	c;
-	char	op_str[2];
+    char    buf[4096];
+    size_t  pos;
+    int     state;
+    char    c;
+    char    op_str[2];
 
     while (s[*i] && is_whitespace(s[*i]))
         (*i)++;
@@ -23,18 +23,22 @@ static char *get_next_token(const char *s, int *i, t_mini *mini)
     if (s[*i] == '<' || s[*i] == '>' || s[*i] == '|')
     {
         op_str[0] = s[*i];
-		op_str[1] = '\0';
+        op_str[1] = '\0';
         (*i)++;
         return (ft_strdup(op_str));
     }
-    pos = 0;
+    pos   = 0;
     state = STATE_NONE;
     ft_bzero(buf, sizeof(buf));
     while (s[*i] && (state != STATE_NONE || !is_whitespace(s[*i])))
     {
+        if (state == STATE_NONE
+         && (s[*i] == '<' || s[*i] == '>' || s[*i] == '|'))
+            break;
+
         c = s[*i];
         if ((c == '\'' && state != STATE_DOUBLE)
-         || (c == '"' && state != STATE_SINGLE))
+         || (c == '"'  && state != STATE_SINGLE))
         {
             state = quote_state_after(state, c);
             (*i)++;
@@ -50,11 +54,13 @@ static char *get_next_token(const char *s, int *i, t_mini *mini)
     buf[pos] = '\0';
     if (state != STATE_NONE)
     {
-        ft_putstr_fd("minishell: syntax error: unclosed quotes\n", STDERR_FILENO);
+        ft_putstr_fd("minishell: syntax error: unclosed quotes\n",
+                     STDERR_FILENO);
         return (NULL);
     }
     return (ft_strdup(buf));
 }
+
 
 int count_tokens(const char *str)
 {
