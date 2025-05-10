@@ -23,16 +23,6 @@ void setup_pipes_and_redirection(t_command *cmd, int prev_pipe_fd, int (*pipe_fd
     setup_output(cmd, pipe_fd);
 }
 
-static void	handle_single_builtin(t_parse_result *result, t_mini *mini)
-{
-	if (result->cmd_count == 1
-		&& is_builtin(result->commands[0].argv[0]))
-	{
-		execute_builtin(&result->commands[0], mini);
-		close_heredocs(result);
-	}
-}
-
 static pid_t	*alloc_pids(int count)
 {
 	pid_t	*pids;
@@ -122,16 +112,13 @@ static void	spawn_commands(t_parse_result *res, t_mini *mini)
 	free(pids);
 }
 
-void	execute_pipeline(t_parse_result *result, t_mini *mini)
+void execute_pipeline(t_parse_result *result, t_mini *mini)
 {
-	check_heredocs(result, mini);
-	handle_single_builtin(result, mini);
-	if (result->cmd_count == 1
-		&& is_builtin(result->commands[0].argv[0]))
-		return ;
-	spawn_commands(result, mini);
-	close_heredocs(result);
+    check_heredocs(result, mini);
+    spawn_commands(result, mini);
+    close_heredocs(result);
 }
+
 
 
 

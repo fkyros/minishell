@@ -107,7 +107,15 @@ static int init_parse_result(const char *input, t_parse_result *result, t_mini *
 
 static int handle_redirection(t_command *cmd, char **args, int *i)
 {
-    enum e_redirect_type type = get_redirection_type(args[*i]);
+    enum e_redirect_type type;
+    
+    type = get_redirection_type(args[*i]);
+     if (!args[*i + 1])
+    {
+        ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n",
+                     STDERR_FILENO);
+        return (0);
+    }
     if (type == heredoc)
         add_redirect(cmd, heredoc, NULL, ft_strdup(args[*i + 1]));
     else
@@ -149,7 +157,6 @@ t_parse_result parse_commands(const char *input, t_mini *mini)
 {
     t_parse_result result;
     int i;
-	int prev_i;
     
 	result = (t_parse_result){0};
 	if (!init_parse_result(input, &result, mini))
@@ -166,18 +173,19 @@ t_parse_result parse_commands(const char *input, t_mini *mini)
 			break ;		
 		init_command(&result.commands[result.cmd_count], 
 				&result.args[i], result.cmd_count == 0);
-		prev_i = i;
-		if (!fill_command(result.args, &i, &result.commands[result.cmd_count]))
+        result.cmd_count++;
+		if (!fill_command(result.args, &i, &result.commands[result.cmd_count - 1]))
+        {    
+            free_commands(&result);
             return (result);
-		if (!result.commands[result.cmd_count].argv[0] && 
-			result.commands[result.cmd_count].redir_count == 0) 
+        }
+		if (!result.commands[result.cmd_count - 1].argv[0] && 
+			result.commands[result.cmd_count - 1].redir_count == 0) 
 		{
 			ft_putstr_fd("minishell: syntax error: empty command\n", STDERR_FILENO);
 			result.cmd_count = 0;
 			break ;
     	}
-    	if (i > prev_i)
-        	result.cmd_count++;
 	}
     return (result);
 }
