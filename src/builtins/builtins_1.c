@@ -75,7 +75,7 @@ void	builtin_cd(char **args, t_mini *mini)
 	{
 		home = ft_getenv("HOME", mini->our_env);
 		if (!home)
-			ft_putstr_fd(BOLD RED"Minishell: cd: HOME not set\n"RST, STDOUT_FILENO);
+			ft_putstr_fd(BOLD RED"Minishell: cd: HOME not set\n"RST, STDERR_FILENO);
 		error = 1;
 		if (safe_chdir(home) != 0)
 			error = 1;
@@ -84,7 +84,7 @@ void	builtin_cd(char **args, t_mini *mini)
 	{
 		if (get_num_args(args) > 2)
 		{
-			ft_putstr_fd(BOLD RED"Minishell: cd: too many arguments\n"RST, STDOUT_FILENO);
+			ft_putstr_fd(BOLD RED"Minishell: cd: too many arguments\n"RST, STDERR_FILENO);
 			error = 1;
 		}
 		else if (safe_chdir(args[1]) != 0)
@@ -98,16 +98,10 @@ void	builtin_cd(char **args, t_mini *mini)
 	update_cd_vars(mini);
 }
 
-void builtin_pwd(char **args, t_mini *mini)
+void builtin_pwd(t_mini *mini)
 {
 	char	cwd[PATH_MAX];
 
-	if (args[1])
-	{
-		ft_putstr_fd("error: pwd: too many arguments\n", STDERR_FILENO);
-		mini->last_status = GENERIC_ERROR;
-		return ;
-	}
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
 		perror(BOLD RED"minishell error: pwd"RST);
 	printf("%s\n", cwd);
