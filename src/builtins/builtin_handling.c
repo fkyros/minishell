@@ -6,7 +6,7 @@
 /*   By: gade-oli <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/03 17:27:15 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/05/09 19:29:37 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/05/11 13:03:56 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	execute_builtin(t_command *cmd, t_mini *mini)
 	else if (!ft_strcmp(cmd->argv[0], "echo"))
 		builtin_echo(cmd->argv, mini);
 	else if (!ft_strcmp(cmd->argv[0], "pwd"))
-		builtin_pwd(cmd->argv, mini);
+		builtin_pwd(mini);
 	else if (!ft_strcmp(cmd->argv[0], "env"))
 		builtin_env(mini);
 	else if (!ft_strcmp(cmd->argv[0], "export"))
