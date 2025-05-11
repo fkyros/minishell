@@ -1,19 +1,24 @@
 #include "../../../inc/minishell.h"
 
-static int check_expand(const char *str) 
+static int check_expand(const char *str)
 {
-    size_t len;
-	
-	len = ft_strlen(str);
-    return (!(len >= 2 && str[0] == '\'' && str[len - 1] == '\''));
+    size_t len = ft_strlen(str);
+
+    if (len >= 2
+     && ((str[0] == '\'' && str[len-1] == '\'')
+      || (str[0] == '"'  && str[len-1] == '"')))
+        return (0);
+    return (1);
 }
 
-static char *strip_quotes(const char *str) 
+static char *strip_quotes(const char *str)
 {
-    size_t len;
-	
-	len = ft_strlen(str);
-    if (len >= 2 && str[0] == '\'' && str[len - 1] == '\'') {
+    size_t len = ft_strlen(str);
+
+    if (len >= 2
+     && ((str[0] == '\'' && str[len-1] == '\'')
+      || (str[0] == '"'  && str[len-1] == '"')))
+    {
         return (ft_substr(str, 1, len - 2));
     }
     return (ft_strdup(str));
@@ -22,6 +27,7 @@ static char *strip_quotes(const char *str)
 static int heredoc_readline(const char *eof, int expand, int fd, t_mini *mini)
 {
 	char *line;
+    char *tmp;
 
 	while (1)
 	{
@@ -30,7 +36,7 @@ static int heredoc_readline(const char *eof, int expand, int fd, t_mini *mini)
 			break ;
 		if (expand)
 		{
-			char *tmp = line;
+			tmp = line;
 			line = expand_line(tmp, mini);
 			free(tmp);
 		}
@@ -41,7 +47,6 @@ static int heredoc_readline(const char *eof, int expand, int fd, t_mini *mini)
 	free(line);
 	return (0);
 }
-
 
 static void process_heredoc(t_command *cmd, const char *heredoc_eof, t_mini *mini)
 {
@@ -61,7 +66,6 @@ static void process_heredoc(t_command *cmd, const char *heredoc_eof, t_mini *min
     close(pipe_fd[1]);
     cmd->heredoc_fd = pipe_fd[0];
 }
-
 
 void check_heredocs(t_parse_result *result, t_mini *mini)
 {
@@ -90,7 +94,6 @@ void check_heredocs(t_parse_result *result, t_mini *mini)
         i++;
     }
 }
-
 
 void close_heredocs(t_parse_result *result)
 {

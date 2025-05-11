@@ -142,22 +142,24 @@ int				is_quote(char c);
 void			skip_quoted_section(const char *str, int *index, char quote_char);
 void			skip_unquoted_section(const char *str, int *index);
 char    		*ft_strjoin_char(const char *s1, char c);
+char			*extract_raw_heredoc_delim(const char *input, const char *eof_clean);
+
 // MAIN FUNCTIONS
 void			add_redirect(t_command *cmd, enum e_redirect_type type, char *filename, char *heredoc_eof);
 char 			**parse_command(const char *cmd, int *token_count, t_mini *mini);
 t_parse_result	parse_commands(const char *input, t_mini *mini);
 
 // PIPING
-void 			setup_input(t_command *cmd, int prev_pipe_fd);
-void 			setup_output(t_command *cmd, int (*pipe_fd)[2]);
-void 			setup_pipes_and_redirection(t_command *cmd, int prev_pipe_fd, int (*pipe_fd)[2]);
+void    		open_close_pipe(t_parse_result *result, int *i, int (*pipe_fd)[2]);
+pid_t			*alloc_pids(int count);
+void			create_pipe(int i, int cmd_count, int pipes[2][2]);
 void 			execute_pipeline(t_parse_result *result, t_mini *mini);
 
-// --> PIPING AUX
+// --> PIPING AUX & PROCESSES
 void			open_close_pipe(t_parse_result *result, int *i, int (*pipe_fd)[2]);
-void 			child_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, t_mini *mini);
-void    		parent_process(t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd);
-void    		process_handling(int *pid, t_parse_result *result, int *i, int (*pipe_fd)[2], int *prev_pipe_fd, t_mini *mini);
+void			spawn_commands(t_parse_result *res, t_mini *mini);
+void			child_branch(int i, t_parse_result *res, t_mini *mini, int pipes[2][2]);
+void			setup_child_io(int i, int cmd_count, int pipes[2][2], t_command *cmd);
 void 			wait_processes(pid_t *pids, int n_commands, t_mini *mini);
 
 // SAFE FUNCTIONS
