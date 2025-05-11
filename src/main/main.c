@@ -76,10 +76,11 @@ char *build_prompt(void)
 
 t_mini *init_shell(char **env)
 {
-	t_mini *mini = malloc(sizeof(t_mini));
+	t_mini *mini;
+	
+	mini = malloc(sizeof(t_mini));
 	if (!mini)
 		return (NULL);
-
 	mini->our_env = init_env(env);
 	mini->last_status = 0;
 	return (mini);

@@ -54,10 +54,9 @@ char *expand_variable(const char *line, int *i, t_mini *mini)
     value = expand(dollar_var, mini);
     free(dollar_var);
     if (!value)
-        return ("");
+        return (ft_strdup(""));
     return (value);
 }
-
 
 static char	*get_expanded_value(const char *line, int *i, t_mini *mini)
 {

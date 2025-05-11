@@ -7,9 +7,29 @@ static char *get_next_token(const char *s, int *i, t_mini *mini)
     int     state;
     char    c;
     char    op_str[2];
+    char    *tok;
 
     while (s[*i] && is_whitespace(s[*i]))
         (*i)++;
+    if (s[*i] == '"' && s[*i+1] == '"')
+    {
+        *i += 2;
+        tok = malloc(2);
+        if (!tok)
+            exit(EXIT_FAILURE);
+        tok[0] = '\1';
+        tok[1] = '\0';
+        return (tok);
+    }
+    if (s[*i] == '\'' && s[*i+1] == '\'')
+    {
+        *i += 2;
+        tok = malloc(2);
+        if (!tok) exit(EXIT_FAILURE);
+        tok[0] = '\1';
+        tok[1] = '\0';
+        return tok;
+    }
     if (s[*i] == '<' && s[*i+1] == '<')
     {
         *i += 2;
@@ -34,7 +54,7 @@ static char *get_next_token(const char *s, int *i, t_mini *mini)
     {
         if (state == STATE_NONE
          && (s[*i] == '<' || s[*i] == '>' || s[*i] == '|'))
-            break;
+            break ;
 
         c = s[*i];
         if ((c == '\'' && state != STATE_DOUBLE)
@@ -61,12 +81,13 @@ static char *get_next_token(const char *s, int *i, t_mini *mini)
     return (ft_strdup(buf));
 }
 
-
 int count_tokens(const char *str)
 {
-    int index = 0;
-    int count = 0;
+    int index;
+    int count;
 
+    index = 0;
+    count = 0;
     while (str[index])
     {
         while (str[index] && is_whitespace(str[index]))
@@ -97,13 +118,17 @@ int count_tokens(const char *str)
 
 char **parse_command(const char *cmd, int *token_count, t_mini *mini) 
 {
-    int index = 0;
-    int cap = 4;
-    int used = 0;
-    char **tokens = malloc(cap * sizeof(char *));
-    char *tok;
+    int   index;
+    int   used;
+    int   cap;
+    char **tokens;
+    char  *tok;
 
-    if (!check_unclosed_quotes(cmd))
+    index = 0;
+    used = 0;
+    cap = 4;
+    tokens = malloc(cap * sizeof(char *));
+    if (!tokens || !check_unclosed_quotes(cmd))
     {
         ft_putstr_fd("minishell: syntax error: unclosed quotes\n",
                      STDERR_FILENO);
@@ -113,17 +138,12 @@ char **parse_command(const char *cmd, int *token_count, t_mini *mini)
     while (index < (int)ft_strlen(cmd) &&
            (tok = get_next_token(cmd, &index, mini)) != NULL)
     {
-        if (used == 0 && tok[0] == '\0')
+        if (tok[0] == '\1')
+            tok[0] = '\0';
+        else if (tok[0] == '\0')
         {
             free(tok);
-            tokens[0] = strdup("");
-            used = 1;
-            break;
-        }
-        if (tok[0] == '\0')
-        {
-            free(tok);
-            continue;
+            continue ;
         }
         if (used + 1 >= cap)
             tokens = realloc(tokens, (cap *= 2) * sizeof(char *));
@@ -133,5 +153,4 @@ char **parse_command(const char *cmd, int *token_count, t_mini *mini)
     *token_count = used;
     return (tokens);
 }
-
 
