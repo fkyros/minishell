@@ -17,7 +17,6 @@ char	*str_append(char *s1, const char *s2)
 	return (new_str);
 }
 
-
 static char	*extract_var_name(const char *line, int *i)
 {
 	int		start;

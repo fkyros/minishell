@@ -140,6 +140,8 @@ int				is_quote(char c);
 void			skip_quoted_section(const char *str, int *index, char quote_char);
 void			skip_unquoted_section(const char *str, int *index);
 char    		*ft_strjoin_char(const char *s1, char c);
+char			*extract_raw_heredoc_delim(const char *input, const char *eof_clean);
+
 // MAIN FUNCTIONS
 void			add_redirect(t_command *cmd, enum e_redirect_type type, char *filename, char *heredoc_eof);
 char 			**parse_command(const char *cmd, int *token_count, t_mini *mini);

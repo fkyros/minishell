@@ -25,6 +25,11 @@ void	child_branch(int i, t_parse_result *res, t_mini *mini,
 	t_command *cmd = &res->commands[i];
 
 	setup_child_io(i, res->cmd_count, pipes, cmd);
+	if (res->cmd_count > 1)
+	{
+		close(pipes[i % 2][0]);
+		close(pipes[i % 2][1]);
+	}
 	if (apply_redirections(cmd))
 		exit(EXIT_FAILURE);
 	if (is_builtin(cmd->argv[0]))
@@ -63,6 +68,11 @@ void	spawn_commands(t_parse_result *res, t_mini *mini)
 		}
 		i++;
 	}
+	if (res->cmd_count > 1)
+    {
+        close(pipes[(i - 1) % 2][0]);
+        close(pipes[(i - 1) % 2][1]);
+    }
 	wait_processes(pids, res->cmd_count, mini);
 	free(pids);
 }
@@ -72,21 +82,31 @@ void wait_processes(pid_t *pids, int n_commands, t_mini *mini)
     int i;
     int status;
     int last_status;
+	int	broken;
 
 	i = 0;
 	last_status = 0;
+	broken = 0;
     while (i < n_commands)
     {
         if (waitpid(pids[i], &status, 0) == -1)
             perror("minishell: waitpid");
         else if (WIFEXITED(status))
+		{
             last_status = WEXITSTATUS(status);
+			if (last_status == 128 + SIGPIPE)
+                broken = 1;
+		}
         else if (WIFSIGNALED(status))
+		{
+			if (WTERMSIG(status) == SIGPIPE)
+				broken = 1;
             last_status = 128 + WTERMSIG(status);
+		}
         i++;
     }
     mini->last_status = last_status;
-	if (last_status == 128 + SIGPIPE)
+	if (broken)
         ft_putstr_fd("Broken pipe\n", STDERR_FILENO);
 }
 

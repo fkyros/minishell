@@ -105,9 +105,10 @@ static int init_parse_result(const char *input, t_parse_result *result, t_mini *
     return (1);
 }
 
-static int handle_redirection(t_command *cmd, char **args, int *i)
+static int handle_redirection(t_command *cmd, char **args, int *i, const char *input)
 {
     enum e_redirect_type type;
+    char *raw_delim;
     
     type = get_redirection_type(args[*i]);
      if (!args[*i + 1])
@@ -117,7 +118,10 @@ static int handle_redirection(t_command *cmd, char **args, int *i)
         return (0);
     }
     if (type == heredoc)
-        add_redirect(cmd, heredoc, NULL, ft_strdup(args[*i + 1]));
+    {
+        raw_delim = extract_raw_heredoc_delim(input, args[*i + 1]);
+        add_redirect(cmd, heredoc, NULL, raw_delim);
+    }
     else
         add_redirect(cmd, type, ft_strdup(args[*i + 1]), NULL);
     args[*i] = NULL;
@@ -126,7 +130,7 @@ static int handle_redirection(t_command *cmd, char **args, int *i)
     return (1);
 }
 
-static int fill_command(char **args, int *i, t_command *cmd)
+static int fill_command(char **args, int *i, t_command *cmd, const char *input)
 {
     int start;
 	int	cmd_length;
@@ -136,7 +140,7 @@ static int fill_command(char **args, int *i, t_command *cmd)
 	{
         if (is_redirection(args[*i]))
         {
-            if(!handle_redirection(cmd, args, i))
+            if(!handle_redirection(cmd, args, i, input))
                 return (0);
         }
         else
@@ -174,7 +178,7 @@ t_parse_result parse_commands(const char *input, t_mini *mini)
 		init_command(&result.commands[result.cmd_count], 
 				&result.args[i], result.cmd_count == 0);
         result.cmd_count++;
-		if (!fill_command(result.args, &i, &result.commands[result.cmd_count - 1]))
+		if (!fill_command(result.args, &i, &result.commands[result.cmd_count - 1], input))
         {    
             free_commands(&result);
             return (result);
