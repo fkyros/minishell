@@ -42,10 +42,11 @@ void	create_pipe(int i, int cmd_count, int pipes[2][2])
 void execute_pipeline(t_parse_result *result, t_mini *mini)
 {
     check_heredocs(result, mini);
+    if (mini->last_status == 130)
+        return;
     spawn_commands(result, mini);
     close_heredocs(result);
 }
-
 
 
 
