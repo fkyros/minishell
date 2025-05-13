@@ -11,6 +11,7 @@
 # include <sys/stat.h>
 # include <fcntl.h>
 # include <signal.h>
+# include <errno.h>
 # include <termcap.h>
 # include <readline/readline.h>
 # include <readline/history.h>
@@ -116,7 +117,7 @@ void			print_banner(void);
 
 // BUILTINS
 
-int			get_num_args(char **args);
+int				get_num_args(char **args);
 int				apply_redirections(t_command *cmd);
 int				is_builtin(char *cmd);
 void  			execute_builtin(t_command *cmd, t_mini *mini);

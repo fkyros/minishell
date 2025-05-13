@@ -57,7 +57,7 @@ char *search_command(char *cmd, char **env)
     {
         v = is_valid_path(cmd);
         if (v == -1)
-            return (strdup("__DIR__"));
+            return (ft_strdup("__DIR__"));
         if (v)
             return (cmd);
         return (NULL);

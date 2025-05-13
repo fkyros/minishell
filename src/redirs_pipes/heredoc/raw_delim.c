@@ -73,6 +73,7 @@ char	*extract_raw_heredoc_delim(const char *input, const char *eof_clean)
 	const char	*start;
 	const char	*end;
 	char		quote;
+	char 		*match;
 
 	p = input;
 	while ((p = find_next_heredoc(p)) != NULL)
@@ -82,7 +83,7 @@ char	*extract_raw_heredoc_delim(const char *input, const char *eof_clean)
 		if (!get_bounds(ptr, quote, &start, &end))
 			break ;
 		{
-			char *match = extract_if_match(start, end, ptr, eof_clean);
+			match = extract_if_match(start, end, ptr, eof_clean);
 			if (match)
 				return (match);
 		}

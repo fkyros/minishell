@@ -21,7 +21,7 @@ void	append_to_buf(char *buf, size_t *pos, const char *src, size_t len)
 {
 	if (*pos + len > 4095)
 		len = 4095 - *pos;
-	memcpy(buf + *pos, src, len);
+	ft_memcpy(buf + *pos, src, len);
 	*pos += len;
 }
 

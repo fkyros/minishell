@@ -75,7 +75,7 @@ void	builtin_cd(char **args, t_mini *mini)
 	{
 		home = ft_getenv("HOME", mini->our_env);
 		if (!home)
-			ft_putstr_fd(BOLD RED"Minishell: cd: HOME not set\n"RST, STDOUT_FILENO);
+			ft_putstr_fd(BOLD RED"Minishell: cd: HOME not set\n"RST, STDERR_FILENO);
 		error = 1;
 		if (safe_chdir(home) != 0)
 			error = 1;
@@ -84,7 +84,7 @@ void	builtin_cd(char **args, t_mini *mini)
 	{
 		if (get_num_args(args) > 2)
 		{
-			ft_putstr_fd(BOLD RED"Minishell: cd: too many arguments\n"RST, STDOUT_FILENO);
+			perror(BOLD RED"Minishell: cd: too many arguments\n"RST);
 			error = 1;
 		}
 		else if (safe_chdir(args[1]) != 0)
