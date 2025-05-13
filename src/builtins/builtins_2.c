@@ -6,7 +6,7 @@
 /*   By: gade-oli <gade-oli@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 18:22:55 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/05/10 18:24:44 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/05/11 16:25:13 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ void	builtin_export(char **args, t_mini *mini)
 			i++;
 			continue;
 		}
-		else if (!ft_strchr(args[i], '=') || invalid_var_export(args[i])) 
+		else if (args[i][0] == '=' || !ft_strchr(args[i], '=') || invalid_var_export(args[i])) 
 		{
 			ft_putstr_fd("error: export with an invalid identifier\n", STDERR_FILENO);
 			status = 1;
@@ -161,7 +161,7 @@ static int	ft_isnotnum(char *str)
 	int	i;
 
 	i = 0;
-	if (str[0] == '-')
+	if (str[i] == '-')
 		i++;
 	while (str[i])
 	{
