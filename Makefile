@@ -37,13 +37,9 @@ SRCS = 	$(SRC_DIR)/main/main.c $(SRC_DIR)/main/utils.c ${SRC_DIR}/main/memory_ha
 		${SRC_DIR}/builtins/builtins_1.c ${SRC_DIR}/builtins/builtins_2.c ${SRC_DIR}/builtins/builtin_handling.c \
 		${SRC_DIR}/env/env.c \
 		${SRC_DIR}/redirs_pipes/process_handling.c ${SRC_DIR}/redirs_pipes/redirections.c ${SRC_DIR}/redirs_pipes/pipe_handling.c \
-<<<<<<< HEAD
-		${SRC_DIR}/redirs_pipes/heredoc/heredoc.c ${SRC_DIR}/redirs_pipes/heredoc/heredoc_expand.c \
-		${SRC_DIR}/safe_funcs/safe_chdir.c
-=======
 		${SRC_DIR}/redirs_pipes/heredoc/heredoc.c ${SRC_DIR}/redirs_pipes/heredoc/heredoc_expand.c ${SRC_DIR}/redirs_pipes/heredoc/raw_delim.c \
->>>>>>> jorexpos
-	   
+		${SRC_DIR}/safe_funcs/safe_chdir.c
+
 
 OBJS = $(SRCS:$(SRC_DIR)/%.c=bin/%.o)
 
