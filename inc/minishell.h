@@ -130,7 +130,7 @@ void			builtin_unset(char **args, t_mini *mini);
 void			builtin_exit(char **args, t_mini *mini);
 
 // HEREDOC
-void			check_heredocs(t_parse_result *result, t_mini *mini);
+int			check_heredocs(t_parse_result *result, t_mini *mini);
 void    		close_heredocs(t_parse_result *result);
 char 			*expand_line(const char *line, t_mini *mini);
 

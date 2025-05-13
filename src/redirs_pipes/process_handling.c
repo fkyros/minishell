@@ -82,31 +82,19 @@ void wait_processes(pid_t *pids, int n_commands, t_mini *mini)
     int i;
     int status;
     int last_status;
-	int	broken;
 
 	i = 0;
 	last_status = 0;
-	broken = 0;
     while (i < n_commands)
     {
         if (waitpid(pids[i], &status, 0) == -1)
             perror("minishell: waitpid");
         else if (WIFEXITED(status))
-		{
             last_status = WEXITSTATUS(status);
-			if (last_status == 128 + SIGPIPE)
-                broken = 1;
-		}
         else if (WIFSIGNALED(status))
-		{
-			if (WTERMSIG(status) == SIGPIPE)
-				broken = 1;
             last_status = 128 + WTERMSIG(status);
-		}
         i++;
     }
     mini->last_status = last_status;
-	if (broken)
-        ft_putstr_fd("Broken pipe\n", STDERR_FILENO);
 }
 

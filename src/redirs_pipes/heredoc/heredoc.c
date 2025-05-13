@@ -103,7 +103,7 @@ static int process_heredoc(t_command *cmd, const char *heredoc_eof, t_mini *mini
     return (0);
 }
 
-void check_heredocs(t_parse_result *result, t_mini *mini)
+int check_heredocs(t_parse_result *result, t_mini *mini)
 {
     t_command *cmd;
     int        i;
@@ -111,7 +111,7 @@ void check_heredocs(t_parse_result *result, t_mini *mini)
     int        err;
 
     if (!result || !result->commands)
-        return ;
+        return (1);
     i = 0;
     while (i < result->cmd_count)
     {
@@ -128,13 +128,14 @@ void check_heredocs(t_parse_result *result, t_mini *mini)
                 if (err == 1)
                 {
                     mini->last_status = 130;
-                    return;
+                    return (1);
                 }
             }
             j++;
         }
         i++;
     }
+    return (0);
 }
 
 void close_heredocs(t_parse_result *result)
