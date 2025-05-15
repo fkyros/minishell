@@ -175,10 +175,14 @@ static int	ft_isnotnum(char *str)
 void	builtin_exit(char **args, t_mini *mini)
 {
 	int	status;
+	int skip;
 
 	status = 0;
 	ft_putstr_fd("exit\n", STDOUT_FILENO);
-	if (args[1] && ft_isnotnum(args[1]))
+	skip = 0;
+	if (args[1] && !ft_strcmp(args[1], "--"))
+		skip = 1;
+	if (!skip && args[1] && ft_isnotnum(args[1]))
 	{
 		ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
 		ft_putstr_fd(args[1], STDERR_FILENO);
@@ -191,7 +195,7 @@ void	builtin_exit(char **args, t_mini *mini)
 		mini->last_status = GENERIC_ERROR;
 		return ;
 	}
-	else if (args[1])
+	else if (!skip && args[1])
 		status = ft_atoi(args[1]) % 256;
 	rl_clear_history();
 	free_array(mini->our_env);
