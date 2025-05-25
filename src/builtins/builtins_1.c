@@ -1,29 +1,40 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   builtins_1.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gade-oli <gade-oli@student.42madrid.com>   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/24 09:40:25 by gade-oli          #+#    #+#             */
+/*   Updated: 2025/05/25 20:22:31 by gade-oli         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../inc/minishell.h"
 
-// ECHO, CD, PWD, EXPORT
-static void    echo_args(char **args, int *newline, int *i)
+static int is_valid_n_flag(char *arg)
 {
-    int parsing_flags;
-    int j;
+	int i;
 
-    parsing_flags = 1;
-    while (args[*i] && parsing_flags)
-    {
-        if (args[*i][0] == '-' && args[*i][1] == 'n')
-        {
-            // CHECK IF IT'S A VALID STRING
-            j = 2;
-            while (args[*i][j] == 'n')
-                j++;
-            // IF IT'S ONLY THE FLAG
-            if (args[(*i)++][j] == '\0')
-                *newline = 0;
-            else  // NOT A VALID FLAG, STOP PROCESSING THEM
-                parsing_flags = 0;
-        }
-        else
-            parsing_flags = 0;
-    }
+	i = 1;
+	if (arg[0] != '-' || arg[1] != 'n')
+		return (0);
+	while (arg[i] == 'n')
+		i++;
+	return (arg[i] == '\0');
+}
+
+static int	echo_args(char **args, int *i)
+{
+	int	newline;
+
+	newline = 1;
+	while (args[*i] && is_valid_n_flag(args[*i]))
+	{
+		newline = 0;
+		(*i)++;
+	}
+	return (newline);
 }
 
 void builtin_echo(char **args, t_mini *mini)
@@ -32,8 +43,7 @@ void builtin_echo(char **args, t_mini *mini)
 	int	newline;
 
 	i = 1;
-	newline = 1;
-	echo_args(args, &newline, &i);
+	newline = echo_args(args, &i);
 	while (args[i])
 	{
 		write(1, args[i], ft_strlen(args[i]));
