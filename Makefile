@@ -34,8 +34,9 @@ SRC_DIR = ./src
 SRCS = 	$(SRC_DIR)/main/main.c $(SRC_DIR)/main/utils.c ${SRC_DIR}/main/memory_handler.c ${SRC_DIR}/main/execution.c \
 		$(SRC_DIR)/parsing/cmdpath.c $(SRC_DIR)/parsing/parser_aux.c $(SRC_DIR)/parsing/parser.c \
 		${SRC_DIR}/parsing/parser_quote_handler.c ${SRC_DIR}/parsing/command_parser.c \
-		${SRC_DIR}/builtins/builtins_1.c ${SRC_DIR}/builtins/builtins_2.c ${SRC_DIR}/builtins/builtin_handling.c \
-		${SRC_DIR}/env/env.c \
+		${SRC_DIR}/builtins/builtin_handler.c ${SRC_DIR}/builtins/ft_cd.c ${SRC_DIR}/builtins/ft_echo.c ${SRC_DIR}/builtins/ft_env.c \
+		${SRC_DIR}/builtins/ft_exit.c ${SRC_DIR}/builtins/ft_export_unset.c ${SRC_DIR}/builtins/ft_pwd.c \
+		${SRC_DIR}/env/env.c ${SRC_DIR}/env/env_utils.c \
 		${SRC_DIR}/redirs_pipes/process_handling.c ${SRC_DIR}/redirs_pipes/redirections.c ${SRC_DIR}/redirs_pipes/pipe_handling.c \
 		${SRC_DIR}/redirs_pipes/heredoc/heredoc.c ${SRC_DIR}/redirs_pipes/heredoc/heredoc_expand.c \
 		${SRC_DIR}/safe_funcs/safe_chdir.c

@@ -8,3 +8,5 @@ bin/
 *.a
 *.swp
 valgrind_logs/
+42_minishell_tester/
+minishell_tester/
