@@ -51,7 +51,7 @@ void execute_pipeline(t_parse_result *result, t_mini *mini)
     {
         execute_builtin(&result->commands[0], mini);
         close_heredocs(result);
-        return;
+        return ;
     }
     spawn_commands(result, mini);
     close_heredocs(result);
