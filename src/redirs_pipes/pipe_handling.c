@@ -42,13 +42,18 @@ void	create_pipe(int i, int cmd_count, int pipes[2][2])
 void execute_pipeline(t_parse_result *result, t_mini *mini)
 {
     int interrupted;
-
+    
     interrupted = check_heredocs(result, mini);
     if (interrupted)
         return ;
+    if (result->cmd_count == 1
+        && is_builtin(result->commands[0].argv[0]))
+    {
+        execute_builtin(&result->commands[0], mini);
+        close_heredocs(result);
+        return;
+    }
     spawn_commands(result, mini);
     close_heredocs(result);
 }
-
-
 

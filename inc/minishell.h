@@ -72,7 +72,8 @@ typedef struct s_parse_result {
 typedef	struct s_mini
 {
 	char		**our_env;
-	int		last_status;
+	int			last_status;
+	int			saved_stdin;
 	t_parse_result	*parse_result;
 }	t_mini;
 
@@ -130,7 +131,7 @@ void			builtin_unset(char **args, t_mini *mini);
 void			builtin_exit(char **args, t_mini *mini);
 
 // HEREDOC
-int			check_heredocs(t_parse_result *result, t_mini *mini);
+int				check_heredocs(t_parse_result *result, t_mini *mini);
 void    		close_heredocs(t_parse_result *result);
 char 			*expand_line(const char *line, t_mini *mini);
 
@@ -159,11 +160,16 @@ void 			execute_pipeline(t_parse_result *result, t_mini *mini);
 // --> PIPING AUX & PROCESSES
 void			open_close_pipe(t_parse_result *result, int *i, int (*pipe_fd)[2]);
 void			spawn_commands(t_parse_result *res, t_mini *mini);
-void			child_branch(int i, t_parse_result *res, t_mini *mini, int pipes[2][2]);
+void 			child_branch(int i, t_parse_result *res, t_mini *mini, int pipes[2][2]);
 void			setup_child_io(int i, int cmd_count, int pipes[2][2], t_command *cmd);
-void 			wait_processes(pid_t *pids, int n_commands, t_mini *mini);
+void			print_all_child_errors(t_parse_result *res, int *exit_codes);
+void			print_error_for_child(char *cmdname, int code);
+void			update_exit_code(int *exit_codes, int idx, int status);
+int				find_pid_index(pid_t *pids, pid_t pid, int count);
+int				*alloc_and_zero_exit_codes(int count);
+
 
 // SAFE FUNCTIONS
-int			safe_chdir(char *dir);
+int				safe_chdir(char *dir);
 
 #endif
