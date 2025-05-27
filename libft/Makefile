@@ -12,7 +12,7 @@ ft_strncmp.c ft_toupper.c ft_tolower.c ft_strnstr.c ft_strrchr.c ft_calloc.c\
 ft_putchar_fd.c ft_putstr_fd.c ft_putnbr_fd.c ft_putendl_fd.c ft_substr.c\
 ft_strjoin.c ft_strtrim.c ft_strmapi.c ft_itoa.c ft_split.c ft_striteri.c\
 get_next_line.c get_next_line_utils.c ft_strjoin_free.c ft_numbers.c\
-ft_printf.c ft_words.c ft_strcmp.c
+ft_printf.c ft_words.c ft_strcmp.c ft_strstr.c
 OBJ = $(SRC:.c=.o)
 INCLUDE = libft.h 
 

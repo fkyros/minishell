@@ -76,10 +76,11 @@ char *build_prompt(void)
 
 t_mini *init_shell(char **env)
 {
-	t_mini *mini = malloc(sizeof(t_mini));
+	t_mini *mini;
+	
+	mini = malloc(sizeof(t_mini));
 	if (!mini)
 		return (NULL);
-
 	mini->our_env = init_env(env);
 	mini->last_status = 0;
 	return (mini);
@@ -119,6 +120,7 @@ int run_prompt_loop(t_mini *mini)
 int main(int argc, char **argv, char **env)
 {
 	t_mini *mini;
+	int		saved_stdin;
 
 	(void)argc;
 	(void)argv;
@@ -127,8 +129,16 @@ int main(int argc, char **argv, char **env)
 	mini = init_shell(env);
 	if (!mini)
 		return (1);
+	saved_stdin = dup(STDIN_FILENO);
+    if (saved_stdin < 0)
+    {
+        perror("minishell: dup");
+        exit(EXIT_FAILURE);
+    }
+    mini->saved_stdin = saved_stdin;
 	run_prompt_loop(mini);
 	free_array(mini->our_env);
+	close(mini->saved_stdin);
 	free(mini);
 	return (EXIT_SUCCESS);
 }

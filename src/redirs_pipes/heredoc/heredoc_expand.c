@@ -17,7 +17,6 @@ char	*str_append(char *s1, const char *s2)
 	return (new_str);
 }
 
-
 static char	*extract_var_name(const char *line, int *i)
 {
 	int		start;
@@ -57,7 +56,6 @@ char *expand_variable(const char *line, int *i, t_mini *mini)
         return (ft_strdup(""));
     return (value);
 }
-
 
 static char	*get_expanded_value(const char *line, int *i, t_mini *mini)
 {

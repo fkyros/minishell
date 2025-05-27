@@ -1,97 +1,132 @@
 #include "../inc/minishell.h"
 
-void child_process(t_parse_result *result, int *i, int (*pipe_fd)[2],
-                  int *prev_pipe_fd, t_mini *mini)
+void setup_child_io(int i, int cmd_count, int pipes[2][2], t_command *cmd)
 {
-	t_command	*cmd;
-
-	cmd = &result->commands[*i];
-	if (!cmd->argv[0])
-	{
-		if (cmd->redir_count > 0)
-		{
-			setup_pipes_and_redirection(cmd, *prev_pipe_fd, pipe_fd);
-			exit(0);
-		}
-		else
-		{
-			ft_putstr_fd("minishell: syntax error: empty command\n", STDERR_FILENO);
-			exit(1);
-		}
-	}
-	if (cmd->heredoc_fd != -1)
-	{
-		dup2(cmd->heredoc_fd, STDIN_FILENO);
-		close(cmd->heredoc_fd);
-	}
-	setup_pipes_and_redirection(cmd, *prev_pipe_fd, pipe_fd);
-	if (*prev_pipe_fd != -1)
-		close(*prev_pipe_fd);
-	if ((*pipe_fd)[0] != -1)
-		close((*pipe_fd)[0]);
-	if ((*pipe_fd)[1] != -1)
-		close((*pipe_fd)[1]);
-	if (is_builtin(cmd->argv[0]))
-	{
-		execute_builtin(cmd, mini);
-		free_array(mini->our_env);
-		free(mini);
-		exit(0);
-	}
-	else
-		exec_command(cmd->argv, mini->our_env);
-}
-
-void	parent_process(t_parse_result *result, int *i, int (*pipe_fd)[2],
-	int *prev_pipe_fd)
-{
-	if (result->commands[*i].heredoc_fd != -1)
-	{
-		close(result->commands[*i].heredoc_fd);
-		result->commands[*i].heredoc_fd = -1;
-	}
-	if ((*pipe_fd)[1] != -1)
-		close((*pipe_fd)[1]);
-	if (*prev_pipe_fd != -1)
-		close(*prev_pipe_fd);
-	*prev_pipe_fd = (*pipe_fd)[0];
-}
-
-void process_handling(int *pid, t_parse_result *result, int *i,
-    int (*pipe_fd)[2], int *prev_pipe_fd, t_mini *mini)
-{
-	if (*pid < 0)
-	{
-		perror(RED BOLD"Error trying to fork"RST);
-		exit(EXIT_FAILURE);
-	}
-	else if (*pid == 0)
-	{
-		signal(SIGINT, SIG_DFL);
-		signal(SIGQUIT, SIG_DFL);
-		child_process(result, i, pipe_fd, prev_pipe_fd, mini);
-	}
-	else
-		parent_process(result, i, pipe_fd, prev_pipe_fd);
-}
-
-void wait_processes(pid_t *pids, int n_commands, t_mini *mini)
-{
-    int i;
-    int status;
-    int last_status;
-
-	i = 0;
-	last_status = 0;
-    while (i < n_commands)
+    if (i > 0)
+        dup2(pipes[(i - 1) % 2][0], STDIN_FILENO);
+    if (i < cmd_count - 1)
+        dup2(pipes[i % 2][1], STDOUT_FILENO);
+    close(pipes[0][0]);
+    close(pipes[0][1]);
+    close(pipes[1][0]);
+    close(pipes[1][1]);
+    if (cmd->heredoc_fd != -1)
     {
-        if (waitpid(pids[i], &status, 0) == -1)
-            perror("minishell: waitpid");
-        else if (WIFEXITED(status))
-            last_status = WEXITSTATUS(status);
-        else if (WIFSIGNALED(status))
-            last_status = 128 + WTERMSIG(status);
+        dup2(cmd->heredoc_fd, STDIN_FILENO);
+        close(cmd->heredoc_fd);
+    }
+}
+
+void child_branch(int i, t_parse_result *res, t_mini *mini,
+                  int pipes[2][2])
+{
+    t_command	*cmd;
+    int			redir_failed;
+    int			is_path;
+	int			status;
+
+    cmd = &res->commands[i];
+    redir_failed = 0;
+    setup_child_io(i, res->cmd_count, pipes, cmd);
+    if (apply_redirections(cmd))
+        redir_failed = 1;
+    if (cmd->argv[0] == NULL)
+    {
+        if (redir_failed)
+            exit(1);
+        exit(0);
+    }
+    if (redir_failed)
+        exit(1);
+    if (is_builtin(cmd->argv[0]))
+    {
+        status = execute_builtin(cmd, mini);
+        exit(status);
+    }
+    is_path = (ft_strchr(cmd->argv[0], '/') != NULL);
+    exec_command(cmd->argv, mini->our_env);
+    if (is_path)
+    {
+        if (errno == EACCES || errno == EISDIR)
+            exit(126);
+        else
+            exit(127);
+    }
+    else
+        exit(127);
+}
+
+static int *collect_exit_codes(t_parse_result *res, pid_t *pids)
+{
+    int   *exit_codes;
+    int    status;
+    int    i;
+    int    remaining;
+    pid_t  pid;
+
+    exit_codes = alloc_and_zero_exit_codes(res->cmd_count);
+    remaining = res->cmd_count;
+    while (remaining > 0)
+    {
+        pid = waitpid(-1, &status, 0);
+        if (pid < 0)
+            break ;
+        i = find_pid_index(pids, pid, res->cmd_count);
+        if (i == -1)
+            continue ;
+        update_exit_code(exit_codes, i, status);
+        remaining--;
+    }
+
+    return (exit_codes);
+}
+
+static void reap_and_handle_errors(t_parse_result *res,
+                                   t_mini *mini,
+                                   pid_t *pids)
+{
+    int  *exit_codes;
+    int   last_index;
+
+    last_index = res->cmd_count - 1;
+    exit_codes = collect_exit_codes(res, pids);
+    print_all_child_errors(res, exit_codes);
+    mini->last_status = exit_codes[last_index];
+    free(exit_codes);
+}
+
+void spawn_commands(t_parse_result *res, t_mini *mini)
+{
+    pid_t *pids;
+    int    pipes[2][2];
+    int    i;
+
+    pids = alloc_pids(res->cmd_count);
+    i = 0;
+    while (i < res->cmd_count)
+    {
+        create_pipe(i, res->cmd_count, pipes);
+        pids[i] = fork();
+        if (pids[i] < 0)
+        {
+            perror("minishell: fork");
+            exit(EXIT_FAILURE);
+        }
+        if (pids[i] == 0)
+            child_branch(i, res, mini, pipes);
+        if (i > 0)
+        {
+            close(pipes[(i - 1) % 2][0]);
+            close(pipes[(i - 1) % 2][1]);
+        }
         i++;
     }
-    mini->last_status = last_status;
+    if (res->cmd_count > 1)
+    {
+        close(pipes[(i - 1) % 2][0]);
+        close(pipes[(i - 1) % 2][1]);
+    }
+    reap_and_handle_errors(res, mini, pids);
+    dup2(mini->saved_stdin, STDIN_FILENO);
+    free(pids);
 }
