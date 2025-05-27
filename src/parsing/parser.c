@@ -1,5 +1,19 @@
 #include "../inc/minishell.h"
 
+static int is_after_heredoc(const char *s, int idx)
+{
+    int  j;
+
+    j = idx - 1;
+    while (j >= 0 && is_whitespace(s[j]))
+        j--;
+    if (j < 1)
+        return (0);
+    if (s[j] == '<' && s[j - 1] == '<')
+        return (1);
+    return (0);
+}
+
 static char *get_next_token(const char *s, int *i, t_mini *mini)
 {
     char    buf[4096];
@@ -11,7 +25,7 @@ static char *get_next_token(const char *s, int *i, t_mini *mini)
 
     while (s[*i] && is_whitespace(s[*i]))
         (*i)++;
-    if (s[*i] == '"' && s[*i+1] == '"')
+    if (s[*i] == '"' && s[*i + 1] == '"')
     {
         *i += 2;
         tok = malloc(2);
@@ -21,21 +35,22 @@ static char *get_next_token(const char *s, int *i, t_mini *mini)
         tok[1] = '\0';
         return (tok);
     }
-    if (s[*i] == '\'' && s[*i+1] == '\'')
+    if (s[*i] == '\'' && s[*i + 1] == '\'')
     {
         *i += 2;
         tok = malloc(2);
-        if (!tok) exit(EXIT_FAILURE);
+        if (!tok)
+            exit(EXIT_FAILURE);
         tok[0] = '\1';
         tok[1] = '\0';
-        return tok;
+        return (tok);
     }
-    if (s[*i] == '<' && s[*i+1] == '<')
+    if (s[*i] == '<' && s[*i + 1] == '<')
     {
         *i += 2;
         return (ft_strdup("<<"));
     }
-    if (s[*i] == '>' && s[*i+1] == '>')
+    if (s[*i] == '>' && s[*i + 1] == '>')
     {
         *i += 2;
         return (ft_strdup(">>"));
@@ -50,12 +65,12 @@ static char *get_next_token(const char *s, int *i, t_mini *mini)
     pos   = 0;
     state = STATE_NONE;
     ft_bzero(buf, sizeof(buf));
-    while (s[*i] && (state != STATE_NONE || !is_whitespace(s[*i])))
+    while (s[*i] &&
+           (state != STATE_NONE || !is_whitespace(s[*i])))
     {
         if (state == STATE_NONE
          && (s[*i] == '<' || s[*i] == '>' || s[*i] == '|'))
             break ;
-
         c = s[*i];
         if ((c == '\'' && state != STATE_DOUBLE)
          || (c == '"'  && state != STATE_SINGLE))
@@ -63,8 +78,12 @@ static char *get_next_token(const char *s, int *i, t_mini *mini)
             state = quote_state_after(state, c);
             (*i)++;
         }
-        else if (c == '$' && state != STATE_SINGLE)
+        else if (c == '$'
+             && state != STATE_SINGLE
+             && !is_after_heredoc(s, *i))
+        {
             handle_dollar(s, i, mini, buf, &pos);
+        }
         else
         {
             buf[pos++] = c;
@@ -78,6 +97,7 @@ static char *get_next_token(const char *s, int *i, t_mini *mini)
                      STDERR_FILENO);
         return (NULL);
     }
+
     return (ft_strdup(buf));
 }
 

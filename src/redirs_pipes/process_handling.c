@@ -20,14 +20,30 @@ void setup_child_io(int i, int cmd_count, int pipes[2][2], t_command *cmd)
 void child_branch(int i, t_parse_result *res, t_mini *mini,
                   int pipes[2][2])
 {
-    t_command *cmd;
-    int        is_path;
+    t_command	*cmd;
+    int			redir_failed;
+    int			is_path;
+	int			status;
 
     cmd = &res->commands[i];
-    is_path = (ft_strchr(cmd->argv[0], '/') != NULL);
+    redir_failed = 0;
     setup_child_io(i, res->cmd_count, pipes, cmd);
     if (apply_redirections(cmd))
+        redir_failed = 1;
+    if (cmd->argv[0] == NULL)
+    {
+        if (redir_failed)
+            exit(1);
+        exit(0);
+    }
+    if (redir_failed)
         exit(1);
+    if (is_builtin(cmd->argv[0]))
+    {
+        status = execute_builtin(cmd, mini);
+        exit(status);
+    }
+    is_path = (ft_strchr(cmd->argv[0], '/') != NULL);
     exec_command(cmd->argv, mini->our_env);
     if (is_path)
     {
@@ -40,31 +56,43 @@ void child_branch(int i, t_parse_result *res, t_mini *mini,
         exit(127);
 }
 
-static void	reap_and_handle_errors(t_parse_result *res,
-	t_mini *mini, pid_t *pids)
+static int *collect_exit_codes(t_parse_result *res, pid_t *pids)
 {
-	int		status;
-	int		i;
-	int		remaining;
-	pid_t	pid;
-	int		*exit_codes;
+    int   *exit_codes;
+    int    status;
+    int    i;
+    int    remaining;
+    pid_t  pid;
 
-	remaining = res->cmd_count;
-	exit_codes = alloc_and_zero_exit_codes(res->cmd_count);
-	while (remaining > 0)
-	{
-		pid = waitpid(-1, &status, 0);
-		if (pid < 0)
-			break ;
-		i = find_pid_index(pids, pid, res->cmd_count);
-		if (i == -1)
-			continue ;
-		update_exit_code(exit_codes, i, status);
-		remaining--;
-	}
-	print_all_child_errors(res, exit_codes);
-	mini->last_status = exit_codes[res->cmd_count - 1];
-	free(exit_codes);
+    exit_codes = alloc_and_zero_exit_codes(res->cmd_count);
+    remaining = res->cmd_count;
+    while (remaining > 0)
+    {
+        pid = waitpid(-1, &status, 0);
+        if (pid < 0)
+            break ;
+        i = find_pid_index(pids, pid, res->cmd_count);
+        if (i == -1)
+            continue ;
+        update_exit_code(exit_codes, i, status);
+        remaining--;
+    }
+
+    return (exit_codes);
+}
+
+static void reap_and_handle_errors(t_parse_result *res,
+                                   t_mini *mini,
+                                   pid_t *pids)
+{
+    int  *exit_codes;
+    int   last_index;
+
+    last_index = res->cmd_count - 1;
+    exit_codes = collect_exit_codes(res, pids);
+    print_all_child_errors(res, exit_codes);
+    mini->last_status = exit_codes[last_index];
+    free(exit_codes);
 }
 
 void spawn_commands(t_parse_result *res, t_mini *mini)

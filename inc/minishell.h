@@ -52,7 +52,7 @@ typedef struct s_redirect {
 
 typedef struct s_command {
 	char    **argv;
-	t_redirect *redirs; // ALREADY ORDERED LINKED LIST
+	t_redirect *redirs;
 	int		redir_count;
 	char    *heredoc;
 	int     pipe_out;
@@ -121,7 +121,7 @@ void			print_banner(void);
 int				get_num_args(char **args);
 int				apply_redirections(t_command *cmd);
 int				is_builtin(char *cmd);
-void  			execute_builtin(t_command *cmd, t_mini *mini);
+int				execute_builtin(t_command *cmd, t_mini *mini);
 void			builtin_echo(char **args, t_mini *mini);
 void    		builtin_cd(char **args, t_mini *mini);
 void			builtin_pwd(char **args, t_mini *mini);

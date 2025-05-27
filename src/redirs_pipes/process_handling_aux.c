@@ -47,50 +47,51 @@ void	update_exit_code(int *exit_codes, int idx, int status)
 	}
 }
 
-void	print_error_for_child(char *cmdname, int code)
+void print_error_for_child(char *cmdname, int code)
 {
-	int			is_path;
-	struct stat	st;
+    int          is_path;
+    struct stat  st;
 
-	is_path = (ft_strchr(cmdname, '/') != NULL);
-	if (code == 127)
-	{
-		ft_putstr_fd(cmdname, STDERR_FILENO);
-		if (is_path)
-		{
-			if (stat(cmdname, &st) < 0)
-				ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
-			else if (S_ISDIR(st.st_mode))
-				ft_putstr_fd(": Is a directory\n", STDERR_FILENO);
-			else
-				ft_putstr_fd(": command not found\n", STDERR_FILENO);
-		}
-		else
-			ft_putstr_fd(": command not found\n", STDERR_FILENO);
-	}
-	else if (code == 126 && is_path)
-	{
-		ft_putstr_fd(cmdname, STDERR_FILENO);
-		if (stat(cmdname, &st) == 0 && S_ISDIR(st.st_mode))
-			ft_putstr_fd(": Is a directory\n", STDERR_FILENO);
-		else
-			ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
-	}
+    if (cmdname == NULL)
+        return ;
+    is_path = (ft_strchr(cmdname, '/') != NULL);
+    if (code == 127)
+    {
+        ft_putstr_fd(cmdname, STDERR_FILENO);
+        if (is_path)
+        {
+            if (stat(cmdname, &st) < 0)
+                ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
+            else if (S_ISDIR(st.st_mode))
+                ft_putstr_fd(": Is a directory\n", STDERR_FILENO);
+            else
+                ft_putstr_fd(": command not found\n", STDERR_FILENO);
+        }
+        else
+            ft_putstr_fd(": command not found\n", STDERR_FILENO);
+    }
+    else if (code == 126 && is_path)
+    {
+        ft_putstr_fd(cmdname, STDERR_FILENO);
+        if (stat(cmdname, &st) == 0 && S_ISDIR(st.st_mode))
+            ft_putstr_fd(": Is a directory\n", STDERR_FILENO);
+        else
+            ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
+    }
 }
 
-void	print_all_child_errors(t_parse_result *res, int *exit_codes)
+void print_all_child_errors(t_parse_result *res, int *exit_codes)
 {
-	int		i;
-	int		code;
-	char	*cmdname;
+    int   i;
+    int   code;
+    char *cmdname;
 
-	i = 0;
-	while (i < res->cmd_count)
-	{
-		code = exit_codes[i];
-		cmdname = res->commands[i].argv[0];
-		print_error_for_child(cmdname, code);
-		i++;
-	}
+    i = 0;
+    while (i < res->cmd_count)
+    {
+        code    = exit_codes[i];
+        cmdname = res->commands[i].argv[0];
+        print_error_for_child(cmdname, code);
+        i++;
+    }
 }
-
