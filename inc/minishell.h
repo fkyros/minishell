@@ -171,5 +171,6 @@ int				*alloc_and_zero_exit_codes(int count);
 
 // SAFE FUNCTIONS
 int				safe_chdir(char *dir);
+int				safe_dup2(int fd1, int fd2);
 
 #endif

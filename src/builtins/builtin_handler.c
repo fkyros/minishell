@@ -6,7 +6,7 @@
 /*   By: gade-oli <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/03 17:27:15 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/05/25 23:22:30 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/05/28 01:17:02 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,40 @@ int	is_builtin(char *cmd)
 		|| !ft_strcmp(cmd, "exit"));
 }
 
+static void	builtin_switch(t_command *cmd, t_mini *mini)
+{
+	if (ft_strcmp(cmd->argv[0], "cd") == 0)
+		builtin_cd(cmd->argv, mini);
+	else if (ft_strcmp(cmd->argv[0], "echo") == 0)
+		builtin_echo(cmd->argv, mini);
+	else if (ft_strcmp(cmd->argv[0], "pwd") == 0)
+		builtin_pwd(mini);
+	else if (ft_strcmp(cmd->argv[0], "env") == 0)
+		builtin_env(mini);
+	else if (ft_strcmp(cmd->argv[0], "export") == 0)
+		builtin_export(cmd->argv, mini);
+	else if (ft_strcmp(cmd->argv[0], "unset") == 0)
+		builtin_unset(cmd->argv, mini);
+	else if (ft_strcmp(cmd->argv[0], "exit") == 0)
+		builtin_exit(cmd->argv, mini);
+	else
+		mini->last_status = 127;
+}
+
+static int	return_to_original_fds(int saved_stdin, int saved_stdout)
+{
+	safe_dup2(saved_stdin, STDIN_FILENO);
+	safe_dup2(saved_stdout, STDOUT_FILENO);
+	close(saved_stdin);
+	close(saved_stdout);
+	return (1);
+}
+
 int	execute_builtin(t_command *cmd, t_mini *mini)
 {
 	int	saved_stdin;
 	int	saved_stdout;
 	int	redir_failed;
-	int	status;
 
 	saved_stdin = dup(STDIN_FILENO);
 	saved_stdout = dup(STDOUT_FILENO);
@@ -51,39 +79,10 @@ int	execute_builtin(t_command *cmd, t_mini *mini)
 		redir_failed = 1;
 	}
 	if (redir_failed)
-	{
-		if (dup2(saved_stdin, STDIN_FILENO) == -1)
-			perror("minishell: dup2");
-		if (dup2(saved_stdout, STDOUT_FILENO) == -1)
-			perror("minishell: dup2");
-		close(saved_stdin);
-		close(saved_stdout);
-		return (1);
-	}
-	if (ft_strcmp(cmd->argv[0], "cd") == 0)
-		builtin_cd(cmd->argv, mini);
-	else if (ft_strcmp(cmd->argv[0], "echo") == 0)
-		builtin_echo(cmd->argv, mini);
-	else if (ft_strcmp(cmd->argv[0], "pwd") == 0)
-		builtin_pwd(cmd->argv, mini);
-	else if (ft_strcmp(cmd->argv[0], "env") == 0)
-		builtin_env(mini);
-	else if (ft_strcmp(cmd->argv[0], "export") == 0)
-		builtin_export(cmd->argv, mini);
-	else if (ft_strcmp(cmd->argv[0], "unset") == 0)
-		builtin_unset(cmd->argv, mini);
-	else if (ft_strcmp(cmd->argv[0], "exit") == 0)
-		builtin_exit(cmd->argv, mini);
-	else
-		mini->last_status = 127;
-	status = mini->last_status;
-	if (dup2(saved_stdin, STDIN_FILENO) == -1)
-		perror("minishell: dup2");
-	if (dup2(saved_stdout, STDOUT_FILENO) == -1)
-		perror("minishell: dup2");
-	close(saved_stdin);
-	close(saved_stdout);
-	return (status);
+		return (return_to_original_fds(saved_stdin, saved_stdout));
+	builtin_switch(cmd, mini);
+	return_to_original_fds(saved_stdin, saved_stdout);
+	return (mini->last_status);
 }
 
 int	get_num_args(char **args)

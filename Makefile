@@ -6,7 +6,7 @@
 #    By: gade-oli <gade-oli@student.42madrid.c      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/29 18:07:54 by gade-oli          #+#    #+#              #
-#    Updated: 2025/05/09 19:38:40 by gade-oli         ###   ########.fr        #
+#    Updated: 2025/05/28 01:06:47 by gade-oli         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,7 +40,7 @@ SRCS = 	$(SRC_DIR)/main/main.c $(SRC_DIR)/main/utils.c ${SRC_DIR}/main/memory_ha
 		${SRC_DIR}/redirs_pipes/process_handling.c ${SRC_DIR}/redirs_pipes/redirections.c ${SRC_DIR}/redirs_pipes/pipe_handling.c \
 		${SRC_DIR}/redirs_pipes/process_handling_aux.c \
 		${SRC_DIR}/redirs_pipes/heredoc/heredoc.c ${SRC_DIR}/redirs_pipes/heredoc/heredoc_expand.c ${SRC_DIR}/redirs_pipes/heredoc/raw_delim.c \
-		${SRC_DIR}/safe_funcs/safe_chdir.c
+		${SRC_DIR}/safe_funcs/safe_chdir.c ${SRC_DIR}/safe_funcs/safe_dup2.c
 
 
 OBJS = $(SRCS:$(SRC_DIR)/%.c=bin/%.o)
