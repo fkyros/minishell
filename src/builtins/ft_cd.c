@@ -6,7 +6,7 @@
 /*   By: gade-oli <gade-oli@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/24 09:40:25 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/05/25 23:48:49 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/05/28 13:52:06 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	update_cd_vars(t_mini *mini)
 	free_array(mini->our_env);
 	mini->our_env = new_env;
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
-		perror(BOLD RED"minishell error: pwd"RST);
+		perror(BOLD RED"cd: error retrieving cwd"RST);
 	new_env = add_var_to_env(mini->our_env, "PWD", cwd);
 	free_array(mini->our_env);
 	mini->our_env = new_env;

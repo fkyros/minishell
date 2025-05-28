@@ -52,14 +52,14 @@ void setup_signals(void)
 	rl_bind_key('\f', handle_ctrl_l);
 }
 
-char *build_prompt(void)
+char *build_prompt(t_mini *mini)
 {
 	char *cwd;
 	char *base;
 	char *prompt;
 	char *tmp;
 
-	cwd = get_cwd();
+	cwd = get_cwd(mini);
 	if (cwd)
 	{
 		tmp = ft_strjoin(BOLD GREEN, cwd);
@@ -94,7 +94,7 @@ int run_prompt_loop(t_mini *mini)
 
 	while (1)
 	{
-		prompt = build_prompt();
+		prompt = build_prompt(mini);
 		set_readline_flag(1);
 		line = readline(prompt);
 		set_readline_flag(0);

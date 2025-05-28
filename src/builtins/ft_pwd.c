@@ -18,6 +18,7 @@ void	builtin_pwd(t_mini *mini)
 
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
 		perror(BOLD RED"minishell error: pwd"RST);
-	printf("%s\n", cwd);
+	if (cwd[0])
+		printf("%s\n", cwd);
 	mini->last_status = 0;
 }

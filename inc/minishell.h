@@ -113,7 +113,7 @@ void 			free_commands(t_parse_result *result);
 
 // SHELL UTILITIES
 
-char    		*get_cwd(void);
+char    		*get_cwd(t_mini *mini);
 void			print_banner(void);
 
 // BUILTINS

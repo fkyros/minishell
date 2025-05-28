@@ -1,31 +1,6 @@
 #include "../inc/minishell.h"
 
-//TODO: still necessary?
-// char	*ft_getenv(char *name, char **env)
-// {
-// 	int		i;
-// 	int		j;
-// 	char	*sub;
-
-// 	i = 0;
-// 	while (env[i])
-// 	{
-// 		j = 0;
-// 		while (env[i][j] && env[i][j] != '=')
-// 			j++;
-// 		sub = ft_substr(env[i], 0, j);
-// 		if (ft_strcmp(sub, name) == 0)
-// 		{
-// 			free(sub);
-// 			return (env[i] + j + 1);
-// 		}
-// 		free(sub);
-// 		i++;
-// 	}
-// 	return (NULL);
-// }
-
-char    *get_cwd(void)
+char    *get_cwd(t_mini *mini)
 {
         char    *cwd = malloc(MAX_CWD);
         if (!cwd)
@@ -35,9 +10,8 @@ char    *get_cwd(void)
         }
         if (!getcwd(cwd, MAX_CWD))
         {
-            perror(BOLD RED"minishell: Error trying to obtain current directory"RST);
             free(cwd);
-            exit(1);
+            cwd = ft_getenv("PWD", mini->our_env);
         }
         return (cwd);
 }
