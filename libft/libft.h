@@ -6,7 +6,7 @@
 /*   By: jorexpos <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:14:59 by jorexpos          #+#    #+#             */
-/*   Updated: 2024/09/26 10:18:14 by jorexpos         ###   ########.fr       */
+/*   Updated: 2025/05/28 13:23:42 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #ifndef LIBFT_H
@@ -23,7 +23,7 @@
 void				*ft_memset(void *b, int c, size_t len);
 size_t				ft_strlen(const char *s);
 void				ft_bzero(void *s, size_t n);
-int					ft_atoi(const char *str);
+long				ft_atoi(const char *str);
 int					ft_isalnum(int c);
 int					ft_isalpha(int c);
 int					ft_isascii(int c);

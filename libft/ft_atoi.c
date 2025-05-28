@@ -6,15 +6,15 @@
 /*   By: jorexpos <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/17 19:04:15 by jorexpos          #+#    #+#             */
-/*   Updated: 2024/09/17 19:04:19 by jorexpos         ###   ########.fr       */
+/*   Updated: 2025/05/28 13:23:29 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int	ft_atoi(const char *str)
+long	ft_atoi(const char *str)
 {
-	int	i;
-	int	neg;
-	int	res;
+	int		i;
+	int		neg;
+	long		res;
 
 	i = 0;
 	neg = 1;
