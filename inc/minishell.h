@@ -18,13 +18,13 @@
 # include "../libft/libft.h"
 
 // COLOURS!
-# define RST    "\x1b[0m" // RESET COLOUR
+# define RST    "\001\x1b[0m\002" // RESET COLOUR
 # define RED    "\x1b[31m"
-# define GREEN  "\x1b[32m"
+# define GREEN  "\001\x1b[32m\002"
 # define BLUE   "\x1b[34m"
-# define PINK   "\x1b[35m"  
+# define PINK   "\001\x1b[35m\002"  
 # define BLINK   "\x1b[5m"
-# define BOLD    "\x1b[1m"
+# define BOLD    "\001\x1b[1m\002"
 # define UNDERLINE "\x1b[4m"
 
 // QUOTE PARSER!

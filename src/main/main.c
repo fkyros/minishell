@@ -12,6 +12,21 @@ void set_readline_flag(int value)
 	g_readline_flag = value;
 }
 
+static int has_no_whitespaces(const char *s)
+{
+    int i;
+
+	i = 0;
+    while (s[i])
+    {
+        if (s[i] != ' ' && s[i] != '\t' && s[i] != '\n')
+            return (1);
+        i++;
+    }
+    return (0);
+}
+
+
 void signal_handler(int sig)
 {
 	if (sig == SIGINT)
@@ -24,32 +39,13 @@ void signal_handler(int sig)
 			rl_redisplay();
 		}
 	}
-	else if (sig == SIGWINCH)
-	{
-		if (get_readline_flag())
-			rl_redisplay();
-	}
-}
-
-int handle_ctrl_l(int count, int key)
-{
-	(void)count;
-	(void)key;
-
-	write(STDOUT_FILENO, "\033[H\033[2J", 7);
-
-	rl_replace_line("", 0);
-	rl_on_new_line();
-	rl_redisplay();
-	return (0);
 }
 
 void setup_signals(void)
 {
 	signal(SIGINT, signal_handler);
 	signal(SIGQUIT, SIG_IGN);
-	signal(SIGWINCH, signal_handler);
-	rl_bind_key('\f', handle_ctrl_l);
+	signal(SIGWINCH, SIG_IGN);
 }
 
 char *build_prompt(t_mini *mini)
@@ -104,7 +100,13 @@ int run_prompt_loop(t_mini *mini)
 			printf(PINK BOLD"\nMinishell: exiting!\n"RST);
 			return (0);
 		}
-		if (*line)
+		if (line[0] == '\f' && line[1] == '\0')
+        {
+            write(STDOUT_FILENO, "\033[H\033[2J", 7);
+            free(line);
+            continue;
+        }
+		if (has_no_whitespaces(line))
 		{
 			add_history(line);
 			parse_result = parse_commands(line, mini);
