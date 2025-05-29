@@ -74,6 +74,7 @@ typedef	struct s_mini
 	char		**our_env;
 	int			last_status;
 	int			saved_stdin;
+	int			saved_stdout;
 	t_parse_result	*parse_result;
 }	t_mini;
 
@@ -160,8 +161,7 @@ void 			execute_pipeline(t_parse_result *result, t_mini *mini);
 // --> PIPING AUX & PROCESSES
 void			open_close_pipe(t_parse_result *result, int *i, int (*pipe_fd)[2]);
 void			spawn_commands(t_parse_result *res, t_mini *mini);
-void 			child_branch(int i, t_parse_result *res, t_mini *mini, int pipes[2][2]);
-void			setup_child_io(int i, int cmd_count, int pipes[2][2], t_command *cmd);
+void			child_branch(int i, t_parse_result *res, t_mini *mini);
 void			print_all_child_errors(t_parse_result *res, int *exit_codes);
 void			print_error_for_child(char *cmdname, int code);
 void			update_exit_code(int *exit_codes, int idx, int status);

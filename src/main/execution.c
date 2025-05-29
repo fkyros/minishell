@@ -1,5 +1,18 @@
 #include "../../inc/minishell.h"
 
+static void unescape_quoted_ops(char **argv)
+{
+    int i;
+
+    i = 0;
+    while (argv[i])
+    {
+        if (argv[i][0] == '\x02')
+            ft_memmove(argv[i], argv[i] + 1, ft_strlen(argv[i]));
+        i++;
+    }
+}
+
 static void exit_if_empty_command(char **argv)
 {
     if (argv[0] && argv[0][0] == '\0')
@@ -54,14 +67,12 @@ static void exec_from_env(char **argv, char **envp)
 
 void exec_command(char **argv, char **envp)
 {
+    unescape_quoted_ops(argv);
     exit_if_empty_command(argv);
     if (!argv[0])
-        return;
-
+        return ;
     if (ft_strchr(argv[0], '/') != NULL)
         exec_if_path(argv, envp);
     else
         exec_from_env(argv, envp);
 }
-
-

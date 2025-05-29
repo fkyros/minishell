@@ -20,16 +20,25 @@ static void compact_argv(char **argv, int length)
 
 static int is_pipe(const char *token)
 {
+    if (!token)
+        return 0;
+    if (token[0] == '\x02')
+        return 0;
     return (ft_strcmp(token, "|") == 0);
 }
 
 static int is_redirection(const char *token)
 {
+    if (!token)
+        return 0;
+    if (token[0] == '\x02')
+        return 0;
     return (ft_strcmp(token, ">") == 0 ||
             ft_strcmp(token, ">>") == 0 ||
             ft_strcmp(token, "<") == 0 ||
             ft_strcmp(token, "<<") == 0);
 }
+
 
 static enum e_redirect_type get_redirection_type(const char *token)
 {

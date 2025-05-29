@@ -20,8 +20,9 @@ static char *get_next_token(const char *s, int *i, t_mini *mini)
     size_t  pos;
     int     state;
     char    c;
-    char    op_str[2];
+    char    op_str[3];
     char    *tok;
+    int     was_quoted = 0;
 
     while (s[*i] && is_whitespace(s[*i]))
         (*i)++;
@@ -29,18 +30,16 @@ static char *get_next_token(const char *s, int *i, t_mini *mini)
     {
         *i += 2;
         tok = malloc(2);
-        if (!tok)
-            exit(EXIT_FAILURE);
+        if (!tok) exit(EXIT_FAILURE);
         tok[0] = '\1';
         tok[1] = '\0';
-        return (tok);
+        return tok;
     }
     if (s[*i] == '\'' && s[*i + 1] == '\'')
     {
         *i += 2;
         tok = malloc(2);
-        if (!tok)
-            exit(EXIT_FAILURE);
+        if (!tok) exit(EXIT_FAILURE);
         tok[0] = '\1';
         tok[1] = '\0';
         return (tok);
@@ -65,22 +64,21 @@ static char *get_next_token(const char *s, int *i, t_mini *mini)
     pos   = 0;
     state = STATE_NONE;
     ft_bzero(buf, sizeof(buf));
-    while (s[*i] &&
-           (state != STATE_NONE || !is_whitespace(s[*i])))
+
+    while (s[*i] && (state != STATE_NONE || !is_whitespace(s[*i])))
     {
-        if (state == STATE_NONE
-         && (s[*i] == '<' || s[*i] == '>' || s[*i] == '|'))
+        if (state == STATE_NONE && (s[*i] == '<' || s[*i] == '>' || s[*i] == '|'))
             break ;
+
         c = s[*i];
-        if ((c == '\'' && state != STATE_DOUBLE)
-         || (c == '"'  && state != STATE_SINGLE))
+        if ((c == '\'' && state != STATE_DOUBLE) || (c == '"' && state != STATE_SINGLE))
         {
+            if (state == STATE_NONE)
+                was_quoted = 1;
             state = quote_state_after(state, c);
             (*i)++;
         }
-        else if (c == '$'
-             && state != STATE_SINGLE
-             && !is_after_heredoc(s, *i))
+        else if (c == '$' && state != STATE_SINGLE && !is_after_heredoc(s, *i))
         {
             handle_dollar(s, i, mini, buf, &pos);
         }
@@ -97,9 +95,19 @@ static char *get_next_token(const char *s, int *i, t_mini *mini)
                      STDERR_FILENO);
         return (NULL);
     }
-
-    return (ft_strdup(buf));
+    if (was_quoted && pos == 1 && (buf[0] == '|' 
+        || buf[0] == '<' || buf[0] == '>'))
+    {
+        op_str[0] = '\x02';
+        op_str[1] = buf[0];
+        op_str[2] = '\0';
+        tok = ft_strdup(op_str);
+    }
+    else
+        tok = ft_strdup(buf);
+    return (tok);
 }
+
 
 int count_tokens(const char *str)
 {

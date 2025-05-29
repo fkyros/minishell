@@ -121,6 +121,7 @@ int main(int argc, char **argv, char **env)
 {
 	t_mini *mini;
 	int		saved_stdin;
+	int		saved_stdout;
 
 	(void)argc;
 	(void)argv;
@@ -130,15 +131,18 @@ int main(int argc, char **argv, char **env)
 	if (!mini)
 		return (1);
 	saved_stdin = dup(STDIN_FILENO);
-    if (saved_stdin < 0)
+	saved_stdout = dup(STDOUT_FILENO);
+    if (saved_stdin < 0 || saved_stdout < 0)
     {
         perror("minishell: dup");
         exit(EXIT_FAILURE);
     }
     mini->saved_stdin = saved_stdin;
+	mini->saved_stdout = saved_stdout;
 	run_prompt_loop(mini);
 	free_array(mini->our_env);
 	close(mini->saved_stdin);
+	close(mini->saved_stdout);
 	free(mini);
 	return (EXIT_SUCCESS);
 }
