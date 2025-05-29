@@ -4,7 +4,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
-# include <linux/limits.h>
+# include <limits.h>
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <sys/types.h>
@@ -114,7 +114,7 @@ void 			free_commands(t_parse_result *result);
 
 // SHELL UTILITIES
 
-char    		*get_cwd(void);
+char    		*get_cwd(t_mini *mini);
 void			print_banner(void);
 
 // BUILTINS
@@ -125,7 +125,7 @@ int				is_builtin(char *cmd);
 int				execute_builtin(t_command *cmd, t_mini *mini);
 void			builtin_echo(char **args, t_mini *mini);
 void    		builtin_cd(char **args, t_mini *mini);
-void			builtin_pwd(char **args, t_mini *mini);
+void			builtin_pwd(t_mini *mini);
 void    		builtin_env(t_mini *mini);
 void			builtin_export(char **args, t_mini *mini);
 void			builtin_unset(char **args, t_mini *mini);
@@ -171,5 +171,6 @@ int				*alloc_and_zero_exit_codes(int count);
 
 // SAFE FUNCTIONS
 int				safe_chdir(char *dir);
+int				safe_dup2(int fd1, int fd2);
 
 #endif

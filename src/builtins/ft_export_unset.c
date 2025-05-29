@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins_2.c                                       :+:      :+:    :+:   */
+/*   ft_export_unset.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gade-oli <gade-oli@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 18:22:55 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/05/09 20:30:08 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/05/25 23:53:51 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "../../inc/minishell.h"
 
 static int	invalid_var_name(char *var)
 {
@@ -23,18 +23,29 @@ static int	invalid_var_name(char *var)
 		return (1);
 	while (var[i])
 	{
-		if (!ft_isalnum(var[i]) || var[i] != '_')
+		if (ft_isalnum(var[i]) == 0 && var[i] != '_')
 			return (1);
 		i++;
 	}
 	return (0);
 }
 
+static int	invalid_var_export(char *var)
+{
+	char	**name;
+	int		res;
+
+	name = ft_split(var, '=');
+	res = invalid_var_name(name[0]);
+	free_array(name);
+	return (res);
+}
+
 void	builtin_unset(char **args, t_mini *mini)
 {
-	int	i;
-	int	j;
-	int	flag;
+	int		i;
+	int		j;
+	int		flag;
 	char	**new_env;
 
 	i = 1;
@@ -46,7 +57,7 @@ void	builtin_unset(char **args, t_mini *mini)
 		if (invalid_var_name(args[i]) || !ft_strcmp(args[i], "_"))
 		{
 			i++;
-			continue;
+			continue ;
 		}
 		while (!flag && mini->our_env[j])
 		{
@@ -72,14 +83,14 @@ char	**export_args_split(char **args, int *i)
 	char	*value;
 	char	*value_str_join;
 	char	**res;
-	int	value_is_empty;
+	int		value_is_empty;
 
 	value = ft_strchr(args[*i], '=');
 	value++;
 	value_is_empty = !value || !ft_strcmp(value, "");
-	if (value_is_empty && args[*i+1] && !ft_strchr(args[*i+1], '='))
+	if (value_is_empty && args[*i + 1] && !ft_strchr(args[*i + 1], '='))
 	{
-		value_str_join = ft_strjoin(args[*i], args[*i+1]);
+		value_str_join = ft_strjoin(args[*i], args[*i + 1]);
 		res = ft_split(value_str_join, '=');
 		free(value_str_join);
 		(*i)++;
@@ -89,32 +100,32 @@ char	**export_args_split(char **args, int *i)
 	return (res);
 }
 
-
 void	builtin_export(char **args, t_mini *mini)
 {
-	int	i;
+	int		i;
 	char	**var;
 	char	**new_env;
-	int	status;
+	int		status;
 
 	status = 0;
 	i = 1;
 	if (!args[i])
 	{
 		ft_putstr_fd("no behaviour defined\n", STDERR_FILENO);
-		ft_putstr_fd("see more at https://www.man7.org/linux/man-pages/man1/export.1p.html\n", STDERR_FILENO);
 		return ;
 	}
-	while(args[i])
+	while (args[i])
 	{
 		if (!ft_strncmp(args[i], "_=", 2))
 		{
 			i++;
-			continue;
+			continue ;
 		}
-		else if (invalid_var_name(args[i]) || !ft_strchr(args[i], '='))
+		else if (args[i][0] == '=' || !ft_strchr(args[i], '=')
+			|| invalid_var_export(args[i]))
 		{
-			ft_putstr_fd("error: export with an invalid identifier\n", STDERR_FILENO);
+			ft_putstr_fd("error: export with an invalid identifier\n",
+				STDERR_FILENO);
 			status = 1;
 		}
 		else
@@ -130,61 +141,4 @@ void	builtin_export(char **args, t_mini *mini)
 		i++;
 	}
 	mini->last_status = status;
-}
-
-void	builtin_env(t_mini *mini)
-{
-	int i;
-
-	i = 0;
-	while (mini->our_env[i])
-	{
-		printf("%s\n", mini->our_env[i]);
-		i++;
-	}
-	mini->last_status = 0;
-}
-
-static int	ft_isnotnum(char *str)
-{
-	int	i;
-
-	i = 0;
-	if (str[0] == '-')
-		i++;
-	while (str[i])
-	{
-		if (!ft_isdigit(str[i]))
-			return (1);
-		i++;
-	}
-	return (0);
-}
-
-void	builtin_exit(char **args, t_mini *mini)
-{
-	int	status;
-
-	status = 0;
-	ft_putstr_fd("exit\n", STDOUT_FILENO);
-	if (args[1] && ft_isnotnum(args[1]))
-	{
-		ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
-		ft_putstr_fd(args[1], STDERR_FILENO);
-		ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
-		status = BUILTIN_MISUSE;
-	}
-	else if (get_num_args(args) > 2)
-	{
-		ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
-		mini->last_status = GENERIC_ERROR;
-		return ;
-	}
-	else if (args[1])
-		status = ft_atoi(args[1]) % 256;
-	rl_clear_history();
-	free_array(mini->our_env);
-	free_commands(mini->parse_result);
-	free(mini);
-	exit(status);
 }

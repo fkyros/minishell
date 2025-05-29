@@ -6,7 +6,7 @@
 /*   By: gade-oli <gade-oli@student.42madrid.c      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 16:00:26 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/05/09 19:24:20 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/05/26 00:01:39 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 char	*shlvl(char *lvl)
 {
-	int	nlvl;
+	int		nlvl;
 	char	**split;
 	char	*res;
 	char	*lvl_aux;
@@ -33,7 +33,7 @@ char	*shlvl(char *lvl)
 
 char	**init_env(char **old_env)
 {
-	int	i;
+	int		i;
 	char	**res;
 
 	i = 0;
@@ -59,14 +59,15 @@ char	**init_env(char **old_env)
 	return (res);
 }
 
-// var name should NOT include its '=' at the end of the name, since the function already handles that
+// var name should NOT include its '=' at the end of the name,
+// since the function already handles that
 char	*ft_getenv(char *var, char **env)
 {
 	char	*res;
-	int	i;
+	int		i;
 	char	*real_var;
-	int	size;
-	int	found;
+	int		size;
+	int		found;
 
 	if (!env || !var || !var[0])
 		return (NULL);
@@ -96,96 +97,4 @@ char	*expand(char *var, t_mini *mini)
 	if (var && ft_strncmp(var, "$", 1) == 0 && var++)
 		return (ft_getenv(var, mini->our_env));
 	return (NULL);
-}
-
-char	*create_var_env(char *name, char *value)
-{
-	char	*aux;
-	char	*res;
-
-	if (!name)
-		return (NULL);
-	aux = ft_strjoin(name, "=");
-	if (value)
-	{
-		res = ft_strjoin(aux, value);
-		free(aux);
-		return (res);
-	}
-	return (aux);
-}
-
-int	is_var_already_in_env(char *name, char *var_from_env)
-{
-	char	*real_name;
-	int 	res;
-
-	real_name = ft_strjoin(name, "=");
-	res = ft_strncmp(real_name, var_from_env, ft_strlen(real_name));
-	free(real_name);	
-	if (res == 0)
-		return (1);
-	return (0);
-}
-
-char	**add_var_to_env(char **our_env, char *name, char *value)
-{
-	int	i;
-	int	j;
-	char	**new_env;
-
-	i = 0;
-	while (our_env[i])
-		i++;
-	new_env = (char **) ft_calloc(i + 2, sizeof(char *));
-	if (!new_env)
-		return (NULL);
-	i = 0;
-	j = 0;
-	while (our_env[i])
-	{
-		if (!is_var_already_in_env(name, our_env[i]))
-		{
-			new_env[j] = ft_strdup(our_env[i]);
-			if (!new_env[j])
-				return (NULL);
-			j++;
-		}
-		i++;
-	}
-	new_env[j] = create_var_env(name, value);
-	if (!new_env[j])
-		return (NULL);
-	j++;
-	new_env[j] = NULL;
-	return (new_env);
-}
-
-char	**delete_var_from_env(char *name, char **our_env)
-{
-	char	**new_env;
-	int	i;
-	int	j;
-
-	i = 0;
-	while (our_env[i])
-		i++;
-	new_env = (char **) ft_calloc(i, sizeof(char *));
-	if (!new_env)
-		return (NULL);
-	i = 0;
-	j = 0;
-	while (our_env[i])
-	{
-		if (!is_var_already_in_env(name, our_env[i]))
-		{
-			new_env[j] = ft_strdup(our_env[i]);
-			if (!new_env[j])
-				return (NULL);
-			j++;
-		}
-		i++;
-	}
-	new_env[j] = NULL;
-	return (new_env);
 }
