@@ -1,0 +1,22 @@
+#include "../inc/minishell.h"
+
+void	signal_handler(int sig)
+{
+	if (sig == SIGINT)
+	{
+		write(STDOUT_FILENO, "\n", 1);
+		if (get_readline_flag())
+		{
+			rl_replace_line("", 0);
+			rl_on_new_line();
+			rl_redisplay();
+		}
+	}
+}
+
+void	setup_signals(void)
+{
+	signal(SIGINT, signal_handler);
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGWINCH, SIG_IGN);
+}

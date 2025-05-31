@@ -32,6 +32,7 @@ LIBFT_DIR = ./libft
 SRC_DIR = ./src
 
 SRCS = 	$(SRC_DIR)/main/main.c $(SRC_DIR)/main/utils.c ${SRC_DIR}/main/memory_handler.c ${SRC_DIR}/main/execution.c \
+		$(SRC_DIR)/main/prompt.c $(SRC_DIR)/main/signals.c \
 		$(SRC_DIR)/parsing/cmdpath.c $(SRC_DIR)/parsing/parser_aux.c $(SRC_DIR)/parsing/parser.c \
 		${SRC_DIR}/parsing/parser_quote_handler.c ${SRC_DIR}/parsing/command_parser.c \
 		${SRC_DIR}/builtins/builtin_handler.c ${SRC_DIR}/builtins/ft_cd.c ${SRC_DIR}/builtins/ft_echo.c ${SRC_DIR}/builtins/ft_env.c \

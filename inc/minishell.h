@@ -116,6 +116,12 @@ void 			free_commands(t_parse_result *result);
 
 char    		*get_cwd(t_mini *mini);
 void			print_banner(void);
+void	signal_handler(int sig);
+void	setup_signals(void);
+int	run_prompt_loop(t_mini *mini);
+int	get_readline_flag(void);
+void	set_readline_flag(int value);
+
 
 // BUILTINS
 
