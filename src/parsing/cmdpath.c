@@ -2,13 +2,13 @@
 
 int	is_valid_path(char *cmd)
 {
-	struct stat path_stat;
+	struct stat	path_stat;
 
 	if (access(cmd, X_OK) != 0)
 		return (0);
 	if (stat(cmd, &path_stat) != 0)
 		return (0);
-	return S_ISREG(path_stat.st_mode);
+	return (S_ISREG(path_stat.st_mode));
 }
 
 char	*build_full_path(char *path, char *cmd)
@@ -45,31 +45,29 @@ char	*search_in_path(char **paths, char *cmd)
 	return (NULL);
 }
 
-char *search_command(char *cmd, char **env)
+char	*search_command(char *cmd, char **env)
 {
-    char    **paths;
-    char    *path_env;
-    int      v;
+	char	**paths;
+	char	*path_env;
+	int		v;
 
-    if (!env || !cmd)
-        return (NULL);
-    if (ft_strchr(cmd, '/') != NULL)
-    {
-        v = is_valid_path(cmd);
-        if (v == -1)
-            return (ft_strdup("__DIR__"));
-        if (v)
-            return (cmd);
-        return (NULL);
-    }
-    path_env = ft_getenv("PATH", env);
-    if (!path_env)
-        return (NULL);
-    paths = ft_split(path_env, ':');
-    free(path_env);
-    if (!paths)
-        return (NULL);
-    return (search_in_path(paths, cmd));
+	if (!env || !cmd)
+		return (NULL);
+	if (ft_strchr(cmd, '/') != NULL)
+	{
+		v = is_valid_path(cmd);
+		if (v == -1)
+			return (ft_strdup("__DIR__"));
+		if (v)
+			return (cmd);
+		return (NULL);
+	}
+	path_env = ft_getenv("PATH", env);
+	if (!path_env)
+		return (NULL);
+	paths = ft_split(path_env, ':');
+	free(path_env);
+	if (!paths)
+		return (NULL);
+	return (search_in_path(paths, cmd));
 }
-
-

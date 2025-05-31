@@ -25,16 +25,15 @@ void	append_to_buf(char *buf, size_t *pos, const char *src, size_t len)
 	*pos += len;
 }
 
-void	handle_dollar(const char *s, int *i, t_mini *mini,
-	char *buf, size_t *pos)
+void	handle_dollar(t_dollar *context)
 {
 	char	*var;
 	size_t	len;
 
-	var = expand_variable(s, i, mini);
+	var = expand_variable(context->input, context->index, context->mini);
 	if (!var)
 		return ;
 	len = ft_strlen(var);
-	append_to_buf(buf, pos, var, len);
+	append_to_buf(context->buf, context->pos, var, len);
 	free(var);
 }

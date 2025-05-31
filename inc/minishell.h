@@ -78,6 +78,31 @@ typedef	struct s_mini
 	t_parse_result	*parse_result;
 }	t_mini;
 
+typedef struct s_dollar
+{
+	const char	*input;
+	int			*index;
+	t_mini		*mini;
+	char		*buf;
+	size_t		*pos;
+}	t_dollar;
+
+typedef struct s_token_detect
+{
+    const char  *input;
+    int         *index;
+}	t_token_detect;
+
+typedef struct s_word_process
+{
+    const char  *input;
+    int         *index;
+    t_mini      *mini;
+    char        *buffer;
+    size_t      *buf_pos;
+    int         *quote_st;
+    int         *flag_quoted;
+}	t_word_process;
 
 // UTILS
 
@@ -90,8 +115,7 @@ char			*expand_variable(const char *line, int *i, t_mini *mini);
 // QUOTE PARSING
 int				quote_state_after(int state, char quote);
 void			append_to_buf(char *buf, size_t *pos, const char *src, size_t len);
-void			handle_dollar(const char *s, int *i, t_mini *mini, char *buf, size_t *pos);
-
+void			handle_dollar(t_dollar *context);
 // ENV
 char			*expand(char *var, t_mini *mini);
 char			**init_env(char **old_env);
@@ -116,11 +140,11 @@ void 			free_commands(t_parse_result *result);
 
 char    		*get_cwd(t_mini *mini);
 void			print_banner(void);
-void	signal_handler(int sig);
-void	setup_signals(void);
-int	run_prompt_loop(t_mini *mini);
-int	get_readline_flag(void);
-void	set_readline_flag(int value);
+void			signal_handler(int sig);
+void			setup_signals(void);
+int				run_prompt_loop(t_mini *mini);
+int				get_readline_flag(void);
+void			set_readline_flag(int value);
 
 
 // BUILTINS
@@ -142,6 +166,19 @@ int				check_heredocs(t_parse_result *result, t_mini *mini);
 void    		close_heredocs(t_parse_result *result);
 char 			*expand_line(const char *line, t_mini *mini);
 
+// PARSING
+
+char			*detect_empty_literal(t_token_detect *tokens);
+char			*detect_double_redir(t_token_detect *tokens);
+char			*detect_single_op(t_token_detect *tokens);
+int				process_quote_or_dollar(t_word_process *words);
+void			process_normal_char(t_word_process *words);
+char			*consume_special(const char *s, int *i);
+char			*consume_word(const char *s, int *i, t_mini *mini);
+int				is_after_heredoc(const char *s, int idx);
+int				handle_operator_tokens(const char *str, int *index);
+char			*get_next_token(const char *s, int *i, t_mini *mini);
+
 // REDIRECTION PARSING
 // AUX FUNCTIONS
 int				check_unclosed_quotes(const char *str);
@@ -152,6 +189,16 @@ void			skip_quoted_section(const char *str, int *index, char quote_char);
 void			skip_unquoted_section(const char *str, int *index);
 char    		*ft_strjoin_char(const char *s1, char c);
 char			*extract_raw_heredoc_delim(const char *input, const char *eof_clean);
+int				is_pipe(const char *token);
+int				is_redirection(const char *token);
+enum e_redirect_type	get_redirection_type(const char *token);
+int				init_parse_result(const char *input, t_parse_result *result, t_mini *mini);
+void			init_command(t_command *cmd, char **argv_start, int is_first);
+int				fill_command(char **args, int *i, t_command *cmd, const char *input);
+void			compact_argv(char **argv, int length);
+int				process_fill_and_empty(t_parse_result *res, int *i, const char *input);
+int				check_extra_pipes(char **args, int i);
+int				check_invalid_pipes(t_parse_result *result, int *i);
 
 // MAIN FUNCTIONS
 void			add_redirect(t_command *cmd, enum e_redirect_type type, char *filename, char *heredoc_eof);

@@ -35,6 +35,8 @@ SRCS = 	$(SRC_DIR)/main/main.c $(SRC_DIR)/main/utils.c ${SRC_DIR}/main/memory_ha
 		$(SRC_DIR)/main/prompt.c $(SRC_DIR)/main/signals.c \
 		$(SRC_DIR)/parsing/cmdpath.c $(SRC_DIR)/parsing/parser_aux.c $(SRC_DIR)/parsing/parser.c \
 		${SRC_DIR}/parsing/parser_quote_handler.c ${SRC_DIR}/parsing/command_parser.c \
+		$(SRC_DIR)/parsing/get_next_token.c $(SRC_DIR)/parsing/get_next_token_aux.c \
+		${SRC_DIR}/parsing/command_parser_aux.c ${SRC_DIR}/parsing/get_redir_type.c ${SRC_DIR}/parsing/command_parser_errors.c \
 		${SRC_DIR}/builtins/builtin_handler.c ${SRC_DIR}/builtins/ft_cd.c ${SRC_DIR}/builtins/ft_echo.c ${SRC_DIR}/builtins/ft_env.c \
 		${SRC_DIR}/builtins/ft_exit.c ${SRC_DIR}/builtins/ft_export_unset.c ${SRC_DIR}/builtins/ft_pwd.c \
 		${SRC_DIR}/env/env.c ${SRC_DIR}/env/env_utils.c \
