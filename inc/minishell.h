@@ -164,7 +164,21 @@ void			builtin_exit(char **args, t_mini *mini);
 // HEREDOC
 int				check_heredocs(t_parse_result *result, t_mini *mini);
 void    		close_heredocs(t_parse_result *result);
+char			*append_char(char *dst, char c);
+char			*str_append(char *s1, const char *s2);
+int				check_expand(const char *str);
+char			*strip_quotes(const char *str);
+const char		*find_next_heredoc(const char *p);
+char			skip_spaces_and_get_quote(const char **q);
+int				get_bounds(const char *q, char quote, const char **start, const char **end);
+char			*extract_raw_heredoc_delim(const char *input, const char *eof_clean);
 char 			*expand_line(const char *line, t_mini *mini);
+void			print_heredoc_warning(const char *eof);
+void			write_heredoc_line(char *line, int expand, int fd, t_mini *mini);
+int				heredoc_readline(const char *eof, int expand, int fd, t_mini *mini);
+int				heredoc_fork_error(char *delim, int fd0, int fd1);
+void			heredoc_child_process(char *delim, int expand, int write_fd, t_mini *mini);
+int				heredoc_parent_after(pid_t pid, int read_fd, t_command *cmd);
 
 // PARSING
 
@@ -188,7 +202,6 @@ int				is_quote(char c);
 void			skip_quoted_section(const char *str, int *index, char quote_char);
 void			skip_unquoted_section(const char *str, int *index);
 char    		*ft_strjoin_char(const char *s1, char c);
-char			*extract_raw_heredoc_delim(const char *input, const char *eof_clean);
 int				is_pipe(const char *token);
 int				is_redirection(const char *token);
 enum e_redirect_type	get_redirection_type(const char *token);
