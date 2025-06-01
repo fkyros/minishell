@@ -54,6 +54,17 @@ static int	return_to_original_fds(int saved_stdin, int saved_stdout)
 	return (1);
 }
 
+static int	close_saved_fds(int saved_stdin, int saved_stdout, t_mini *mini)
+{
+	perror("minishell: dup");
+	if (saved_stdin >= 0)
+		close(saved_stdin);
+	if (saved_stdout >= 0)
+		close(saved_stdout);
+	mini->last_status = 1;
+	return (1);
+}
+
 int	execute_builtin(t_command *cmd, t_mini *mini)
 {
 	int	saved_stdin;
@@ -63,15 +74,7 @@ int	execute_builtin(t_command *cmd, t_mini *mini)
 	saved_stdin = dup(STDIN_FILENO);
 	saved_stdout = dup(STDOUT_FILENO);
 	if (saved_stdin < 0 || saved_stdout < 0)
-	{
-		perror("minishell: dup");
-		if (saved_stdin >= 0)
-			close(saved_stdin);
-		if (saved_stdout >= 0)
-			close(saved_stdout);
-		mini->last_status = 1;
-		return (1);
-	}
+		return (close_saved_fds(saved_stdin, saved_stdout, mini));
 	redir_failed = 0;
 	if (apply_redirections(cmd) != 0)
 	{
@@ -83,14 +86,4 @@ int	execute_builtin(t_command *cmd, t_mini *mini)
 	builtin_switch(cmd, mini);
 	return_to_original_fds(saved_stdin, saved_stdout);
 	return (mini->last_status);
-}
-
-int	get_num_args(char **args)
-{
-	int	res;
-
-	res = 0;
-	while (args[res])
-		res++;
-	return (res);
 }

@@ -38,7 +38,7 @@ SRCS = 	$(SRC_DIR)/main/main.c $(SRC_DIR)/main/utils.c ${SRC_DIR}/main/memory_ha
 		$(SRC_DIR)/parsing/get_next_token.c $(SRC_DIR)/parsing/get_next_token_aux.c \
 		${SRC_DIR}/parsing/command_parser_aux.c ${SRC_DIR}/parsing/get_redir_type.c ${SRC_DIR}/parsing/command_parser_errors.c \
 		${SRC_DIR}/builtins/builtin_handler.c ${SRC_DIR}/builtins/ft_cd.c ${SRC_DIR}/builtins/ft_echo.c ${SRC_DIR}/builtins/ft_env.c \
-		${SRC_DIR}/builtins/ft_exit.c ${SRC_DIR}/builtins/ft_export_unset.c ${SRC_DIR}/builtins/ft_pwd.c \
+		${SRC_DIR}/builtins/ft_exit.c ${SRC_DIR}/builtins/ft_export.c ${SRC_DIR}/builtins/ft_unset.c ${SRC_DIR}/builtins/ft_pwd.c \
 		${SRC_DIR}/env/env.c ${SRC_DIR}/env/env_utils.c \
 		${SRC_DIR}/redirs_pipes/process_handling.c ${SRC_DIR}/redirs_pipes/redirections.c ${SRC_DIR}/redirs_pipes/pipe_handling.c \
 		${SRC_DIR}/redirs_pipes/process_handling_aux.c ${SRC_DIR}/redirs_pipes/process_handling_aux2.c \

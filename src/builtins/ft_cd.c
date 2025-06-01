@@ -15,7 +15,7 @@
 static int	var_on_env(char *name, char **env)
 {
 	int	i;
-	int 	res;
+	int	res;
 
 	if (!name || !env)
 		return (0);
@@ -68,6 +68,16 @@ static int	cd_without_args(t_mini *mini)
 	if (safe_chdir(home) != 0)
 		error = 1;
 	return (error);
+}
+
+int	get_num_args(char **args)
+{
+	int	res;
+
+	res = 0;
+	while (args[res])
+		res++;
+	return (res);
 }
 
 void	builtin_cd(char **args, t_mini *mini)

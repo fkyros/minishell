@@ -178,6 +178,7 @@ void					builtin_pwd(t_mini *mini);
 void					builtin_env(t_mini *mini);
 void					builtin_export(char **args, t_mini *mini);
 void					builtin_unset(char **args, t_mini *mini);
+int						invalid_var_name(char *var);
 void					builtin_exit(char **args, t_mini *mini);
 
 // HEREDOC

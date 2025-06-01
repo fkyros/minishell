@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_export_unset.c                                  :+:      :+:    :+:   */
+/*   ft_export.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gade-oli <gade-oli@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,7 +12,7 @@
 
 #include "../../inc/minishell.h"
 
-static int	invalid_var_name(char *var)
+int	invalid_var_name(char *var)
 {
 	int	i;
 
@@ -41,43 +41,6 @@ static int	invalid_var_export(char *var)
 	return (res);
 }
 
-void	builtin_unset(char **args, t_mini *mini)
-{
-	int		i;
-	int		j;
-	int		flag;
-	char	**new_env;
-
-	i = 1;
-	j = 0;
-	flag = 0;
-	new_env = NULL;
-	while (args[i])
-	{
-		if (invalid_var_name(args[i]) || !ft_strcmp(args[i], "_"))
-		{
-			i++;
-			continue ;
-		}
-		while (!flag && mini->our_env[j])
-		{
-			if (is_var_already_in_env(args[i], mini->our_env[j]))
-				flag = 1;
-			j++;
-		}
-		if (flag)
-			new_env = delete_var_from_env(args[i], mini->our_env);
-		flag = 0;
-		if (new_env)
-		{
-			free_array(mini->our_env);
-			mini->our_env = new_env;
-		}
-		i++;
-	}
-	mini->last_status = 0;
-}
-
 char	**export_args_split(char **args, int *i)
 {
 	char	*value;
@@ -100,27 +63,35 @@ char	**export_args_split(char **args, int *i)
 	return (res);
 }
 
+static void	handle_export_single_var(char **args, int *i,
+				t_mini *mini, int *status)
+{
+	char	**var;
+	char	**new_env;
+
+	var = export_args_split(args, i);
+	new_env = add_var_to_env(mini->our_env, var[0], var[1]);
+	if (!new_env)
+		ft_putstr_fd("Error adding var to env\n", STDERR_FILENO);
+	free_array(var);
+	free_array(mini->our_env);
+	mini->our_env = new_env;
+	*status = 0;
+}
+
 void	builtin_export(char **args, t_mini *mini)
 {
 	int		i;
-	char	**var;
-	char	**new_env;
 	int		status;
 
 	status = 0;
 	i = 1;
 	if (!args[i])
-	{
-		ft_putstr_fd("no behaviour defined\n", STDERR_FILENO);
-		return ;
-	}
+		return (ft_putstr_fd("no behaviour defined\n", STDERR_FILENO));
 	while (args[i])
 	{
 		if (!ft_strncmp(args[i], "_=", 2))
-		{
-			i++;
-			continue ;
-		}
+			;
 		else if (args[i][0] == '=' || !ft_strchr(args[i], '=')
 			|| invalid_var_export(args[i]))
 		{
@@ -129,15 +100,7 @@ void	builtin_export(char **args, t_mini *mini)
 			status = 1;
 		}
 		else
-		{
-			var = export_args_split(args, &i);
-			new_env = add_var_to_env(mini->our_env, var[0], var[1]);
-			if (!new_env)
-				ft_putstr_fd("Error adding var to env\n", STDERR_FILENO);
-			free_array(var);
-			free_array(mini->our_env);
-			mini->our_env = new_env;
-		}
+			handle_export_single_var(args, &i, mini, &status);
 		i++;
 	}
 	mini->last_status = status;

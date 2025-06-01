@@ -41,7 +41,6 @@ static int	ft_isnotnum(char *str)
 	int	i;
 
 	i = 0;
-
 	if (!is_valid_num_input(str))
 		return (1);
 	if (str[i] == '-' || str[i] == '+')
