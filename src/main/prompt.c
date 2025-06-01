@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   prompt.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jorexpos <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/01 16:42:51 by jorexpos          #+#    #+#             */
+/*   Updated: 2025/06/01 16:42:52 by jorexpos         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../inc/minishell.h"
 
 static int	has_no_whitespaces(const char *s)
@@ -66,7 +78,7 @@ int	run_prompt_loop(t_mini *mini)
 		free(prompt);
 		if (!line)
 		{
-			//printf(PINK BOLD"\nMinishell: exiting!\n"RST);
+			printf(PINK BOLD"\nMinishell: exiting!\n"RST);
 			return (0);
 		}
 		if (line[0] == '\f' && line[1] == '\0')

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jorexpos <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/01 16:42:36 by jorexpos          #+#    #+#             */
+/*   Updated: 2025/06/01 16:42:37 by jorexpos         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../inc/minishell.h"
 
 static int	g_readline_flag = 0;
@@ -17,7 +29,7 @@ t_mini	*init_shell(char **env)
 	t_mini	*mini;
 
 	setup_signals();
-	//print_banner();
+	print_banner();
 	mini = malloc(sizeof(t_mini));
 	if (!mini)
 		return (NULL);
