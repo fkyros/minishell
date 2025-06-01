@@ -216,7 +216,6 @@ void			open_close_pipe(t_parse_result *result, int *i, int (*pipe_fd)[2]);
 void			spawn_commands(t_parse_result *res, t_mini *mini);
 void			child_branch(int i, t_parse_result *res, t_mini *mini);
 void			print_all_child_errors(t_parse_result *res, int *exit_codes);
-void			print_error_for_child(char *cmdname, int code);
 void			update_exit_code(int *exit_codes, int idx, int status);
 int				find_pid_index(pid_t *pids, pid_t pid, int count);
 int				*alloc_and_zero_exit_codes(int count);

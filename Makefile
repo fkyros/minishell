@@ -41,7 +41,7 @@ SRCS = 	$(SRC_DIR)/main/main.c $(SRC_DIR)/main/utils.c ${SRC_DIR}/main/memory_ha
 		${SRC_DIR}/builtins/ft_exit.c ${SRC_DIR}/builtins/ft_export_unset.c ${SRC_DIR}/builtins/ft_pwd.c \
 		${SRC_DIR}/env/env.c ${SRC_DIR}/env/env_utils.c \
 		${SRC_DIR}/redirs_pipes/process_handling.c ${SRC_DIR}/redirs_pipes/redirections.c ${SRC_DIR}/redirs_pipes/pipe_handling.c \
-		${SRC_DIR}/redirs_pipes/process_handling_aux.c \
+		${SRC_DIR}/redirs_pipes/process_handling_aux.c ${SRC_DIR}/redirs_pipes/process_handling_aux2.c \
 		${SRC_DIR}/redirs_pipes/heredoc/heredoc.c ${SRC_DIR}/redirs_pipes/heredoc/heredoc_expand.c ${SRC_DIR}/redirs_pipes/heredoc/raw_delim.c \
 		${SRC_DIR}/safe_funcs/safe_chdir.c ${SRC_DIR}/safe_funcs/safe_dup2.c
 
