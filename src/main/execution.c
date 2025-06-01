@@ -49,6 +49,8 @@ static void	exec_if_path(char **argv, char **envp)
 		errno = EACCES;
 		return ;
 	}
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
 	execve(argv[0], argv, envp);
 	return ;
 }
@@ -71,6 +73,8 @@ static void	exec_from_env(char **argv, char **envp)
 		free(path);
 		return ;
 	}
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
 	execve(path, argv, envp);
 	free(path);
 	return ;

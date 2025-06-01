@@ -27,6 +27,8 @@ static int	*collect_exit_codes(t_parse_result *res, pid_t *pids)
 		pid = waitpid(-1, &status, 0);
 		if (pid < 0)
 			break ;
+		if (WIFSIGNALED(status) && WTERMSIG(status) == SIGQUIT)
+			write(STDERR_FILENO, "Quit (core dumped)\n", 20);
 		i = find_pid_index(pids, pid, res->cmd_count);
 		if (i == -1)
 			continue ;

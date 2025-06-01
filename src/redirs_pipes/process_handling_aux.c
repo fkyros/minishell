@@ -6,7 +6,7 @@
 /*   By: gade-oli <gade-oli@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/01 10:52:19 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/06/01 11:01:14 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/06/01 17:04:40 by jorexpos         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,9 +63,9 @@ static void	print_error_for_child(char *cmdname, int code)
 	if (cmdname == NULL)
 		return ;
 	is_path = (ft_strchr(cmdname, '/') != NULL);
-	ft_putstr_fd(cmdname, STDERR_FILENO);
 	if (code == COMMAND_NOT_FOUND)
 	{
+		ft_putstr_fd(cmdname, STDERR_FILENO);
 		if (is_path)
 			print_path_errors(cmdname, &st);
 		else
@@ -73,6 +73,7 @@ static void	print_error_for_child(char *cmdname, int code)
 	}
 	else if (code == COMMAND_NOT_EXECUTABLE && is_path)
 	{
+		ft_putstr_fd(cmdname, STDERR_FILENO);
 		if (stat(cmdname, &st) == 0 && S_ISDIR(st.st_mode))
 			ft_putstr_fd(": Is a directory\n", STDERR_FILENO);
 		else
@@ -91,8 +92,7 @@ void	print_all_child_errors(t_parse_result *res, int *exit_codes)
 	{
 		code = exit_codes[i];
 		cmdname = res->commands[i].argv[0];
-		if (code != 0)
-			print_error_for_child(cmdname, code);
+		print_error_for_child(cmdname, code);
 		i++;
 	}
 }
