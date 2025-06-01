@@ -6,7 +6,7 @@
 /*   By: gade-oli <gade-oli@student.42madrid.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 23:35:49 by gade-oli          #+#    #+#             */
-/*   Updated: 2025/05/28 13:34:54 by gade-oli         ###   ########.fr       */
+/*   Updated: 2025/06/01 17:12:51 by gade-oli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,8 @@ void	builtin_exit(char **args, t_mini *mini)
 	ft_putstr_fd("exit\n", STDOUT_FILENO);
 	if (args[1] && ft_isnotnum(args[1]))
 	{
+		if (!ft_strcmp("--", args[1]))
+			clean_exit(mini, 0);
 		ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
 		ft_putstr_fd(args[1], STDERR_FILENO);
 		ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
