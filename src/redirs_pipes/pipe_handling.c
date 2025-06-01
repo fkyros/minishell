@@ -42,15 +42,6 @@ pid_t	*alloc_pids(int count)
 	return (pids);
 }
 
-void	create_pipe(int i, int cmd_count, int pipes[2][2])
-{
-	if (i < cmd_count - 1 && pipe(pipes[i % 2]) < 0)
-	{
-		perror("minishell: pipe");
-		exit(EXIT_FAILURE);
-	}
-}
-
 void	execute_pipeline(t_parse_result *result, t_mini *mini)
 {
 	int	interrupted;

@@ -66,7 +66,7 @@ int	run_prompt_loop(t_mini *mini)
 		free(prompt);
 		if (!line)
 		{
-			printf(PINK BOLD"\nMinishell: exiting!\n"RST);
+			//printf(PINK BOLD"\nMinishell: exiting!\n"RST);
 			return (0);
 		}
 		if (line[0] == '\f' && line[1] == '\0')

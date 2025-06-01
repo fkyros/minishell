@@ -49,6 +49,39 @@ static void	reap_and_handle_errors(t_parse_result *res,
 	free(exit_codes);
 }
 
+static void	child_fd_setup(t_parse_result *res, int prev_fd, int fd[2], int i)
+{
+	if (prev_fd != -1)
+	{
+		dup2(prev_fd, STDIN_FILENO);
+		close(prev_fd);
+	}
+	if (i < res->cmd_count - 1)
+	{
+		dup2(fd[1], STDOUT_FILENO);
+		close(fd[0]);
+		close(fd[1]);
+	}
+	if (res->commands[i].heredoc_fd != -1)
+	{
+		dup2(res->commands[i].heredoc_fd, STDIN_FILENO);
+		close(res->commands[i].heredoc_fd);
+	}
+}
+
+static void	close_and_update_fds(int *prev_fd, int i,
+				t_parse_result *res, int fd[2])
+{
+	if (*prev_fd != -1)
+		close(*prev_fd);
+	if (i < res->cmd_count - 1)
+		close(fd[1]);
+	if (i < res->cmd_count - 1)
+		*prev_fd = fd[0];
+	else
+		*prev_fd = -1;
+}
+
 void	spawn_commands(t_parse_result *res, t_mini *mini)
 {
 	pid_t	*pids;
@@ -62,47 +95,14 @@ void	spawn_commands(t_parse_result *res, t_mini *mini)
 	while (i < res->cmd_count)
 	{
 		if (i < res->cmd_count - 1)
+			safe_pipe(fd);
+		pids[i] = safe_fork();
+		if (pids[i] == 0)
 		{
-			if (pipe(fd) < 0)
-			{
-				perror("minishell: pipe");
-				exit(EXIT_FAILURE);
-			}
-			pids[i] = fork();
-			if (pids[i] < 0)
-			{
-				perror("minishell: fork");
-				exit(EXIT_FAILURE);
-			}
-			if (pids[i] == 0)
-			{
-				if (prev_fd != -1)
-				{
-					dup2(prev_fd, STDIN_FILENO);
-					close(prev_fd);
-				}
-				if (i < res->cmd_count - 1)
-				{
-					dup2(fd[1], STDOUT_FILENO);
-					close(fd[0]);
-					close(fd[1]);
-				}
-				if (res->commands[i].heredoc_fd != -1)
-				{
-					dup2(res->commands[i].heredoc_fd, STDIN_FILENO);
-					close(res->commands[i].heredoc_fd);
-				}
-				child_branch(i, res, mini);
-			}
+			child_fd_setup(res, prev_fd, fd, i);
+			child_branch(i, res, mini);
 		}
-		if (prev_fd != -1)
-			close(prev_fd);
-		if (i < res->cmd_count - 1)
-			close(fd[1]);
-		if (i < res->cmd_count - 1)
-			prev_fd = fd[0];
-		else
-			prev_fd = -1;
+		close_and_update_fds(&prev_fd, i, res, fd);
 		i++;
 	}
 	reap_and_handle_errors(res, mini, pids);

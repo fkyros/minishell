@@ -91,7 +91,8 @@ void	print_all_child_errors(t_parse_result *res, int *exit_codes)
 	{
 		code = exit_codes[i];
 		cmdname = res->commands[i].argv[0];
-		print_error_for_child(cmdname, code);
+		if (code != 0)
+			print_error_for_child(cmdname, code);
 		i++;
 	}
 }

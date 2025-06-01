@@ -17,7 +17,7 @@ t_mini	*init_shell(char **env)
 	t_mini	*mini;
 
 	setup_signals();
-	print_banner();
+	//print_banner();
 	mini = malloc(sizeof(t_mini));
 	if (!mini)
 		return (NULL);

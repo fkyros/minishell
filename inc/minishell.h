@@ -208,7 +208,6 @@ t_parse_result	parse_commands(const char *input, t_mini *mini);
 // PIPING
 void    		open_close_pipe(t_parse_result *result, int *i, int (*pipe_fd)[2]);
 pid_t			*alloc_pids(int count);
-void			create_pipe(int i, int cmd_count, int pipes[2][2]);
 void 			execute_pipeline(t_parse_result *result, t_mini *mini);
 
 // --> PIPING AUX & PROCESSES
@@ -224,5 +223,7 @@ int				*alloc_and_zero_exit_codes(int count);
 // SAFE FUNCTIONS
 int				safe_chdir(char *dir);
 int				safe_dup2(int fd1, int fd2);
+int				safe_fork();
+void			safe_pipe(int fd[2]);
 
 #endif
